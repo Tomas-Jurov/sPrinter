@@ -16,7 +16,7 @@ int main(int argc, char** argv)
   ros::Publisher lin_actuator_is_on_point_pub  = nh.advertise<std_msgs::Bool>("lin_actuator_fb/is_on_point", 1);
 
   ROSbridge::ROSBridge ros_bridge(wheels_twist_pub, stepper1_position_pub, stepper2_position_pub, servo1_angle_pub,
-                                  servo2_angle_pub, suntracker_fb_pub);
+                                  servo2_angle_pub, suntracker_fb_pub, lin_actuator_is_on_point_pub);
 
   // Parameters
   ros_bridge.loadParams(nh);
