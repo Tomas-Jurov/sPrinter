@@ -1,5 +1,6 @@
 #include "../include/printer_control.h"
 #include "../include/printer_joint_positions.h"
+#include <iostream>
 
 PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ros::Publisher& tilt_pub,
                                const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
@@ -52,7 +53,6 @@ void PrinterControl::update()
   {
     go_home_ = true;
     need_go_home_ = false;
-    lin_actuator_last_time_ = ros::Time::now();
     setAbsAndRelTargets(joint_positions_home_);
   }
 
@@ -82,6 +82,7 @@ void PrinterControl::update()
     ROS_DEBUG_STREAM("Rotating lens away from the sun");
     publishStatus(LOG_LEVEL_T::OK, "Rotating lens away from the sun");
   }
+  lin_actuator_last_time_ = ros::Time::now();
 }
 
 /// \brief Called when variable go_print_ is set.
@@ -92,7 +93,6 @@ void PrinterControl::update()
 /// If IK didn't find the solution, there is a FAILURE state set and robot does not move.
 void PrinterControl::goPrint()
 {
-  lin_actuator_last_time_ = ros::Time::now();
 
   if (need_initialize_)
   {
@@ -177,6 +177,7 @@ void PrinterControl::goPrint()
   }
 
   // on printing pos
+  ROS_DEBUG_STREAM("servos on pos: " << servosOnPos() << "steppersOnPos: " << steppersOnPos() << "lin_actuator on pose: "<< lin_actuator.is_on_pos);
   if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
   {
     publishStatus(LOG_LEVEL_T::OK, "Printer is on PRINTING position");
@@ -197,7 +198,6 @@ void PrinterControl::goPrint()
 /// If actuators are on desired position, IDLE state is returned.
 void PrinterControl::goIdle()
 {
-  lin_actuator_last_time_ = ros::Time::now();
 
   if (printer_state_ != BUSY_TO_IDLE && printer_state_ == HOME)
     printer_state_ = BUSY_TO_IDLE;
@@ -254,7 +254,6 @@ void PrinterControl::goIdle()
 /// If actuators are on desired position, IDLE state is returned.
 void PrinterControl::goHome()
 {
-  lin_actuator_last_time_ = ros::Time::now();
   if (!need_initialize_)
     need_initialize_ = true;
   if (printer_state_ != BUSY)
@@ -302,6 +301,7 @@ void PrinterControl::servo1Update(bool condition)
 /// Override servo1Update(bool condition)
 void PrinterControl::servo1Update()
 {
+  ROS_DEBUG_STREAM("Updating servo1... ");
   servo1Update(true);
 }
 
@@ -328,6 +328,7 @@ void PrinterControl::servo2Update(bool condition)
 /// Override servo2Update(bool condition)
 void PrinterControl::servo2Update()
 {
+  ROS_DEBUG_STREAM("Updating servo2... "); 
   servo2Update(true);
 }
 
@@ -388,10 +389,19 @@ void PrinterControl::stepper2Update()
 /// \brief Set error to linActuatorControl(error).
 void PrinterControl::linActuatorUpdate()
 {
+  std_msgs::Int8 msg;
   // linear motor MainFrame_pitch
   if (!lin_actuator.is_on_pos && linActuatorControl(joint_positions_abs_target_[0] - joint_positions_[0]))
   {
     lin_actuator.is_on_pos = true;
+    ROS_DEBUG("Is on spot");
+  }
+
+  if (lin_actuator.is_on_pos == true && lin_fb_is_on_point_ != true)
+  {
+    msg.data = static_cast<int8_t>(0);
+    tilt_pub_.publish(msg);
+    ros::Duration(0.025).sleep();
   }
 }
 
@@ -453,8 +463,13 @@ bool PrinterControl::linActuatorControl(double error)
     // PI controller
     ros::Duration dt = ros::Time::now() - lin_actuator_last_time_;
     integrator += error * dt.toSec();
+    ROS_DEBUG_STREAM("Dt: " << dt.toSec());
+    ROS_DEBUG_STREAM(integrator);
     u = KP_GAIN * (error) + KI_GAIN * integrator + K_DIR * (error / std::abs(error));
   }
+  ROS_DEBUG("----Lin actuator----");
+  ROS_DEBUG_STREAM(error);
+  ROS_DEBUG_STREAM(joint_positions_abs_target_[0]);
 
   // Publish msg
   msg.data = static_cast<int8_t>(u);
@@ -548,7 +563,6 @@ void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg
     ik_pose_found_ = false;
     printing_point_ = *msg;
     go_print_ = true;
-    lin_actuator_last_time_ = ros::Time::now();
     resetActuatorsStruct();
     if (printer_state_ == IDLE2)
       need_initialize_ = true;
@@ -577,14 +591,12 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
       if (printer_state_ == IDLE || printer_state_ == BUSY_TO_IDLE)
       {
         go_home_ = true;
-        lin_actuator_last_time_ = ros::Time::now();
         setAbsAndRelTargets(joint_positions_home_);
       }
       else
       {
         go_idle_ = true;
         need_go_home_ = true;
-        lin_actuator_last_time_ = ros::Time::now();
         setAbsAndRelTargets(joint_positions_idle1_);
       }
     }
@@ -602,7 +614,6 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
       ROS_DEBUG_STREAM("PrinterStateCallback: IDLE");
       setAbsAndRelTargets(joint_positions_idle1_);
       go_idle_ = true;
-      lin_actuator_last_time_ = ros::Time::now();
     }
     else
     {
@@ -619,4 +630,9 @@ void PrinterControl::jointStateCallback(const sensor_msgs::JointState::ConstPtr&
   std::vector<double>::const_iterator first = msg->position.begin() + 8;
   std::vector<double> newVec(first, msg->position.end());
   joint_positions_ = newVec;
+}
+
+void PrinterControl::linFbCallback(const std_msgs::Bool::ConstPtr& msg)
+{
+  lin_fb_is_on_point_ = msg->data;
 }

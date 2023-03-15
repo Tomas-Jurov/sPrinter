@@ -3,7 +3,7 @@
 #define ERR_TRESHOLD_ANG 0.017  // [rad]; angle tolerance
 #define ERR_TRESHOLD_POS 0.005  // [m]
 #define KP_GAIN 200
-#define KI_GAIN 20000
+#define KI_GAIN 1
 #define K_DIR 10             // the direct u in order to overcome the deadzone
 #define PRINTING_TIMEOUT 60  // [s]
 #define IDLE_TIMEOUT 5       // [s]
@@ -55,6 +55,7 @@ public:
   void targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg);
   void printerStateCallback(const std_msgs::Int8::ConstPtr& msg);
   void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg);
+  void linFbCallback(const std_msgs::Bool::ConstPtr& msg);
 
   /*methods*/
   void update();
@@ -85,6 +86,7 @@ private:
   geometry_msgs::PoseStamped printing_pose_;
   ros::Time printing_start_timestamp_, idle_start_timestamp_, lin_actuator_last_time_;
   int counter_printing_point_;
+  bool lin_fb_is_on_point_ = false;
 
   /*fcn*/
   void setAbsAndRelTargets(std::vector<double> target_absolute);
