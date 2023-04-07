@@ -33,3 +33,8 @@
 
 # IDE enviroment settings
 .vscode/*
+
+# ROS
+ROS_ws/build/*
+ROS_ws/devel/*
+ROS_ws/logs/*
