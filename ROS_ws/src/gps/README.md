@@ -1,7 +1,7 @@
 # GPS package
 
 ## Description
-Get a location message in ROS from the Altix GPS using the Alink USB to serial converter.
+Provides location messages in ROS from the Altix GPS using the Alink USB to serial converter.
 
 ## Hardware dependencies
 * Alink USB to serial converter
@@ -47,8 +47,10 @@ Get a location message in ROS from the Altix GPS using the Alink USB to serial c
     $ sudo chmod +x gps_install.sh
     $ ./gps_install.sh
     ```
-3. Launch using launchfile
+
+## Usage
+* Launch using launchfile
     ```
     $ roslaunch gps gps.launch
-    ```
-4. The GPS position data is published on the `/fix` ([sensor_msgs/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)) topic
+    ```  
+* The GPS position data is published on the `/fix` ([sensor_msgs/NavSatFix](http://docs.ros.org/en/api/sensor_msgs/html/msg/NavSatFix.html)) topic
