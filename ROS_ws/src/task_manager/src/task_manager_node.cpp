@@ -2,19 +2,19 @@
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "task_manager");
-    ros::NodeHandle nh;
+  ros::init(argc, argv, "task_manager");
+  ros::NodeHandle nh;
 
-    ros::Publisher vehicle_pub = nh.advertise<geometry_msgs::Pose2D>("target/vehicle/cmd", 1);
-    ros::Publisher printer_pub = nh.advertise<geometry_msgs::Point>("target/printer/cmd", 1);
-    
-    TaskManager task_manager(vehicle_pub, printer_pub);
+  ros::Publisher vehicle_pub = nh.advertise<geometry_msgs::Pose2D>("target/vehicle/cmd", 1);
+  ros::Publisher printer_pub = nh.advertise<geometry_msgs::Point>("target/printer/cmd", 1);
 
-    ros::Subscriber vehicle_sub = nh.subscribe("target/vehicle/reached", 1, &TaskManager::vehicleFeedback, &task_manager);
-    ros::Subscriber printer_sub = nh.subscribe("target/printer/reached", 1, &TaskManager::printerFeedback, &task_manager);
+  TaskManager task_manager(vehicle_pub, printer_pub);
 
-    while (nh.ok())
-    {
-        ros::spinOnce();
-    }
+  ros::Subscriber vehicle_sub = nh.subscribe("target/vehicle/reached", 1, &TaskManager::vehicleFeedback, &task_manager);
+  ros::Subscriber printer_sub = nh.subscribe("target/printer/reached", 1, &TaskManager::printerFeedback, &task_manager);
+
+  while (nh.ok())
+  {
+    ros::spinOnce();
+  }
 }
