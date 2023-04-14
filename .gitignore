@@ -32,9 +32,10 @@
 *.app
 
 # IDE enviroment settings
-.vscode/*
+.vscode/
 
 # ROS
-ROS_ws/build/*
-ROS_ws/devel/*
-ROS_ws/logs/*
+ROS_ws/.catkin_tools/
+ROS_ws/build/
+ROS_ws/devel/
+ROS_ws/logs/
