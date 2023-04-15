@@ -15,9 +15,7 @@
 class StateEstimation
 {
 public:
-  StateEstimation(const ros::Publisher& odom_pub) : odom_pub_(odom_pub)
-  {
-  }
+  StateEstimation(const ros::Publisher& odom_pub);
   ~StateEstimation() = default;
 
   void Do();

@@ -1,5 +1,10 @@
 #include "../include/state_estimation.h"
 
+StateEstimation::StateEstimation(const ros::Publisher& odom_pub) 
+: odom_pub_(odom_pub)
+{
+}
+
 void StateEstimation::Do()
 {
 }

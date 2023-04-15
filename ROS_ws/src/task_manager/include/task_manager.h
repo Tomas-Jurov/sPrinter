@@ -8,10 +8,7 @@
 class TaskManager
 {
 public:
-  TaskManager(const ros::Publisher& vehicle_target_pub, const ros::Publisher& printer_target_pub)
-    : vehicle_target_pub_(vehicle_target_pub), printer_target_pub_(printer_target_pub)
-  {
-  }
+  TaskManager(const ros::Publisher& vehicle_target_pub, const ros::Publisher& printer_target_pub);
   ~TaskManager() = default;
 
   void Do();

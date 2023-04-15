@@ -1,5 +1,25 @@
 #include "../include/ros_bridge.h"
 
+ROSBridge::ROSBridge(const ros::Publisher& encoders_left_pub, const ros::Publisher& encoders_right_pub,
+    			const ros::Publisher& encoders_location_pub, const ros::Publisher& imu_pub, const ros::Publisher& tilt_pub,
+    			const ros::Publisher& stepper1_idle_pub, const ros::Publisher& stepper2_idle_pub,
+    			const ros::Publisher& stepper1_current_pub, const ros::Publisher& stepper2_current_pub,
+    			const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub, const ros::Publisher& suntracker_fb_pub)
+: encoders_left_pub_(encoders_left_pub)
+, encoders_right_pub_(encoders_right_pub)
+, encoders_location_pub_(encoders_location_pub)
+, imu_pub_(imu_pub)
+, tilt_pub_(tilt_pub)
+, stepper1_idle_pub_(stepper1_idle_pub)
+, stepper2_idle_pub_(stepper2_idle_pub)
+, stepper1_current_pub_(stepper1_current_pub_)
+, stepper2_current_pub_(stepper2_current_pub)
+, servo1_pub_(servo1_pub)
+, servo2_pub_(servo2_pub)
+, suntracker_fb_pub_(suntracker_fb_pub)
+{
+}
+
 void ROSBridge::Do()
 {
 }

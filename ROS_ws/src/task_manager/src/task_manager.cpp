@@ -1,5 +1,10 @@
 #include "../include/task_manager.h"
 
+TaskManager::TaskManager(const ros::Publisher& vehicle_target_pub, const ros::Publisher& printer_target_pub)
+: vehicle_target_pub_(vehicle_target_pub), printer_target_pub_(printer_target_pub)
+{
+}
+
 void TaskManager::Do()
 {
   geometry_msgs::Pose2D vehicle_target;
