@@ -2,6 +2,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/Empty.h>
+#include <std_msgs/Bool.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Int32.h>
@@ -21,9 +22,9 @@ public:
 
   // Callbacks
   void targetCmdCallback(const geometry_msgs::Point& msg);
-  void stepper1Callback(const std_msgs::Empty& msg);
-  void stepper2Callback(const std_msgs::Empty& msg);
-  void suntrackerCallback(const std_msgs::Empty& msg);
+  void stepper1Callback(const std_msgs::Bool& msg);
+  void stepper2Callback(const std_msgs::Bool& msg);
+  void suntrackerCallback(const std_msgs::Bool& msg);
 
   void Do();
 

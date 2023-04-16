@@ -10,13 +10,13 @@ int main(int argc, char** argv)
   ros::Publisher encoders_location_pub = nh.advertise<geometry_msgs::Pose2D>("wheels/encoders/location", 1);
   ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
   ros::Publisher tilt_pub = nh.advertise<std_msgs::Int8>("tilt/cmd_speed", 1);
-  ros::Publisher stepper1_idle_pub = nh.advertise<std_msgs::Empty>("stepper1/idle", 1);
-  ros::Publisher stepper2_idle_pub = nh.advertise<std_msgs::Empty>("stepper2/idle", 1);
+  ros::Publisher stepper1_idle_pub = nh.advertise<std_msgs::Bool>("stepper1/busy", 1);
+  ros::Publisher stepper2_idle_pub = nh.advertise<std_msgs::Bool>("stepper2/busy", 1);
   ros::Publisher stepper1_current_pub = nh.advertise<std_msgs::Int32>("stepper1/currnet_steps", 1);
   ros::Publisher stepper2_current_pub = nh.advertise<std_msgs::Int32>("stepper2/currnet_steps", 1);
   ros::Publisher servo1_pub = nh.advertise<std_msgs::Int16>("servo1/current_angle", 1);
   ros::Publisher servo2_pub = nh.advertise<std_msgs::Int16>("servo2/current_angle", 1);
-  ros::Publisher suntracker_fb_pub = nh.advertise<std_msgs::Empty>("suntracker/done", 1);
+  ros::Publisher suntracker_fb_pub = nh.advertise<std_msgs::Bool>("suntracker/done", 1);
 
   ROSBridge ros_bridge(encoders_left_pub, encoders_right_pub, encoders_location_pub, imu_pub, tilt_pub,
                        stepper1_idle_pub, stepper2_idle_pub, stepper1_current_pub, stepper2_current_pub, servo1_pub,

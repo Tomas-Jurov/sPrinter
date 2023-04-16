@@ -20,8 +20,8 @@ int main(int argc, char** argv)
 
   ros::Subscriber target_cmd_sub =
       nh.subscribe("target/printer/cmd", 1, &PrinterControl::targetCmdCallback, &printer_control);
-  ros::Subscriber stepper1_sub = nh.subscribe("stepper1/idle", 1, &PrinterControl::stepper1Callback, &printer_control);
-  ros::Subscriber stepper2_sub = nh.subscribe("stepper2/idle", 1, &PrinterControl::stepper2Callback, &printer_control);
+  ros::Subscriber stepper1_sub = nh.subscribe("stepper1/busy", 1, &PrinterControl::stepper1Callback, &printer_control);
+  ros::Subscriber stepper2_sub = nh.subscribe("stepper2/busy", 1, &PrinterControl::stepper2Callback, &printer_control);
   ros::Subscriber suntracker_sub =
       nh.subscribe("suntracker/done", 1, &PrinterControl::suntrackerCallback, &printer_control);
 
