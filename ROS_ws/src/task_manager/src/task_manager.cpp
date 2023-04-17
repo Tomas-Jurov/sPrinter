@@ -1,25 +1,15 @@
 #include "../include/task_manager.h"
 
-TaskManager::TaskManager(const ros::Publisher& vehicle_target_pub, const ros::Publisher& printer_target_pub)
-: vehicle_target_pub_(vehicle_target_pub), printer_target_pub_(printer_target_pub)
+TaskManager::TaskManager(const ros::ServiceClient& pose_cmd_client, const ros::ServiceClient& printer_cmd_client,
+                        const ros::ServiceClient& gps_orientation_client)
+: pose_target_client_(pose_cmd_client), printer_target_client_(printer_cmd_client), gps_robot_orientation_client_(gps_orientation_client)
 {
 }
 
 void TaskManager::Do()
 {
-  geometry_msgs::Pose2D vehicle_target;
-  geometry_msgs::Point printer_target;
-
+  
   /* ... */
 
-  vehicle_target_pub_.publish(vehicle_target);
-  printer_target_pub_.publish(printer_target);
-}
-
-void TaskManager::vehicleFeedback(const std_msgs::Empty& msg)
-{
-}
-
-void TaskManager::printerFeedback(const std_msgs::Empty& msg)
-{
+  
 }

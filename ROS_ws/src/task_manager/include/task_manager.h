@@ -1,22 +1,19 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <std_msgs/Empty.h>
-#include <geometry_msgs/Point.h>
-#include <geometry_msgs/Pose2D.h>
+#include <sprinter_srvs/SetPoseTarget.h>
+#include <sprinter_srvs/SetPrinterTarget.h>
+#include <std_srvs/Trigger.h>
 
 class TaskManager
 {
 public:
-  TaskManager(const ros::Publisher& vehicle_target_pub, const ros::Publisher& printer_target_pub);
+  TaskManager(const ros::ServiceClient& pose_cmd_client, const ros::ServiceClient& printer_cmd_client,
+              const ros::ServiceClient& gps_orientation_client);
   ~TaskManager() = default;
 
   void Do();
 
-  // Callbacks
-  void vehicleFeedback(const std_msgs::Empty& msg);
-  void printerFeedback(const std_msgs::Empty& msg);
-
 private:
-  ros::Publisher vehicle_target_pub_, printer_target_pub_;
+  ros::ServiceClient pose_target_client_, printer_target_client_, gps_robot_orientation_client_;
 };

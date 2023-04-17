@@ -1,6 +1,7 @@
 # sPrinter ROS workspace
 
 ### Packages list
+* [sprinter_control](./src/sprinter_control/README.md)
 * [task_manager](./src/task_manager/README.md)
 * [pose_control](./src/pose_control/README.md)
 * [printer_control](./src/printer_control/README.md)
@@ -21,6 +22,17 @@ sPrinter/ROS_ws
   | |_README.md                 -- describe the package here
 ```
 
+## Prerequisities
+* python catkin tools (required by catkin build)
+    ```bash
+        sudo apt install python3-catkin-tools
+    ```
+* nmea navsat driver (required by GPS module)
+    ``` bash
+        sudo chmod +x ./src/gps/gps_install.sh
+        ./gps/src/gps_install.sh
+    ```
+
 ## Build
 * build one package
     ```
@@ -32,12 +44,6 @@ sPrinter/ROS_ws
     $ catkin build
     ```
 
-* Note 1: catkin build requires python catkin tools installed (`sudo apt install python3-catkin-tools`)  
-* Note 2: before building the whole workspace, follow [Install dependencies for GPS](./src/gps/README.md) steps or run
-    ```
-    $ catkin config --skiplist gps
-    ``` 
-
 ## Launch
 * Run single node (example)
     ```
@@ -45,4 +51,4 @@ sPrinter/ROS_ws
     $ rosrun task_manager task_manager
     ```
 * Run multiple nodes  
-    See [sprinter/README.md](./src/sprinter/README.md)
+    See [sprinter_control/README.md](./src/sprinter_control/README.md)

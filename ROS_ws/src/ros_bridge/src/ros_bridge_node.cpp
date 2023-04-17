@@ -16,11 +16,10 @@ int main(int argc, char** argv)
   ros::Publisher stepper2_current_pub = nh.advertise<std_msgs::Int32>("stepper2/currnet_steps", 1);
   ros::Publisher servo1_pub = nh.advertise<std_msgs::Int16>("servo1/current_angle", 1);
   ros::Publisher servo2_pub = nh.advertise<std_msgs::Int16>("servo2/current_angle", 1);
-  ros::Publisher suntracker_fb_pub = nh.advertise<std_msgs::Bool>("suntracker/done", 1);
-
+  
   ROSBridge ros_bridge(encoders_left_pub, encoders_right_pub, encoders_location_pub, imu_pub, tilt_pub,
                        stepper1_idle_pub, stepper2_idle_pub, stepper1_current_pub, stepper2_current_pub, servo1_pub,
-                       servo2_pub, suntracker_fb_pub);
+                       servo2_pub);
 
   ros::Subscriber left_speed_target_sub =
       nh.subscribe("wheels/cmd/left_speed", 1, &ROSBridge::leftSpeedTargetCallback, &ros_bridge);
@@ -40,7 +39,7 @@ int main(int argc, char** argv)
       nh.subscribe("servo1/target_angle", 1, &ROSBridge::servo1TargetCallback, &ros_bridge);
   ros::Subscriber servo2_target_sub =
       nh.subscribe("servo2/target_angle", 1, &ROSBridge::servo2TargetCallback, &ros_bridge);
-  ros::Subscriber suntracker_cmd_sub = nh.subscribe("suntracker/do", 1, &ROSBridge::suntrackerCmdCallback, &ros_bridge);
+  ros::ServiceServer suntracker_cmd_sub = nh.advertiseService("suntracker/lens_target_orientation", &ROSBridge::suntrackerCallback, &ros_bridge);
 
   while (nh.ok())
   {

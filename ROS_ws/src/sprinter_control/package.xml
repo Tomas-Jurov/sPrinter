@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sprinter</name>
+  <name>sprinter_control</name>
   <version>0.0.0</version>
-  <description>The sprinter package</description>
+  <description>The sprinter_control package</description>
 
   <maintainer email="todo@todo.todo">todo</maintainer>
 
