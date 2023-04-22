@@ -30,10 +30,6 @@ int main(int argc, char** argv)
   ros::Rate looprate(100);
   while (nh.ok())
   {
-    /*nav_msgs::Odometry msg;
-    msg.pose.pose.orientation.x = 5;
-    msg.pose.pose.position.x = 5;
-    odom_pub.publish(msg);*/
     state_estimation.update();
     ros::spinOnce();
     state_estimation.Do();

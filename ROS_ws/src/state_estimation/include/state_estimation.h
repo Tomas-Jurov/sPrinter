@@ -42,6 +42,7 @@ public:
 private:
   void publishOdomMsg();
   void publishTFMsg();
+  geometry_msgs::Quaternion createQuaternionMsgFromYaw(double &theta);
 
 private:
   // Publishers and broadcasters
