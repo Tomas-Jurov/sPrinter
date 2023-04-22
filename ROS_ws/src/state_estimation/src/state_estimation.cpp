@@ -11,8 +11,8 @@ void StateEstimation::update()
 {
   current_time_ = ros::Time::now();
 
-  publishOdomMsg();
   publishTFMsg();
+  publishOdomMsg();
 
   last_time_ = current_time_;
 }
@@ -23,9 +23,8 @@ void StateEstimation::publishOdomMsg()
   double vel_x = R*(right_velocity_.data + left_velocity_.data)/2;
   double vel_theta = R*(right_velocity_.data - left_velocity_.data)/B;
 
-  tf2::Quaternion q;
-  q.setRPY(0, 0, odom_.theta);
-  geometry_msgs::Quaternion odom_quat = tf2::toMsg(q);
+  // Create quaternion from yaw data
+  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(odom_.theta);
 
   //next, we'll publish the odometry message over ROS
   nav_msgs::Odometry odom;
@@ -36,7 +35,7 @@ void StateEstimation::publishOdomMsg()
   odom.pose.pose.position.x = odom_.x;
   odom.pose.pose.position.y = odom_.y;
   odom.pose.pose.position.z = 0.0;
-  odom.pose.pose.orientation = odom_quat;
+  odom.pose.pose.orientation = odom_quaternion;
 
   //set the velocity
   odom.child_frame_id = "base_link";
@@ -50,9 +49,8 @@ void StateEstimation::publishOdomMsg()
 
 void StateEstimation::publishTFMsg()
 {
-  tf2::Quaternion q;
-  q.setRPY(0, 0, odom_.theta);
-  geometry_msgs::Quaternion odom_quat = tf2::toMsg(q);
+  // Create quaternion from yaw data
+  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(odom_.theta);
 
   //first, we'll publish the transform over tf
   geometry_msgs::TransformStamped odom_trans;
@@ -60,12 +58,22 @@ void StateEstimation::publishTFMsg()
   odom_trans.header.frame_id = "odom";
   odom_trans.child_frame_id = "base_link";
 
+  //set the position
   odom_trans.transform.translation.x = odom_.x;
   odom_trans.transform.translation.y = odom_.y;
   odom_trans.transform.translation.z = 0.0;
-  odom_trans.transform.rotation = odom_quat;
+  odom_trans.transform.rotation = odom_quaternion;
 
   tf_broadcaster_.sendTransform(odom_trans);
+}
+
+geometry_msgs::Quaternion StateEstimation::createQuaternionMsgFromYaw(double &theta)
+{
+  tf2::Quaternion q;
+  q.setRPY(0, 0, theta);
+  geometry_msgs::Quaternion odom_quaternion = tf2::toMsg(q);
+
+  return odom_quaternion;
 }
 
 void StateEstimation::encodersLeftCallback(const std_msgs::Int8& msg)
