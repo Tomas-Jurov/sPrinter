@@ -27,9 +27,12 @@ int main(int argc, char** argv)
   ros::Subscriber servo2_sub =
       nh.subscribe("servo2/current_angle", 1, &StateEstimation::servo2Callback, &state_estimation);
 
+	// set the rate of TF publishing
+  ros::Rate looprate(100);
   while (nh.ok())
   {
     state_estimation.update();
     ros::spinOnce();
+		looprate.sleep();
   }
 }

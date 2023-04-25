@@ -4,7 +4,6 @@ StateEstimation::StateEstimation(const ros::Publisher& odom_pub)
 : odom_pub_(odom_pub)
 {
   current_time_ = ros::Time::now();
-  last_time_ = ros::Time::now();
 }
 
 void StateEstimation::update()
@@ -13,8 +12,6 @@ void StateEstimation::update()
 
   publishTFMsg();
   publishOdomMsg();
-
-  last_time_ = current_time_;
 }
 
 void StateEstimation::publishOdomMsg()
@@ -30,6 +27,7 @@ void StateEstimation::publishOdomMsg()
   nav_msgs::Odometry odom;
   odom.header.stamp = current_time_;
   odom.header.frame_id = "odom";
+  odom.child_frame_id = "base_link";
 
   //set the position
   odom.pose.pose.position.x = odom_.x;
@@ -38,7 +36,6 @@ void StateEstimation::publishOdomMsg()
   odom.pose.pose.orientation = odom_quaternion;
 
   //set the velocity
-  odom.child_frame_id = "base_link";
   odom.twist.twist.linear.x = vel_x;
   odom.twist.twist.linear.y = 0.0;
   odom.twist.twist.angular.z = vel_theta;
