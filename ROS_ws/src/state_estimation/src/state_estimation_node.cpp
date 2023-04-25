@@ -27,12 +27,23 @@ int main(int argc, char** argv)
   ros::Subscriber servo2_sub =
       nh.subscribe("servo2/current_angle", 1, &StateEstimation::servo2Callback, &state_estimation);
 
+<<<<<<< HEAD
   ros::Rate looprate(100);
+||||||| parent of 91d5b2e (Set rate for state_estimation node - latency problem fixed)
+=======
+	// set the rate of TF publishing
+  ros::Rate looprate(100);
+>>>>>>> 91d5b2e (Set rate for state_estimation node - latency problem fixed)
   while (nh.ok())
   {
     state_estimation.update();
     ros::spinOnce();
+<<<<<<< HEAD
     state_estimation.Do();
     looprate.sleep();
+||||||| parent of 91d5b2e (Set rate for state_estimation node - latency problem fixed)
+=======
+		looprate.sleep();
+>>>>>>> 91d5b2e (Set rate for state_estimation node - latency problem fixed)
   }
 }
