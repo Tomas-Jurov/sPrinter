@@ -11,8 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_service_files(
   FILES
-  SetPoseTarget.srv
-  SetPrinterTarget.srv
   GetOrientation.srv
 )
 
