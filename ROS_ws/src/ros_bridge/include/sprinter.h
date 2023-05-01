@@ -20,7 +20,6 @@ namespace sprinter
   private:
     bool readStateOfSprinter(Returns *data);
     bool writeParameters(uint8_t command, bytePtr data, size_t data_size);
-    bool checkHeader(const Header& header, uint8_t header_func);
     uint32_t crc32(const bytePtr data, size_t length);
 
   private:

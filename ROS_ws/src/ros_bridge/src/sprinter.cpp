@@ -1,4 +1,5 @@
 #include "../include/sprinter.h"
+#include <iostream>
 
 sprinter::Sprinter::Sprinter(const std::string& port_name, uint32_t baud_rate)
 : port_name_(port_name)
@@ -46,6 +47,7 @@ bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns *data)
   size_t crc_size = sizeof(uint32_t);
 
   ssize_t read_header_bytes = serial_port_->read(data_packet.messsage, header_size);
+
   if (read_header_bytes != static_cast<ssize_t>(header_size))
   {
     return 1;
@@ -55,15 +57,14 @@ bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns *data)
   size_t expected_data_size = sizeof(Returns);
   size_t read_data_bytes = serial_port_->read(data_packet.messsage + header_size, data_size + crc_size); 
 
-  if (read_data_bytes < (data_size + crc_size))
+  if (read_data_bytes < (data_size + crc_size) || expected_data_size != data_size || (read_data_bytes - crc_size) != expected_data_size)
   {
     return 1;
   }
 
-  auto result = checkHeader(data_packet.header, READ_RETURNS);
-  if (result != 0)
+  if (data_packet.header.header_func != READ_RETURNS)
   {
-    return result;
+    return 1;
   }
 
   uint32_t crc = crc32(data_packet.messsage, header_size + data_size);
@@ -75,7 +76,7 @@ bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns *data)
     return 1;
   }
 
-  memcpy((bytePtr)data, data_packet.messsage + header_size, expected_data_size < data_size ? expected_data_size : data_size);  
+  memcpy((bytePtr)data, data_packet.messsage + header_size, data_size);  
 
   return 0;
 }
@@ -103,15 +104,6 @@ bool sprinter::Sprinter::writeParameters(uint8_t command, bytePtr data, size_t d
       return 1;
   }
 
-  return 0;
-}
-
-bool sprinter::Sprinter::checkHeader(const sprinter::Header& header, uint8_t header_func)
-{
-  if (header.header_func != header_func)
-  {
-    return 1;
-  }
   return 0;
 }
 
