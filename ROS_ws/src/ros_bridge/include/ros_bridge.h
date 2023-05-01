@@ -13,11 +13,7 @@
 class ROSBridge
 {
 public:
-  ROSBridge(const ros::Publisher& encoders_left_pub, const ros::Publisher& encoders_right_pub,
-            const ros::Publisher& encoders_location_pub, const ros::Publisher& imu_pub,
-            const ros::Publisher& stepper1_current_pub, const ros::Publisher& stepper2_current_pub,
-            const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub, const ros::Publisher& suntracker_fb_pub,
-            const std::string& port_name, const uint32_t baud_rate);
+  ROSBridge(ros::NodeHandle* nh);
   ~ROSBridge() = default;
 
   void setup();
@@ -36,8 +32,19 @@ public:
   void suntrackerCmdCallback(const std_msgs::Empty& msg);
 
 private:
-  ros::Publisher encoders_left_pub_, encoders_right_pub_, encoders_location_pub_, imu_pub_, stepper1_current_pub_, stepper2_current_pub_, servo1_pub_, servo2_pub_,
-      suntracker_fb_pub_;
+  bool getParameters();
+
+private:
+  ros::NodeHandle *nh_;
+  ros::Publisher encoders_left_pub_, encoders_right_pub_, encoders_location_pub_,
+                 imu_pub_, stepper1_current_pub_, stepper2_current_pub_, 
+                 servo1_pub_, servo2_pub_, suntracker_fb_pub_;
+  ros::Subscriber left_speed_target_sub_, right_speed_target_sub_, tilt_speed_target_sub_, 
+                  stepper1_speed_sub_, stepper2_speed_sub_, stepper1_target_sub_,
+                  stepper2_target_sub_, servo1_target_sub_, servo2_target_sub_, suntracker_cmd_sub_; 
+
+  std::string port_name_;
+  int baud_rate_;
   std::unique_ptr<sprinter::Sprinter> sprinter_;
   sprinter::SpeedOfWheels speed_of_wheels_;
   sprinter::Returns returns_;
