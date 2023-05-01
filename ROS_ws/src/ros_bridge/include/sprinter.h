@@ -9,7 +9,7 @@ namespace sprinter
   {
   public:
     Sprinter() = delete;
-    Sprinter(const std::string& port_name="dev/tty/ACM0", uint32_t baud_rate=230400);
+    Sprinter(const std::string& port_name="dev/tty/ACM0", const uint32_t baud_rate=230400);
     ~Sprinter() = default;
     bool connect();
     bool disconnect();

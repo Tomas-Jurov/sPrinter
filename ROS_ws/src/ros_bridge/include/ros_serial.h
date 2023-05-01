@@ -15,7 +15,7 @@ namespace sprinter{
   class SerialPort{
   public:
     SerialPort() = delete;
-    SerialPort(const std::string& port_name, uint32_t baud_rate);
+    SerialPort(const std::string& port_name, const uint32_t baud_rate);
     ~SerialPort() = default;
 
     void open();

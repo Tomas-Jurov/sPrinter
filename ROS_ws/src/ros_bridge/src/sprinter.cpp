@@ -1,7 +1,7 @@
 #include "../include/sprinter.h"
 #include <iostream>
 
-sprinter::Sprinter::Sprinter(const std::string& port_name, uint32_t baud_rate)
+sprinter::Sprinter::Sprinter(const std::string& port_name, const uint32_t baud_rate)
 : port_name_(port_name)
 , baud_rate_(baud_rate)
 {
