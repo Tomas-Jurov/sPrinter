@@ -3,25 +3,40 @@
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "ros_bridge");
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("~");
+
+  ros::Rate loop_rate(230400);
 
   ros::Publisher encoders_left_pub = nh.advertise<std_msgs::Int8>("wheels/encoders/left_speed", 1);
   ros::Publisher encoders_right_pub = nh.advertise<std_msgs::Int8>("wheels/encoders/right_speed", 1);
   ros::Publisher encoders_location_pub = nh.advertise<geometry_msgs::Pose2D>("wheels/encoders/location", 1);
   ros::Publisher imu_pub = nh.advertise<sensor_msgs::Imu>("imu/data", 1);
-  ros::Publisher tilt_pub = nh.advertise<std_msgs::Int8>("tilt/cmd_speed", 1);
-  ros::Publisher stepper1_idle_pub = nh.advertise<std_msgs::Empty>("stepper1/idle", 1);
-  ros::Publisher stepper2_idle_pub = nh.advertise<std_msgs::Empty>("stepper2/idle", 1);
-  ros::Publisher stepper1_current_pub = nh.advertise<std_msgs::Int32>("stepper1/currnet_steps", 1);
-  ros::Publisher stepper2_current_pub = nh.advertise<std_msgs::Int32>("stepper2/currnet_steps", 1);
+  ros::Publisher stepper1_current_pub = nh.advertise<std_msgs::Int32>("stepper1/current_steps", 1);
+  ros::Publisher stepper2_current_pub = nh.advertise<std_msgs::Int32>("stepper2/current_steps", 1);
   ros::Publisher servo1_pub = nh.advertise<std_msgs::Int16>("servo1/current_angle", 1);
   ros::Publisher servo2_pub = nh.advertise<std_msgs::Int16>("servo2/current_angle", 1);
-  ros::Publisher suntracker_fb_pub = nh.advertise<std_msgs::Empty>("suntracker/done", 1);
+  ros::Publisher suntracker_fb_pub = nh.advertise<std_msgs::Bool>("suntracker/done", 1);
 
-  ROSBridge ros_bridge(encoders_left_pub, encoders_right_pub, encoders_location_pub, imu_pub, tilt_pub,
-                       stepper1_idle_pub, stepper2_idle_pub, stepper1_current_pub, stepper2_current_pub, servo1_pub,
-                       servo2_pub, suntracker_fb_pub);
+  std::string port;
+  int baud;
+  std::string param_name;
+    if (nh.searchParam("port", param_name)) {
+    nh.getParam(param_name, port);
+  } else {
+    ROS_WARN("Parameter 'port_name' not defined");
+  }
 
+  if (nh.searchParam("baud", param_name)) {
+    nh.getParam(param_name, baud);
+  } else {
+    ROS_WARN("Parameter 'baudrate' not defined");
+  }
+
+  ROSBridge ros_bridge(encoders_left_pub, encoders_right_pub, encoders_location_pub, imu_pub,
+                       stepper1_current_pub, stepper2_current_pub, servo1_pub,
+                       servo2_pub, suntracker_fb_pub, port, (uint32_t)baud);
+  ros_bridge.setup();
+  
   ros::Subscriber left_speed_target_sub =
       nh.subscribe("wheels/cmd/left_speed", 1, &ROSBridge::leftSpeedTargetCallback, &ros_bridge);
   ros::Subscriber right_speed_target_sub =
@@ -44,6 +59,10 @@ int main(int argc, char** argv)
 
   while (nh.ok())
   {
+    ros_bridge.update();
     ros::spinOnce();
+    loop_rate.sleep();
   }
+
+  return 0;
 }

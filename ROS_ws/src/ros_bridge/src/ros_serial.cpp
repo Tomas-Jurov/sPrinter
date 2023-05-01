@@ -1,7 +1,7 @@
 #include "../include/ros_serial.h"
 #include <iostream>
 
-sprinter::SerialPort::SerialPort(const std::string& port_name, const uint32_t baud_rate)
+sprinter::SerialPort::SerialPort(const std::string& port_name, uint32_t baud_rate)
 : port_name_(port_name)
 , baud_rate_(baud_rate) 
 { 

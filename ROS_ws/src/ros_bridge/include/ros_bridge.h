@@ -1,38 +1,27 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Int32.h>
 #include <geometry_msgs/Pose2D.h>
 #include <sensor_msgs/Imu.h>
+#include "sprinter.h"
 
 class ROSBridge
 {
 public:
   ROSBridge(const ros::Publisher& encoders_left_pub, const ros::Publisher& encoders_right_pub,
-            const ros::Publisher& encoders_location_pub, const ros::Publisher& imu_pub, const ros::Publisher& tilt_pub,
-            const ros::Publisher& stepper1_idle_pub, const ros::Publisher& stepper2_idle_pub,
+            const ros::Publisher& encoders_location_pub, const ros::Publisher& imu_pub,
             const ros::Publisher& stepper1_current_pub, const ros::Publisher& stepper2_current_pub,
-            const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub, const ros::Publisher& suntracker_fb_pub)
-    : encoders_left_pub_(encoders_left_pub)
-    , encoders_right_pub_(encoders_right_pub)
-    , encoders_location_pub_(encoders_location_pub)
-    , imu_pub_(imu_pub)
-    , tilt_pub_(tilt_pub)
-    , stepper1_idle_pub_(stepper1_idle_pub)
-    , stepper2_idle_pub_(stepper2_idle_pub)
-    , stepper1_current_pub_(stepper1_current_pub_)
-    , stepper2_current_pub_(stepper2_current_pub)
-    , servo1_pub_(servo1_pub)
-    , servo2_pub_(servo2_pub)
-    , suntracker_fb_pub_(suntracker_fb_pub)
-  {
-  }
+            const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub, const ros::Publisher& suntracker_fb_pub,
+            const std::string& port_name, const uint32_t baud_rate);
   ~ROSBridge() = default;
 
-  void Do();
+  void setup();
+  void update();
 
   // Callbacks
   void leftSpeedTargetCallback(const std_msgs::Int8& msg);
@@ -47,7 +36,9 @@ public:
   void suntrackerCmdCallback(const std_msgs::Empty& msg);
 
 private:
-  ros::Publisher encoders_left_pub_, encoders_right_pub_, encoders_location_pub_, imu_pub_, tilt_pub_,
-      stepper1_idle_pub_, stepper2_idle_pub_, stepper1_current_pub_, stepper2_current_pub_, servo1_pub_, servo2_pub_,
+  ros::Publisher encoders_left_pub_, encoders_right_pub_, encoders_location_pub_, imu_pub_, stepper1_current_pub_, stepper2_current_pub_, servo1_pub_, servo2_pub_,
       suntracker_fb_pub_;
+  std::unique_ptr<sprinter::Sprinter> sprinter_;
+  sprinter::SpeedOfWheels speed_of_wheels_;
+  sprinter::Returns returns_;
 };
