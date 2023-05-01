@@ -29,7 +29,7 @@ void ROSBridge::update()
   {
     speed_of_wheels_.left_speed = 5;
     speed_of_wheels_.right_speed = -15;
-    sprinter_->setSpeedOfWheels(&speed_of_wheels_);
+    sprinter_->setSpeedOfWheels(speed_of_wheels_);
     sprinter_->readReturns(&returns_);
     // std::cout << returns_.left_grp_speed << " " << returns_.right_grp_speed << " " << returns_.pose.theta << 
     // " " << returns_.pose.x << " " << returns_.pose.y << " " << returns_.servo1_current_angle << " " << returns_.servo2_current_angle <<

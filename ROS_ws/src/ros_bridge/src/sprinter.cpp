@@ -34,9 +34,9 @@ bool sprinter::Sprinter::readReturns(sprinter::Returns *data)
   return readStateOfSprinter(data);
 }
 
-bool sprinter::Sprinter::setSpeedOfWheels(sprinter::SpeedOfWheels* speed_of_wheels)
+bool sprinter::Sprinter::setSpeedOfWheels(const sprinter::SpeedOfWheels& speed_of_wheels)
 {
-  return writeParameters(SET_SPEED_OF_WHEELS, (bytePtr)speed_of_wheels, sizeof(SpeedOfWheels));
+  return writeParameters(SET_SPEED_OF_WHEELS, (constBytePtr)std::addressof(speed_of_wheels), sizeof(SpeedOfWheels));
 }
 
 bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns *data)
@@ -81,7 +81,7 @@ bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns *data)
   return 0;
 }
 
-bool sprinter::Sprinter::writeParameters(uint8_t command, bytePtr data, size_t data_size)
+bool sprinter::Sprinter::writeParameters(uint8_t command, constBytePtr data, size_t data_size)
 {
   DataPacket data_packet;
 

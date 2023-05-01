@@ -15,11 +15,11 @@ namespace sprinter
     bool disconnect();
 
     bool readReturns(Returns *data);
-    bool setSpeedOfWheels(SpeedOfWheels* speed_of_wheels); 
+    bool setSpeedOfWheels(const SpeedOfWheels& speed_of_wheels); 
 
   private:
     bool readStateOfSprinter(Returns *data);
-    bool writeParameters(uint8_t command, bytePtr data, size_t data_size);
+    bool writeParameters(uint8_t command, constBytePtr data, size_t data_size);
     uint32_t crc32(const bytePtr data, size_t length);
 
   private:
