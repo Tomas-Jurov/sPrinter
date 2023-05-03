@@ -18,15 +18,17 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
 {
-  // Constructor
+    //Constructor
 }
 
 void PrinterControl::update()
 {
+
 }
 
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
+
 }
 
 void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
@@ -35,6 +37,7 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
 
 void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
+
 }
 
 bool PrinterControl::lin_actuator_control(double target_angle)

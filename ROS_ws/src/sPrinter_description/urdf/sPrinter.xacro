@@ -448,4 +448,28 @@
     <child link="lens_focal_static_frame"/>
   </joint>
 
+  <!--middle frame joint-->
+  <joint name="lens_frame_middle_joint" type="fixed">
+    <origin xyz="-0.2535  0.0 0.0" rpy="0 0 0"/>
+    <parent link="lens_Xrot_frame_1"/>
+    <child link="lens_frame_middle"/>
+  </joint>
+
+  <!--focal work frame joint-->
+  <joint name="lens_focal_work_frame_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0 0.0 -0.50" />
+            <!-- z: ohniskova vzdialenost -->
+    <parent link="lens_frame_middle"/>
+    <child link="lens_focal_work_frame"/>
+  </joint>
+
+  <!--focal static frame joint-->
+  <joint name="lens_focal_static_frame_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.753764 0.0 0.05" />
+            <!-- z: 55cm - ohniskova vzdialenost = 5cm nad zemou-->
+            <!-- x: 0.753764 je pri 0.615m vysunuti sosovky v x (HOME) ... pod lens_midle frame-->
+    <parent link="base_link"/>
+    <child link="lens_focal_static_frame"/>
+  </joint>
+
 </robot>
