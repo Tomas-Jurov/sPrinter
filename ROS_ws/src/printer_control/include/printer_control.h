@@ -23,15 +23,13 @@ public:
   // Callbacks
   void targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg);
   void targetStateCallback(const std_msgs::Int8::ConstPtr& msg);
-  void stepper1Callback(const std_msgs::Bool::ConstPtr& msg);
-  void stepper2Callback(const std_msgs::Bool::ConstPtr& msg);
   void suntrackerCallback(const std_msgs::Bool::ConstPtr& msg);
   
   void Do();
 
 private:
   ros::Publisher target_reached_pub_, tilt_pub_, stepper1_speed_pub_, stepper2_speed_pub_, stepper1_target_pub_,
-      stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_;
+                stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_;
    ros::ServiceClient gps_client_;
 
   tf2_ros::Buffer tf_buffer_;

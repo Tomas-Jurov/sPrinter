@@ -33,14 +33,6 @@ void PrinterControl::targetStateCallback(const std_msgs::Int8::ConstPtr& msg)
 
 }
 
-void PrinterControl::stepper1Callback(const std_msgs::Bool::ConstPtr& msg)
-{
-}
-
-void PrinterControl::stepper2Callback(const std_msgs::Bool::ConstPtr& msg)
-{
-}
-
 void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
 }

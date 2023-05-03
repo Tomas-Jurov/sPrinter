@@ -6,10 +6,9 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
 
   ros::Publisher target_reached_pub = nh.advertise<std_msgs::Bool>("target/pose/reached", 1);
-  ros::Publisher left_speed_pub = nh.advertise<std_msgs::Int8>("wheels/cmd/left_speed", 1);
-  ros::Publisher right_speed_pub = nh.advertise<std_msgs::Int8>("wheels/cmd/right_speed", 1);
-
-  PoseControl pose_control(target_reached_pub, left_speed_pub, right_speed_pub);
+  ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("wheels/cmd_vel", 1);
+  
+  PoseControl pose_control(target_reached_pub, cmd_vel_pub);
 
   ros::Subscriber target_cmd_sub =
       nh.subscribe("target/pose/cmd", 1, &PoseControl::targetCmdCallback, &pose_control);
