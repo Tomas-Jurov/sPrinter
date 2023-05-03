@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="rviz_config" default="$(find sprinter_control)/rviz/sprinter.rviz"/>
+
     <node pkg="task_manager" type="task_manager" name="task_manager" output="screen"/>
 
-    <node pkg="rviz" type="rviz" name="rviz_visualization"  respawn="false"
-        args="-d $(arg rviz_config)" output="screen">
-    </node>
-    
+    <!--    <arg name="rviz_config" default="$(find sprinter)/rviz/sprinter.rviz"/>-->
+    <!--     <node pkg="rviz" type="rviz" name="rviz_visualization"  respawn="false" -->
+    <!--         args="-d $(arg rviz_config)" output="screen"> -->
+    <!--     </node> -->
+
+    <!--    RVIZ-->
+    <include file="$(find sPrinter_description)/launch/display_sprinter.launch" />
+
 </launch>
