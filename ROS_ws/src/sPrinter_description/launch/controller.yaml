@@ -1,59 +1,58 @@
-sPrinter_controller:
   # Publish all joint states -----------------------------------
-  joint_state_controller:
-    type: joint_state_controller/JointStateController
-    publish_rate: 50
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
 
-  # Position Controllers --------------------------------------
-  Boggie_right_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Boggie_right
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Boggie_left_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Boggie_left
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Wheel_right_front_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Wheel_right_front
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Wheel_right_middle_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Wheel_right_middle
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Wheel_right_rear_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Wheel_right_rear
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Wheel_left_front_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Wheel_left_front
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Wheel_left_middle_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Wheel_left_middle
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Wheel_left_rear_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Wheel_left_rear
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  MainFrame_pitch_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: MainFrame_pitch
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Lens_Y_axis_trans_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Lens_Y_axis_trans
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Lens_X_axis_trans_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Lens_X_axis_trans
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Lens_Y_axis_rot_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Lens_Y_axis_rot
-    pid: {p: 100.0, i: 0.01, d: 10.0}
-  Lens_X_axis_rot_position_controller:
-    type: effort_controllers/JointPositionController
-    joint: Lens_X_axis_rot
-    pid: {p: 100.0, i: 0.01, d: 10.0}
+# Position Controllers --------------------------------------
+Boggie_right_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Boggie_right
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Boggie_left_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Boggie_left
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Wheel_right_front_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Wheel_right_front
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Wheel_right_middle_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Wheel_right_middle
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Wheel_right_rear_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Wheel_right_rear
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Wheel_left_front_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Wheel_left_front
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Wheel_left_middle_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Wheel_left_middle
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Wheel_left_rear_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Wheel_left_rear
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+MainFrame_pitch_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: MainFrame_pitch
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Lens_Y_axis_trans_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Lens_Y_axis_trans
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Lens_X_axis_trans_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Lens_X_axis_trans
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Lens_Y_axis_rot_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Lens_Y_axis_rot
+  pid: {p: 100.0, i: 0.01, d: 10.0}
+Lens_X_axis_rot_position_controller:
+  type: effort_controllers/JointPositionController
+  joint: Lens_X_axis_rot
+  pid: {p: 100.0, i: 0.01, d: 10.0}
