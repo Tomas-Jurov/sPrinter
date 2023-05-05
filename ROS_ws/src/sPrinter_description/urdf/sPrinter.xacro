@@ -300,31 +300,6 @@
     </collision>
   </link>
 
-  <!--  frame in the middle of the lens-->
-  <link name="lens_frame_middle">
-    <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
-      <mass value="0.0"/>
-      <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0.0" iyz="0.0" ixz="0.0"/>
-    </inertial>
-  </link>
-
-  <link name="lens_focal_work_frame">
-    <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
-      <mass value="0.0"/>
-      <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0.0" iyz="0.0" ixz="0.0"/>
-    </inertial>
-  </link>
-
-  <link name="lens_focal_static_frame">
-    <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
-      <mass value="0.0"/>
-      <inertia ixx="0.0" iyy="0.0" izz="0.0" ixy="0.0" iyz="0.0" ixz="0.0"/>
-    </inertial>
-  </link>
-
 <!--  JOINTS  .......................................................................................................-->
   <joint name="Boggie_right" type="revolute">
     <origin xyz="-0.26 -0.22975 0.21" rpy="0 0 0"/>
@@ -422,27 +397,6 @@
     <child link="lens_Xrot_frame_1"/>
     <axis xyz="1.0 -0.0 0.0"/>
     <limit upper="0.698132" lower="-0.698132" effort="100" velocity="100"/>
-  </joint>
-
-  <!--middle frame joint-->
-  <joint name="lens_frame_middle_joint" type="fixed">
-    <origin xyz="-0.2535  0.0 0.0" rpy="0 0 0"/>
-    <parent link="lens_Xrot_frame_1"/>
-    <child link="lens_frame_middle"/>
-  </joint>
-
-  <!--focal work frame joint-->
-  <joint name="lens_focal_work_frame_joint" type="fixed">
-    <origin xyz="0.0 0.0 -0.40" rpy="0 0 0"/>    <!-- posun v "z" je konstanta - zmenit -->
-    <parent link="lens_frame_middle"/>
-    <child link="lens_focal_work_frame"/>
-  </joint>
-
-  <!--focal static frame joint-->
-  <joint name="lens_focal_static_frame_joint" type="fixed">
-    <origin xyz="0.74 0.0 0.15" rpy="0 0 0"/>    <!-- posun v "x" a "z" je konstanta -(odcitat z robot-conf, ked sa vysunie sosovka)-->
-    <parent link="base_link"/>
-    <child link="lens_focal_static_frame"/>
   </joint>
 
 </robot>
