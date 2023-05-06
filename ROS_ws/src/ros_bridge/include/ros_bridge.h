@@ -36,8 +36,8 @@ private:
 
 private:
   ros::NodeHandle *nh_;
-  ros::Publisher encoders_left_pub_, encoders_right_pub_, encoders_location_pub_,
-                 imu_pub_, stepper1_current_pub_, stepper2_current_pub_, 
+  ros::Publisher encoders_left_pub_, encoders_right_pub_, imu_pub_,
+                 stepper1_current_pub_, stepper2_current_pub_, 
                  servo1_pub_, servo2_pub_, suntracker_fb_pub_;
   ros::Subscriber left_speed_target_sub_, right_speed_target_sub_, tilt_speed_target_sub_, 
                   stepper1_speed_sub_, stepper2_speed_sub_, stepper1_target_sub_,

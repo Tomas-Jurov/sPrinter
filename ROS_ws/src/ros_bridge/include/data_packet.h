@@ -41,18 +41,10 @@ namespace sprinter
     short right_speed : 8;
   } __attribute__((packed)); 
 
-  struct Pose2D
-  {
-    float x;
-    float y;
-    float theta; 
-  } __attribute__((packed));
-
   struct Returns
   {
     short left_grp_speed       : 8;
     short right_grp_speed      : 8;
-    Pose2D pose;
     int stepper1_current_steps : 32;
     int stepper2_current_steps : 32;
     short servo1_current_angle : 16;

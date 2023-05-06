@@ -4,7 +4,6 @@ ROSBridge::ROSBridge(ros::NodeHandle *nh)
 : nh_(nh)
 , encoders_left_pub_(nh_->advertise<std_msgs::Int8>("wheels/encoders/left_speed", 1))
 , encoders_right_pub_(nh_->advertise<std_msgs::Int8>("wheels/encoders/right_speed", 1))
-, encoders_location_pub_(nh_->advertise<geometry_msgs::Pose2D>("wheels/encoders/location", 1))
 , imu_pub_(nh_->advertise<sensor_msgs::Imu>("imu/data", 1))
 , stepper1_current_pub_(nh_->advertise<std_msgs::Int32>("stepper1/current_steps", 1))
 , stepper2_current_pub_(nh_->advertise<std_msgs::Int32>("stepper2/current_steps", 1))
@@ -61,7 +60,6 @@ void ROSBridge::update()
     // " " << returns_.stepper1_current_steps << " " << returns_.stepper2_current_steps << " " << returns_.suntracker_done << std::endl;
     std_msgs::Int8 left_speed;
     std_msgs::Int8 right_speed;
-    geometry_msgs::Pose2D location;
     std_msgs::Int32 stepper1_current_steps;
     std_msgs::Int32 stepper2_current_steps;
     std_msgs::Int16 servo1_current_angle;
@@ -69,9 +67,6 @@ void ROSBridge::update()
     std_msgs::Bool suntracker_done;
     left_speed.data = returns_.left_grp_speed;
     right_speed.data = returns_.right_grp_speed;
-    location.theta = returns_.pose.theta;
-    location.x = returns_.pose.x;
-    location.y = returns_.pose.y;
     stepper1_current_steps.data = returns_.stepper1_current_steps;
     stepper2_current_steps.data = returns_.stepper2_current_steps;
     servo1_current_angle.data = returns_.servo1_current_angle;
@@ -80,7 +75,6 @@ void ROSBridge::update()
 
     encoders_left_pub_.publish(left_speed);
     encoders_right_pub_.publish(right_speed);  
-    encoders_location_pub_.publish(location);
     servo1_pub_.publish(servo1_current_angle);
     servo2_pub_.publish(servo2_current_angle);
     stepper1_current_pub_.publish(stepper1_current_steps);
