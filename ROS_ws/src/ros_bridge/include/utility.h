@@ -3,7 +3,7 @@
 
 namespace sprinter
 {
-  typedef uint8_t * bytePtr; 
+typedef uint8_t* bytePtr;
 }
 
-#endif //SPRINTER_UTILITY_H
+#endif  // SPRINTER_UTILITY_H
