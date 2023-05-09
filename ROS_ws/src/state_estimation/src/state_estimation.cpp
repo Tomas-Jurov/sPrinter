@@ -1,8 +1,7 @@
 #include "../include/state_estimation.h"
 
 StateEstimation::StateEstimation(const ros::Publisher& odom_pub, const ros::Publisher& joint_state_pub)
-: odom_pub_(odom_pub)
-, joint_state_pub_(joint_state_pub)
+  : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
 {
   current_time_ = ros::Time::now();
 }
@@ -23,9 +22,9 @@ void StateEstimation::calculateOdom()
 {
   // velocity calculation
   double dt = (current_time_ - last_time_).toSec();
-  double delta_x = lin_vel_*cos(theta_)*dt;
-  double delta_y = lin_vel_*sin(theta_)*dt;
-  double delta_th = ang_vel_*dt;
+  double delta_x = lin_vel_ * cos(theta_) * dt;
+  double delta_y = lin_vel_ * sin(theta_) * dt;
+  double delta_th = ang_vel_ * dt;
 
   x_ += delta_x;
   y_ += delta_y;
@@ -37,60 +36,60 @@ void StateEstimation::publishOdomMsg()
   // Create quaternion from yaw data
   geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
 
-  //next, we'll publish the odometry message over ROS
+  // next, we'll publish the odometry message over ROS
   nav_msgs::Odometry odom;
   odom.header.stamp = current_time_;
   odom.header.frame_id = "odom";
   odom.child_frame_id = "base_link";
 
-  //set the position
+  // set the position
   odom.pose.pose.position.x = x_;
   odom.pose.pose.position.y = y_;
   odom.pose.pose.position.z = 0.0;
   odom.pose.pose.orientation = odom_quaternion;
 
-  //set the velocity
+  // set the velocity
   odom.twist.twist.linear.x = lin_vel_;
   odom.twist.twist.linear.y = 0.0;
   odom.twist.twist.angular.z = ang_vel_;
 
-  //publish the message
+  // publish the message
   odom_pub_.publish(odom);
 }
 
 void StateEstimation::publishTFMsg()
 {
-    // Create quaternion from yaw data
-    geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
+  // Create quaternion from yaw data
+  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
 
-    //first, we'll publish the transform over tf
-    geometry_msgs::TransformStamped odom_trans;
-    odom_trans.header.stamp = current_time_;
-    odom_trans.header.frame_id = "odom";
-    odom_trans.child_frame_id = "base_link";
+  // first, we'll publish the transform over tf
+  geometry_msgs::TransformStamped odom_trans;
+  odom_trans.header.stamp = current_time_;
+  odom_trans.header.frame_id = "odom";
+  odom_trans.child_frame_id = "base_link";
 
-    //set the position
-    odom_trans.transform.translation.x = x_;
-    odom_trans.transform.translation.y = y_;
-    odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.rotation = odom_quaternion;
+  // set the position
+  odom_trans.transform.translation.x = x_;
+  odom_trans.transform.translation.y = y_;
+  odom_trans.transform.translation.z = 0.0;
+  odom_trans.transform.rotation = odom_quaternion;
 
-    tf_broadcaster_.sendTransform(odom_trans);
+  tf_broadcaster_.sendTransform(odom_trans);
 }
 
 void StateEstimation::publishJointStates()
 {
   double dt = (current_time_ - last_time_).toSec();
-  double left_velocity = (2*lin_vel_/R - B*ang_vel_/R)/2;
-  double right_velocity = (2*lin_vel_/R + B*ang_vel_/R)/2;
+  double left_velocity = (2 * lin_vel_ / R - B * ang_vel_ / R) / 2;
+  double right_velocity = (2 * lin_vel_ / R + B * ang_vel_ / R) / 2;
 
   sensor_msgs::JointState joint_state_msg;
   joint_state_msg.header.stamp = current_time_;
   joint_state_msg.name.resize(13);
   joint_state_msg.position.resize(13);
 
-  left_pos_ += R*left_velocity*dt;
-  right_pos_ += R*right_velocity*dt;
+  left_pos_ += R * left_velocity * dt;
+  right_pos_ += R * right_velocity * dt;
 
   joint_state_msg.name[0] = "Wheel_left_front";
   joint_state_msg.name[1] = "Wheel_left_middle";
@@ -115,8 +114,8 @@ void StateEstimation::publishJointStates()
   joint_state_msg.position[6] = 0;
   joint_state_msg.position[7] = 0;
   joint_state_msg.position[8] = imu_pitch_;
-  joint_state_msg.position[9] = stepper1_steps_.data*STEP_TO_DIS;
-  joint_state_msg.position[10] = stepper2_steps_.data*STEP_TO_DIS;
+  joint_state_msg.position[9] = stepper1_steps_.data * STEP_TO_DIS;
+  joint_state_msg.position[10] = stepper2_steps_.data * STEP_TO_DIS;
   joint_state_msg.position[11] = servo1_angle_.data;
   joint_state_msg.position[12] = servo2_angle_.data;
 

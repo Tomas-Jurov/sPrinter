@@ -15,9 +15,9 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <sensor_msgs/JointState.h>
 
-#define B 1.2 // wheel distance [m]
-#define R 0.1 // wheel radius [m]
-#define STEP_TO_DIS 0.01 //[m]
+#define B 1.2             // wheel distance [m]
+#define R 0.1             // wheel radius [m]
+#define STEP_TO_DIS 0.01  //[m]
 
 class StateEstimation
 {
@@ -59,10 +59,9 @@ private:
   double lin_vel_, ang_vel_;
 
   //
-  double x_, y_ , theta_;
+  double x_, y_, theta_;
   double left_pos_, right_pos_;
 
   //
   ros::Time current_time_, last_time_;
-
 };
