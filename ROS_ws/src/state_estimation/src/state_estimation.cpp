@@ -73,49 +73,49 @@ geometry_msgs::Quaternion StateEstimation::createQuaternionMsgFromYaw(double &th
   return odom_quaternion;
 }
 
-void StateEstimation::encodersLeftCallback(const std_msgs::Int8& msg)
+void StateEstimation::encodersLeftCallback(const std_msgs::Int8::ConstPtr& msg)
 {
   left_velocity_ = msg;
 }
 
-void StateEstimation::encodersRightCallback(const std_msgs::Int8& msg)
+void StateEstimation::encodersRightCallback(const std_msgs::Int8::ConstPtr& msg)
 {
   right_velocity_ = msg;
 }
 
-void StateEstimation::locationCallback(const geometry_msgs::Pose2D& msg)
+void StateEstimation::locationCallback(const geometry_msgs::Pose2D::ConstPtr& msg)
 {
   odom_ = msg;
 }
 
-void StateEstimation::gpsCallback(const sensor_msgs::NavSatFix& msg)
+void StateEstimation::gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
 }
 
-void StateEstimation::imuCallback(const sensor_msgs::Imu& msg)
+void StateEstimation::imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
 {
 }
 
-void StateEstimation::tiltCmdCallback(const std_msgs::Int8& msg)
+void StateEstimation::tiltCmdCallback(const std_msgs::Int8::ConstPtr& msg)
 {
 }
 
-void StateEstimation::stepper1Callback(const std_msgs::Int32& msg)
+void StateEstimation::stepper1Callback(const std_msgs::Int32::ConstPtr& msg)
 {
   stepper1_steps_ = msg;
 }
 
-void StateEstimation::stepper2Callback(const std_msgs::Int32& msg)
+void StateEstimation::stepper2Callback(const std_msgs::Int32::ConstPtr& msg)
 {
   stepper2_steps_ = msg;
 }
 
-void StateEstimation::servo1Callback(const std_msgs::Int16& msg)
+void StateEstimation::servo1Callback(const std_msgs::Int16::ConstPtr& msg)
 {
   servo1_angle_ = msg;
 }
 
-void StateEstimation::servo2Callback(const std_msgs::Int16& msg)
+void StateEstimation::servo2Callback(const std_msgs::Int16::ConstPtr& msg)
 {
   servo2_angle_ = msg;
 }

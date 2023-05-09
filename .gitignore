@@ -33,6 +33,7 @@
 
 # IDE enviroment settings
 .vscode/
+.idea/
 
 # ROS
 ROS_ws/.catkin_tools/
