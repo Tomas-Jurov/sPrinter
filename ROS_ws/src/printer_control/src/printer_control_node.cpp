@@ -16,8 +16,9 @@ int main(int argc, char** argv)
   ros::Publisher suntracker_pub = nh.advertise<std_msgs::Empty>("suntracker/do", 1);
   ros::ServiceClient gps_client = nh.serviceClient<sprinter_srvs::GetOrientation>("gps/lens_target_orientation");
 
-  PrinterControl printer_control(target_reached_pub, tilt_pub, stepper1_speed_pub, stepper2_speed_pub, stepper1_target_pub,
-                                stepper2_target_pub, servo1_pub, servo2_pub, suntracker_pub, gps_client);
+  PrinterControl printer_control(target_reached_pub, tilt_pub, stepper1_speed_pub, stepper2_speed_pub,
+                                 stepper1_target_pub, stepper2_target_pub, servo1_pub, servo2_pub, suntracker_pub,
+                                 gps_client);
 
   ros::Subscriber target_cmd_sub =
       nh.subscribe("target/printer/cmd", 1, &PrinterControl::targetCmdCallback, &printer_control);
@@ -25,7 +26,7 @@ int main(int argc, char** argv)
       nh.subscribe("target/printer/state", 1, &PrinterControl::targetStateCallback, &printer_control);
   ros::Subscriber suntracker_sub =
       nh.subscribe("suntracker/done", 1, &PrinterControl::suntrackerCallback, &printer_control);
-  
+
   ros::Rate looprate(100);
   while (nh.ok())
   {
