@@ -22,9 +22,6 @@ void StateEstimation::update()
 void StateEstimation::calculateOdom()
 {
   // velocity calculation
-  lin_vel_ = R/2*(left_velocity_.data + right_velocity_.data);
-  ang_vel_ = R/B*(right_velocity_.data - left_velocity_.data);
-
   double dt = (current_time_ - last_time_).toSec();
   double delta_x = lin_vel_*cos(theta_)*dt;
   double delta_y = lin_vel_*sin(theta_)*dt;
@@ -84,13 +81,16 @@ void StateEstimation::publishTFMsg()
 void StateEstimation::publishJointStates()
 {
   double dt = (current_time_ - last_time_).toSec();
+  double left_velocity = (2*lin_vel_/R - B*ang_vel_/R)/2;
+  double right_velocity = (2*lin_vel_/R + B*ang_vel_/R)/2;
+
   sensor_msgs::JointState joint_state_msg;
   joint_state_msg.header.stamp = current_time_;
   joint_state_msg.name.resize(13);
   joint_state_msg.position.resize(13);
 
-  left_pos_ += R*left_velocity_.data*dt;
-  right_pos_ += R*right_velocity_.data*dt;
+  left_pos_ += R*left_velocity*dt;
+  right_pos_ += R*right_velocity*dt;
 
   joint_state_msg.name[0] = "Wheel_left_front";
   joint_state_msg.name[1] = "Wheel_left_middle";
@@ -132,21 +132,10 @@ geometry_msgs::Quaternion StateEstimation::createQuaternionMsgFromYaw(double the
   return odom_quaternion;
 }
 
-void StateEstimation::encodersLeftCallback(const std_msgs::Int8& msg)
+void StateEstimation::twistCallback(const geometry_msgs::Twist& msg)
 {
-  left_velocity_.data = msg.data;
-}
-
-void StateEstimation::encodersRightCallback(const std_msgs::Int8& msg)
-{
-  right_velocity_.data = msg.data;
-}
-
-void StateEstimation::locationCallback(const geometry_msgs::Pose2D& msg)
-{
-  odom_.x = msg.x;
-  odom_.y = msg.y;
-  odom_.theta = msg.theta;
+  lin_vel_ = msg.linear.x;
+  ang_vel_ = msg.angular.z;
 }
 
 void StateEstimation::gpsCallback(const sensor_msgs::NavSatFix& msg)

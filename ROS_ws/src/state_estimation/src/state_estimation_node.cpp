@@ -10,12 +10,8 @@ int main(int argc, char** argv)
 
   StateEstimation state_estimation(odom_pub, joint_state_pub);
 
-  ros::Subscriber encoders_left_sub =
-      nh.subscribe("wheels/encoders/left_speed", 1, &StateEstimation::encodersLeftCallback, &state_estimation);
-  ros::Subscriber encoders_right_sub =
-      nh.subscribe("wheels/encoders/right_speed", 1, &StateEstimation::encodersRightCallback, &state_estimation);
-  ros::Subscriber location_sub =
-      nh.subscribe("wheels/encoders/location", 1, &StateEstimation::locationCallback, &state_estimation);
+  ros::Subscriber twist_sub =
+      nh.subscribe("wheels/twist", 1, &StateEstimation::twistCallback, &state_estimation);
   ros::Subscriber gps_sub = nh.subscribe("gps/fix", 1, &StateEstimation::gpsCallback, &state_estimation);
   ros::Subscriber imu_sub = nh.subscribe("imu/data", 1, &StateEstimation::imuCallback, &state_estimation);
   ros::Subscriber tilt_sub = nh.subscribe("tilt/cmd_speed", 1, &StateEstimation::tiltCmdCallback, &state_estimation);

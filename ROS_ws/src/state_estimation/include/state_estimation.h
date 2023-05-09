@@ -29,9 +29,7 @@ public:
   void update();
 
   // Callbacks
-  void encodersLeftCallback(const std_msgs::Int8& msg);
-  void encodersRightCallback(const std_msgs::Int8& msg);
-  void locationCallback(const geometry_msgs::Pose2D& msg);
+  void twistCallback(const geometry_msgs::Twist& msg);
   void gpsCallback(const sensor_msgs::NavSatFix& msg);
   void imuCallback(const sensor_msgs::Imu& msg);
   void tiltCmdCallback(const std_msgs::Int8& msg);
@@ -55,10 +53,8 @@ private:
   tf2_ros::StaticTransformBroadcaster tf_static_broadcaster_;
 
   //
-  std_msgs::Int8 right_velocity_, left_velocity_;
   std_msgs::Int32 stepper1_steps_, stepper2_steps_;
   std_msgs::Int16 servo1_angle_, servo2_angle_;
-  geometry_msgs::Pose2D odom_;
 
   //
   double x_, y_ , theta_;
