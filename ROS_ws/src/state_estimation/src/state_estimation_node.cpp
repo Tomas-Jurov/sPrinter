@@ -6,8 +6,9 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
 
   ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 1);
+  ros::Publisher joint_state_pub = nh.advertise<sensor_msgs::JointState>("joint_states",1);
 
-  StateEstimation state_estimation(odom_pub);
+  StateEstimation state_estimation(odom_pub, joint_state_pub);
 
   ros::Subscriber encoders_left_sub =
       nh.subscribe("wheels/encoders/left_speed", 1, &StateEstimation::encodersLeftCallback, &state_estimation);
