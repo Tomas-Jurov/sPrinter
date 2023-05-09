@@ -17,6 +17,7 @@
 
 #define B 1.2 // wheel distance [m]
 #define R 0.1 // wheel radius [m]
+#define STEP_TO_DIS 0.01 //[m]
 
 class StateEstimation
 {
@@ -32,7 +33,6 @@ public:
   void twistCallback(const geometry_msgs::Twist& msg);
   void gpsCallback(const sensor_msgs::NavSatFix& msg);
   void imuCallback(const sensor_msgs::Imu& msg);
-  void tiltCmdCallback(const std_msgs::Int8& msg);
   void stepper1Callback(const std_msgs::Int32& msg);
   void stepper2Callback(const std_msgs::Int32& msg);
   void servo1Callback(const std_msgs::Int16& msg);
@@ -55,10 +55,11 @@ private:
   //
   std_msgs::Int32 stepper1_steps_, stepper2_steps_;
   std_msgs::Int16 servo1_angle_, servo2_angle_;
+  double imu_pitch_;
+  double lin_vel_, ang_vel_;
 
   //
   double x_, y_ , theta_;
-  double lin_vel_, ang_vel_;
   double left_pos_, right_pos_;
 
   //

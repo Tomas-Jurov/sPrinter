@@ -14,7 +14,6 @@ int main(int argc, char** argv)
       nh.subscribe("wheels/twist", 1, &StateEstimation::twistCallback, &state_estimation);
   ros::Subscriber gps_sub = nh.subscribe("gps/fix", 1, &StateEstimation::gpsCallback, &state_estimation);
   ros::Subscriber imu_sub = nh.subscribe("imu/data", 1, &StateEstimation::imuCallback, &state_estimation);
-  ros::Subscriber tilt_sub = nh.subscribe("tilt/cmd_speed", 1, &StateEstimation::tiltCmdCallback, &state_estimation);
   ros::Subscriber stepper1_sub =
       nh.subscribe("stepper1/current_steps", 1, &StateEstimation::stepper1Callback, &state_estimation);
   ros::Subscriber stepper2_sub =

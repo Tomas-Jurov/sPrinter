@@ -114,11 +114,11 @@ void StateEstimation::publishJointStates()
   joint_state_msg.position[5] = right_pos_;
   joint_state_msg.position[6] = 0;
   joint_state_msg.position[7] = 0;
-  joint_state_msg.position[8] = 0;
-  joint_state_msg.position[9] = 0;
-  joint_state_msg.position[10] = 0;
-  joint_state_msg.position[11] = 0;
-  joint_state_msg.position[12] = 0;
+  joint_state_msg.position[8] = imu_pitch_;
+  joint_state_msg.position[9] = stepper1_steps_.data*STEP_TO_DIS;
+  joint_state_msg.position[10] = stepper2_steps_.data*STEP_TO_DIS;
+  joint_state_msg.position[11] = servo1_angle_.data;
+  joint_state_msg.position[12] = servo2_angle_.data;
 
   joint_state_pub_.publish(joint_state_msg);
 }
@@ -144,10 +144,7 @@ void StateEstimation::gpsCallback(const sensor_msgs::NavSatFix& msg)
 
 void StateEstimation::imuCallback(const sensor_msgs::Imu& msg)
 {
-}
-
-void StateEstimation::tiltCmdCallback(const std_msgs::Int8& msg)
-{
+  imu_pitch_ = msg.orientation.y;
 }
 
 void StateEstimation::stepper1Callback(const std_msgs::Int32& msg)
