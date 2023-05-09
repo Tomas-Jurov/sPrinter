@@ -14,7 +14,8 @@ int main(int argc, char** argv)
 
   ros::Subscriber pose_sub = nh.subscribe("target/pose/reached", 1, &TaskManager::poseReached, &task_manager);
   ros::Subscriber printer_sub = nh.subscribe("target/printer/reached", 1, &TaskManager::printerReached, &task_manager);
-  ros::Subscriber gps_sub = nh.subscribe("gps/robot_global_orientation/done", 1, &TaskManager::gpsFeedback, &task_manager);
+  ros::Subscriber gps_sub =
+      nh.subscribe("gps/robot_global_orientation/done", 1, &TaskManager::gpsFeedback, &task_manager);
 
   ros::Rate looprate(100);
   while (nh.ok())
