@@ -15,24 +15,22 @@
 class StateEstimation
 {
 public:
-  StateEstimation(const ros::Publisher& odom_pub) : odom_pub_(odom_pub)
-  {
-  }
+  StateEstimation(const ros::Publisher& odom_pub);
   ~StateEstimation() = default;
 
   void Do();
 
   // Callbacks
-  void encodersLeftCallback(const std_msgs::Int8& msg);
-  void encodersRightCallback(const std_msgs::Int8& msg);
-  void locationCallback(const geometry_msgs::Pose2D& msg);
-  void gpsCallback(const sensor_msgs::NavSatFix& msg);
-  void imuCallback(const sensor_msgs::Imu& msg);
-  void tiltCmdCallback(const std_msgs::Int8& msg);
-  void stepper1Callback(const std_msgs::Int32& msg);
-  void stepper2Callback(const std_msgs::Int32& msg);
-  void servo1Callback(const std_msgs::Int16& msg);
-  void servo2Callback(const std_msgs::Int16& msg);
+  void encodersLeftCallback(const std_msgs::Int8::ConstPtr& msg);
+  void encodersRightCallback(const std_msgs::Int8::ConstPtr& msg);
+  void locationCallback(const geometry_msgs::Pose2D::ConstPtr& msg);
+  void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& msg);
+  void imuCallback(const sensor_msgs::Imu::ConstPtr& msg);
+  void tiltCmdCallback(const std_msgs::Int8::ConstPtr& msg);
+  void stepper1Callback(const std_msgs::Int32::ConstPtr& msg);
+  void stepper2Callback(const std_msgs::Int32::ConstPtr& msg);
+  void servo1Callback(const std_msgs::Int16::ConstPtr& msg);
+  void servo2Callback(const std_msgs::Int16::ConstPtr& msg);
 
 private:
   ros::Publisher odom_pub_;

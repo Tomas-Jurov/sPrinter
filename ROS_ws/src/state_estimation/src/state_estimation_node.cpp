@@ -27,8 +27,11 @@ int main(int argc, char** argv)
   ros::Subscriber servo2_sub =
       nh.subscribe("servo2/current_angle", 1, &StateEstimation::servo2Callback, &state_estimation);
 
+  ros::Rate looprate(100);
   while (nh.ok())
   {
     ros::spinOnce();
+    state_estimation.Do();
+    looprate.sleep();
   }
 }

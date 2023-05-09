@@ -1,7 +1,7 @@
-# sPrinter package
+# sPrinter Control package
 
 ## Description
-Central package of the sPrinter ROS implementation.
+User control interface for sPrinter ROS implementation.
 
 ## Setup
 
@@ -13,9 +13,9 @@ Central package of the sPrinter ROS implementation.
     ```
 * Launch mid-level control (on the onboard RPI device)
     ```
-    $ roslaunch sprinter mid_level.launch
+    $ roslaunch sprinter_control mid_level.launch
     ```
 * Launch high-level control (on remote PC)
     ```
-    $ roslaunch sprinter high_level.launch
+    $ roslaunch sprinter_control high_level.launch
     ```
