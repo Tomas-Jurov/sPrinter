@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+    <remap from="fix" to="gps/fix" />
+	<node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="gps_sensor" output="screen" 
+        args="_port:=/dev/ttyUSB0  _baud:=115200">
+    </node>
+
+    <node pkg="gps_processing" type="gps_processing.py" name="gps_processing" output="screen"/>
+    
+</launch>
