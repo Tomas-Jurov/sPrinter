@@ -1,14 +1,5 @@
-<<<<<<< HEAD
 <?xml version="1.0"?>
 <launch>
     <rosparam command="load" file="$(find ros_bridge)/params/ros_bridge.yaml"/>
     <node pkg="ros_bridge" type="ros_bridge" name="ros_bridge" output="screen"/>
 </launch>
-=======
-<launch> 
-    <node name="ros_bridge" pkg="ros_bridge" type="ros_bridge" output="screen">
-    <param name="port" value="/dev/ttyACM0" />
-    <param name="baud" value="230400" />
-    </node>
-</launch>
->>>>>>> Launch file added

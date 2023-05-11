@@ -32,7 +32,6 @@ public:
 
   // Callbacks
   void cmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
-<<<<<<< HEAD
   void tiltTargetVelCallback(const std_msgs::Int8::ConstPtr& msg);
   void stepper1SetSpeedCallback(const std_msgs::Int16::ConstPtr& msg);
   void stepper2SetSpeedCallback(const std_msgs::Int16::ConstPtr& msg);
@@ -41,16 +40,6 @@ public:
   void servo1TargetCallback(const std_msgs::Float32::ConstPtr& msg);
   void servo2TargetCallback(const std_msgs::Float32::ConstPtr& msg);
   void suntrackerCmdCallback(const std_msgs::Empty::ConstPtr& msg);
-=======
-  void tiltSpeedTargetCallback(const std_msgs::Int8& msg);
-  void stepper1SpeedCallback(const std_msgs::Int16& msg);
-  void stepper2SpeedCallback(const std_msgs::Int16& msg);
-  void stepper1TargetCallback(const std_msgs::Int32& msg);
-  void stepper2TargetCallback(const std_msgs::Int32& msg);
-  void servo1TargetCallback(const std_msgs::Int16& msg);
-  void servo2TargetCallback(const std_msgs::Int16& msg);
-  void suntrackerCmdCallback(const std_msgs::Empty& msg);
->>>>>>> Implementation of callback for steppers, servos and suntracker
 
 private:
   void getAndPublishReturns();
