@@ -1,7 +1,7 @@
 #include "../include/state_estimation.h"
 
 StateEstimation::StateEstimation(const ros::Publisher& odom_pub, const ros::Publisher& joint_state_pub)
-  : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
+    : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
 {
   current_time_ = ros::Time::now();
 }
@@ -34,7 +34,7 @@ void StateEstimation::calculateOdom()
 void StateEstimation::publishOdomMsg()
 {
   // Create quaternion from yaw data
-  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
+  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsg(0, 0, theta_);
 
   // next, we'll publish the odometry message over ROS
 
@@ -60,7 +60,7 @@ void StateEstimation::publishOdomMsg()
 void StateEstimation::publishTFMsg()
 {
   // Create quaternion from yaw data
-  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
+  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsg(0, 0, theta_);
 
   // first, we'll publish the transform over tf
   odom_trans_msg_.header.stamp = current_time_;
@@ -117,13 +117,13 @@ void StateEstimation::publishJointStates()
   joint_state_msg_.position[11] = servo1_angle_.data;
   joint_state_msg_.position[12] = servo2_angle_.data;
 
-  joint_state_pub_.publish(joint_state_msg_);
+  joint_state_pub_.publish(joint_state_msg);
 }
 
-geometry_msgs::Quaternion StateEstimation::createQuaternionMsgFromYaw(double theta)
+geometry_msgs::Quaternion StateEstimation::createQuaternionMsg(double r, double p, double y)
 {
   tf2::Quaternion q;
-  q.setRPY(0, 0, theta);
+  q.setRPY(r, p, y);
   geometry_msgs::Quaternion odom_quaternion = tf2::toMsg(q);
 
   return odom_quaternion;
@@ -135,13 +135,14 @@ void StateEstimation::twistCallback(const geometry_msgs::Twist::ConstPtr& msg)
   ang_vel_ = msg->angular.z;
 }
 
-void StateEstimation::gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
+void StateEstimation::imuCallback(const sensor_msgs::Imu& msg)
 {
-}
+  double roll, pitch, yaw;
+  tf2::Quaternion q(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w);
+  tf2::Matrix3x3 m(q);
+  m.getRPY(roll, pitch, yaw);
 
-void StateEstimation::imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
-{
-  imu_pitch_ = msg->orientation.y;
+  imu_pitch_ = pitch;
 }
 
 void StateEstimation::stepper1Callback(const std_msgs::Float32::ConstPtr& msg)

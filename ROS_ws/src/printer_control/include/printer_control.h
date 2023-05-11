@@ -10,6 +10,8 @@
 #include <tf2_ros/transform_listener.h>
 #include <sprinter_srvs/GetOrientation.h>
 
+#define PRINTER_CONTROL_LOOP_RATE 120
+
 class PrinterControl
 {
 public:
@@ -20,11 +22,12 @@ public:
                  const ros::Publisher& suntracker_pub, const ros::ServiceClient& gps_client);
   ~PrinterControl() = default;
 
-  // Callbacks
+  /*callbacks*/
   void targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg);
-  void targetStateCallback(const std_msgs::Int8::ConstPtr& msg);
+  void printerStateCallback(const std_msgs::Int8::ConstPtr& msg);
   void suntrackerCallback(const std_msgs::Bool::ConstPtr& msg);
 
+  /*methods*/
   void update();
 
 private:

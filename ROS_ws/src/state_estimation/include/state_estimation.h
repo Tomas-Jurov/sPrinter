@@ -35,13 +35,19 @@ public:
   void stepper2Callback(const std_msgs::Float32::ConstPtr& msg);
   void servo1Callback(const std_msgs::Float32::ConstPtr& msg);
   void servo2Callback(const std_msgs::Float32::ConstPtr& msg);
+  void twistCallback(const geometry_msgs::Twist& msg);
+  void imuCallback(const sensor_msgs::Imu& msg);
+  void stepper1Callback(const std_msgs::Int32& msg);
+  void stepper2Callback(const std_msgs::Int32& msg);
+  void servo1Callback(const std_msgs::Int16& msg);
+  void servo2Callback(const std_msgs::Int16& msg);
 
 private:
   void calculateOdom();
   void publishOdomMsg();
   void publishTFMsg();
   void publishJointStates();
-  geometry_msgs::Quaternion createQuaternionMsgFromYaw(double theta);
+  geometry_msgs::Quaternion createQuaternionMsg(double r, double p, double y);
 
 private:
   // Publishers and broadcasters
