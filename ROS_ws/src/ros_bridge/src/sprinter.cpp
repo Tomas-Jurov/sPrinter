@@ -38,7 +38,6 @@ bool ROSbridge::Sprinter::setVelocityOfWheels(const ROSbridge::VelocityOfWheels&
   return writeParameters(SET_VELOCITY_OF_WHEELS, (constBytePtr)std::addressof(velocity_of_wheels), sizeof(VelocityOfWheels));
 }
 
-<<<<<<< HEAD
 bool ROSbridge::Sprinter::setVelocityOfLinearActuator(int8_t velocity_of_actuator)
 {
   return writeParameters(SET_VELOCITY_OF_LIN_ACTUATOR, (constBytePtr)&velocity_of_actuator, sizeof(int8_t));
@@ -80,14 +79,6 @@ bool ROSbridge::Sprinter::runSunTracking()
 }
 
 bool ROSbridge::Sprinter::readStateOfSprinter(ROSbridge::Returns* data)
-=======
-bool sprinter::Sprinter::setSpeedOfLinearActuator(int8_t speed_of_actuator)
-{
-  return writeParameters(SET_SPEED_OF_LIN_ACTUATOR, (constBytePtr)speed_of_actuator, sizeof(int8_t));
-}
-
-bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns* data)
->>>>>>> Linear actuator callback
 {
   DataPacket data_packet;
 
