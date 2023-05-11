@@ -33,9 +33,49 @@ bool ROSbridge::Sprinter::readReturns(ROSbridge::Returns* data)
   return readStateOfSprinter(data);
 }
 
-bool ROSbridge::Sprinter::setSpeedOfWheels(const ROSbridge::SpeedOfWheels& speed_of_wheels)
+bool ROSbridge::Sprinter::setVelocityOfWheels(const ROSbridge::VelocityOfWheels& velocity_of_wheels)
 {
-  return writeParameters(SET_SPEED_OF_WHEELS, (constBytePtr)std::addressof(speed_of_wheels), sizeof(SpeedOfWheels));
+  return writeParameters(SET_VELOCITY_OF_WHEELS, (constBytePtr)std::addressof(velocity_of_wheels), sizeof(VelocityOfWheels));
+}
+
+bool ROSbridge::Sprinter::setVelocityOfLinearActuator(int8_t velocity_of_actuator)
+{
+  return writeParameters(SET_VELOCITY_OF_LIN_ACTUATOR, (constBytePtr)&velocity_of_actuator, sizeof(int8_t));
+}
+
+bool ROSbridge::Sprinter::setAngleOfServo1(uint16_t angle)
+{
+  return writeParameters(SET_SERVO1_TARG_ANGLE, (constBytePtr)&angle, sizeof(uint16_t));
+}
+
+bool ROSbridge::Sprinter::setAngleOfServo2(uint16_t angle)
+{
+  return writeParameters(SET_SERVO2_TARG_ANGLE, (constBytePtr)&angle, sizeof(uint16_t));
+}
+
+bool ROSbridge::Sprinter::stepper1SetTargetSteps(int32_t steps)
+{
+  return writeParameters(SET_STEPPER1_TARG_STEPS, (constBytePtr)&steps, sizeof(int32_t));
+}
+
+bool ROSbridge::Sprinter::stepper2SetTargetSteps(int32_t steps)
+{
+  return writeParameters(SET_STEPPER2_TARG_STEPS, (constBytePtr)&steps, sizeof(int32_t));
+}
+
+bool ROSbridge::Sprinter::setSpeedOfStepper1(uint16_t speed)
+{
+  return writeParameters(SET_STEPPER1_SPEED, (constBytePtr)&speed, sizeof(uint16_t));
+}
+
+bool ROSbridge::Sprinter::setSpeedOfStepper2(uint16_t speed)
+{
+  return writeParameters(SET_STEPPER2_SPEED, (constBytePtr)&speed, sizeof(uint16_t));
+}
+
+bool ROSbridge::Sprinter::runSunTracking()
+{
+  return writeParameters(START_SUNTRACKING, nullptr, 0);
 }
 
 bool ROSbridge::Sprinter::readStateOfSprinter(ROSbridge::Returns* data)
