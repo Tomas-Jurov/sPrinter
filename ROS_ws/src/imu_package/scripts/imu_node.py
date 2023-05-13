@@ -3,7 +3,7 @@
 #roslib.load_manifest('imu_package')
 
 import rospy
-import lsm6ds0 
+import lsm6ds0
 import time 
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Vector3
