@@ -37,7 +37,7 @@ void StateEstimation::publishOdomMsg()
   geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
 
   // next, we'll publish the odometry message over ROS
-  
+
   odom_msg_.header.stamp = current_time_;
   odom_msg_.header.frame_id = "odom";
   odom_msg_.child_frame_id = "base_link";

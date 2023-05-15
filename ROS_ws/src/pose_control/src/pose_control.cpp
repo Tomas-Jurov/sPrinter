@@ -7,7 +7,6 @@ PoseControl::PoseControl(const ros::Publisher& target_reached_pub, const ros::Pu
 
 void PoseControl::update()
 {
-
   /* ... */
 
   cmd_vel_pub_.publish(cmd_vel_msg_);

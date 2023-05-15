@@ -34,7 +34,7 @@ private:
 
   std_msgs::Bool target_reached_msg_;
   std_msgs::Float32 tilt_msg_, stepper1_speed_msg_, stepper2_speed_msg_, stepper1_target_msg_, stepper2_target_msg_,
-                    servo1_msg_, servo2_msg_;
+      servo1_msg_, servo2_msg_;
   std_msgs::Empty suntracker_msg_;
   sprinter_srvs::GetOrientation gps_srv_;
 
