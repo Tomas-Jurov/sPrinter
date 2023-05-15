@@ -1,18 +1,18 @@
 #include "../include/ros_serial.h"
 #include <iostream>
 
-sprinter::SerialPort::SerialPort(const std::string& port_name, const uint32_t baud_rate)
+ROSbridge::SerialPort::SerialPort(const std::string& port_name, const uint32_t baud_rate)
   : port_name_(port_name), baud_rate_(baud_rate)
 {
 }
 
-void sprinter::SerialPort::open()
+void ROSbridge::SerialPort::open()
 {
   file_desc_ = ::open(port_name_.c_str(), O_RDWR | O_EXCL | O_ASYNC);
   this->configureTermios();
 }
 
-int sprinter::SerialPort::close()
+int ROSbridge::SerialPort::close()
 {
   if (file_desc_ != -1)
   {
@@ -30,7 +30,7 @@ int sprinter::SerialPort::close()
   return file_desc_;
 }
 
-ssize_t sprinter::SerialPort::read(bytePtr buffer, size_t size)
+ssize_t ROSbridge::SerialPort::read(bytePtr buffer, size_t size)
 {
   if (file_desc_ < 0)
   {
@@ -64,7 +64,7 @@ ssize_t sprinter::SerialPort::read(bytePtr buffer, size_t size)
   return read_bytes;
 }
 
-ssize_t sprinter::SerialPort::write(bytePtr buffer, size_t size)
+ssize_t ROSbridge::SerialPort::write(bytePtr buffer, size_t size)
 {
   if (file_desc_ < 0)
   {
@@ -79,7 +79,7 @@ ssize_t sprinter::SerialPort::write(bytePtr buffer, size_t size)
   return ::write(file_desc_, buffer, size);
 }
 
-void sprinter::SerialPort::configureTermios()
+void ROSbridge::SerialPort::configureTermios()
 {
   struct termios tty;
 
@@ -116,7 +116,7 @@ void sprinter::SerialPort::configureTermios()
   }
 }
 
-speed_t sprinter::SerialPort::getBaudrate() const
+speed_t ROSbridge::SerialPort::getBaudrate() const
 {
   switch (baud_rate_)
   {
@@ -225,7 +225,7 @@ speed_t sprinter::SerialPort::getBaudrate() const
   }
 }
 
-int sprinter::SerialPort::getElapsedTime(struct timeval* start, struct timeval* end)
+int ROSbridge::SerialPort::getElapsedTime(struct timeval* start, struct timeval* end)
 {
   if (!start || !end)
   {

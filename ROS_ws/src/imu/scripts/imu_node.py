@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #import roslib 
-#roslib.load_manifest('imu_package')
+#roslib.load_manifest('imu')
 
 import rospy
 import lsm6ds0
@@ -21,10 +21,10 @@ def main():
 
 def publisher():
     # define the actions the publisher will make
-    pub = rospy.Publisher('imu',Imu,queue_size =10)
+    pub = rospy.Publisher('imu_data',Imu,queue_size =10)
 
     #initalize the publishing node 
-    rospy.init_node('ros_imu',anonymous = True)
+    rospy.init_node('imu',anonymous = True)
 
     # define how many times per second
     # will the data be published

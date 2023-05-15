@@ -1,7 +1,7 @@
 #ifndef SPRINTER_DATA_PACKET_H
 #define SPRINTER_DATA_PACKET_H
 #include <cstdint>
-namespace sprinter
+namespace ROSbridge
 {
 enum HeaderFunc
 {
@@ -52,6 +52,6 @@ struct Returns
   bool suntracker_done : 1;
 } __attribute__((packed));
 
-}  // namespace sprinter
+}  // namespace ROSbridge
 
 #endif  // SPRINTER_DATA_PACKET_H
