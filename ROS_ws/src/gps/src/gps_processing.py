@@ -6,7 +6,6 @@ from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import Pose2D, Quaternion
 from suncalc import get_position
 from sprinter_srvs import GetOrientation, GetOrientationResponse
-#from suncalc import get_position
 from datetime import datetime
 from collections import deque
 
@@ -21,11 +20,11 @@ class GPSProcessing:
         self.curr_pos = []
         # Subscribers
         self.sub_global = rospy.Subscriber("/gps/robot_global_orientation/cmd", Empty, self.callback_global)
-        self.subpos = rospy.Subscriber("/gps/fix", NavSatFix, self.callback_gps)
+        self.sub_pos = rospy.Subscriber("/gps/fix", NavSatFix, self.callback_gps)
         self.sub_reached = rospy.Subscriber("/target/pose/reached", Bool, self.callback_reached)
         # Publishers
         self.pub_global = rospy.Publisher("/gps/robot_global_orientation/done", Bool, queue_size=1)
-        self.pubpos = rospy.Publisher("/tf_static", NavSatFix, queue_size=1)
+        self.pub_pos = rospy.Publisher("/tf_static", NavSatFix, queue_size=1)
         self.pub = rospy.Publisher("/target/pose/cmd", Pose2D, queue_size=1)
         # Services
         self.sun_server = rospy.Service('(/gps/get_sun_orientation)', GetOrientation, handle_get_sun_orientation)
@@ -61,7 +60,8 @@ class GPSProcessing:
                 pass
             second = self.measure_position(self)
             north_angle = arctan2(second.x - first.x, second.y - first.y)
-            self.pub.publish(Pose2D(second.x,second.y, north_angle))
+            self.pub_pos.publish(Pose2D(second.x,second.y, north_angle))
+            self.is_done = True
 
 
 if __name__ == '__main__':
