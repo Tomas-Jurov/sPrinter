@@ -29,7 +29,6 @@ public:
 
   // Callbacks
   void twistCallback(const geometry_msgs::Twist& msg);
-  void gpsCallback(const sensor_msgs::NavSatFix& msg);
   void imuCallback(const sensor_msgs::Imu& msg);
   void stepper1Callback(const std_msgs::Float32& msg);
   void stepper2Callback(const std_msgs::Float32& msg);

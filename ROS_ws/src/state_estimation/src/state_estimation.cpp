@@ -1,7 +1,7 @@
 #include "../include/state_estimation.h"
 
 StateEstimation::StateEstimation(const ros::Publisher& odom_pub, const ros::Publisher& joint_state_pub)
-  : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
+    : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
 {
   current_time_ = ros::Time::now();
 }
@@ -117,7 +117,7 @@ void StateEstimation::publishJointStates()
   joint_state_msg_.position[11] = servo1_angle_.data;
   joint_state_msg_.position[12] = servo2_angle_.data;
 
-  joint_state_pub_.publish(joint_state_msg_);
+  joint_state_pub_.publish(joint_state_msg);
 }
 
 geometry_msgs::Quaternion StateEstimation::createQuaternionMsg(double r, double p, double y)
