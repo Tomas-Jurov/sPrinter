@@ -27,7 +27,7 @@ class GPSProcessing:
         self.pub_pos = rospy.Publisher("/tf_static", NavSatFix, queue_size=1)
         self.pub = rospy.Publisher("/target/pose/cmd", Pose2D, queue_size=1)
         # Services
-        self.sun_server = rospy.Service('(/gps/get_sun_orientation)', GetOrientation, handle_get_sun_orientation)
+        self.sun_server = rospy.Service('(/gps/get_sun_orientation)', GetOrientation, self.handle_get_sun_orientation)
         rospy.spin()
 
     def handle_get_sun_orientation(self, req):
