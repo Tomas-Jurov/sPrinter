@@ -1,4 +1,4 @@
-# GPS package
+# GPS Processing package
 
 ## Description
 Provides location messages in ROS from the Altix GPS using the Alink USB to serial converter.

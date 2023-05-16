@@ -3,7 +3,7 @@
 #include "ros_serial.h"
 #include <memory>
 #include "data_packet.h"
-namespace sprinter
+namespace ROSbridge
 {
 class Sprinter
 {

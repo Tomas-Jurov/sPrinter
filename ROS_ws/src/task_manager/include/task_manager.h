@@ -14,7 +14,7 @@ public:
               const ros::Publisher& printer_state_pub, const ros::Publisher& gps_cmd_pub);
   ~TaskManager() = default;
 
-  void Do();
+  void update();
 
   // Callbacks
   void poseReached(const std_msgs::Bool::ConstPtr& msg);
@@ -23,4 +23,8 @@ public:
 
 private:
   ros::Publisher pose_cmd_pub_, printer_cmd_pub_, printer_state_pub_, gps_cmd_pub_;
+
+  geometry_msgs::Pose2D pose_cmd_msg_;
+  geometry_msgs::Point printer_cmd_msg_;
+  std_msgs::Int8 printer_state_msg_;
 };

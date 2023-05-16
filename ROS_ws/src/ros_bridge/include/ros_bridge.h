@@ -3,48 +3,47 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Empty.h>
-#include <std_msgs/Int8.h>
-#include <std_msgs/Int16.h>
-#include <std_msgs/Int32.h>
-#include <geometry_msgs/Pose2D.h>
-#include <sensor_msgs/Imu.h>
+#include <std_msgs/Float32.h>
+#include <geometry_msgs/Twist.h>
 #include "sprinter.h"
 
+namespace ROSbridge
+{
 class ROSBridge
 {
 public:
-  ROSBridge(ros::NodeHandle* nh);
+  ROSBridge(const ros::Publisher& wheels_twist_pub, const ros::Publisher& stepper1_position_pub,
+            const ros::Publisher& stepper2_position_pub, const ros::Publisher& servo1_angle_pub,
+            const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub,
+            const std::string& port_name, const int baud_rate);
   ~ROSBridge() = default;
 
   void setup();
   void update();
 
   // Callbacks
-  void leftSpeedTargetCallback(const std_msgs::Int8& msg);
-  void rightSpeedTargetCallback(const std_msgs::Int8& msg);
-  void tiltSpeedTargetback(const std_msgs::Int8& msg);
-  void stepper1SpeedCallback(const std_msgs::Int16& msg);
-  void stepper2SpeedCallback(const std_msgs::Int16& msg);
-  void stepper1TargetCallback(const std_msgs::Int32& msg);
-  void stepper2TargetCallback(const std_msgs::Int32& msg);
-  void servo1TargetCallback(const std_msgs::Int16& msg);
-  void servo2TargetCallback(const std_msgs::Int16& msg);
-  void suntrackerCmdCallback(const std_msgs::Empty& msg);
+  void cmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
+  void tiltTargetVelCallback(const std_msgs::Float32::ConstPtr& msg);
+  void stepper1SetSpeedCallback(const std_msgs::Float32::ConstPtr& msg);
+  void stepper2SetSpeedCallback(const std_msgs::Float32::ConstPtr& msg);
+  void stepper1TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void stepper2TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void servo1TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void servo2TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void suntrackerCmdCallback(const std_msgs::Empty::ConstPtr& msg);
 
 private:
-  bool getParameters();
-
-private:
-  ros::NodeHandle* nh_;
-  ros::Publisher encoders_left_pub_, encoders_right_pub_, imu_pub_, stepper1_current_pub_, stepper2_current_pub_,
-      servo1_pub_, servo2_pub_, suntracker_fb_pub_;
-  ros::Subscriber left_speed_target_sub_, right_speed_target_sub_, tilt_speed_target_sub_, stepper1_speed_sub_,
-      stepper2_speed_sub_, stepper1_target_sub_, stepper2_target_sub_, servo1_target_sub_, servo2_target_sub_,
-      suntracker_cmd_sub_;
+  ros::Publisher wheels_twist_pub_, stepper1_position_pub_, stepper2_position_pub_, servo1_angle_pub_,
+      servo2_angle_pub_, suntracker_fb_pub_;
 
   std::string port_name_;
   int baud_rate_;
-  std::unique_ptr<sprinter::Sprinter> sprinter_;
-  sprinter::SpeedOfWheels speed_of_wheels_;
-  sprinter::Returns returns_;
+  std::unique_ptr<ROSbridge::Sprinter> sprinter_;
+  ROSbridge::SpeedOfWheels speed_of_wheels_;
+  ROSbridge::Returns returns_;
+
+  geometry_msgs::Twist wheels_twist_msg_;
+  std_msgs::Float32 stepper1_position_msg_, stepper2_position_msg_, servo1_angle_msg_, servo2_angle_msg_,
+      suntracker_fb_msg_;
 };
+}

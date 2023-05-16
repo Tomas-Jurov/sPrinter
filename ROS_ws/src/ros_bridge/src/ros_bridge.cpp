@@ -1,53 +1,28 @@
 #include "../include/ros_bridge.h"
 
-ROSBridge::ROSBridge(ros::NodeHandle* nh)
-  : nh_(nh)
-  , encoders_left_pub_(nh_->advertise<std_msgs::Int8>("wheels/encoders/left_speed", 1))
-  , encoders_right_pub_(nh_->advertise<std_msgs::Int8>("wheels/encoders/right_speed", 1))
-  , imu_pub_(nh_->advertise<sensor_msgs::Imu>("imu/data", 1))
-  , stepper1_current_pub_(nh_->advertise<std_msgs::Int32>("stepper1/current_steps", 1))
-  , stepper2_current_pub_(nh_->advertise<std_msgs::Int32>("stepper2/current_steps", 1))
-  , servo1_pub_(nh_->advertise<std_msgs::Int16>("servo1/current_angle", 1))
-  , servo2_pub_(nh_->advertise<std_msgs::Int16>("servo2/current_angle", 1))
-  , suntracker_fb_pub_(nh_->advertise<std_msgs::Bool>("suntracker/done", 1))
-  , left_speed_target_sub_(nh_->subscribe("wheels/cmd/left_speed", 1, &ROSBridge::leftSpeedTargetCallback, this))
-  , right_speed_target_sub_(nh_->subscribe("wheels/cmd/right_speed", 1, &ROSBridge::rightSpeedTargetCallback, this))
-  , tilt_speed_target_sub_(nh_->subscribe("tilt/target_speed", 1, &ROSBridge::tiltSpeedTargetback, this))
-  , stepper1_speed_sub_(nh_->subscribe("stepper1/speed", 1, &ROSBridge::stepper1SpeedCallback, this))
-  , stepper2_speed_sub_(nh_->subscribe("stepper2/speed", 1, &ROSBridge::stepper2SpeedCallback, this))
-  , stepper1_target_sub_(nh_->subscribe("stepper1/target_steps", 1, &ROSBridge::stepper1TargetCallback, this))
-  , stepper2_target_sub_(nh_->subscribe("stepper2/target_steps", 1, &ROSBridge::stepper2TargetCallback, this))
-  , servo1_target_sub_(nh_->subscribe("servo1/target_angle", 1, &ROSBridge::servo1TargetCallback, this))
-  , servo2_target_sub_(nh_->subscribe("servo2/target_angle", 1, &ROSBridge::servo2TargetCallback, this))
-  , suntracker_cmd_sub_(nh_->subscribe("suntracker/do", 1, &ROSBridge::suntrackerCmdCallback, this))
+ROSbridge::ROSBridge::ROSBridge(const ros::Publisher& wheels_twist_pub, const ros::Publisher& stepper1_position_pub,
+                                const ros::Publisher& stepper2_position_pub, const ros::Publisher& servo1_angle_pub,
+                                const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub,
+                                const std::string& port_name, const int baud_rate)
+  : wheels_twist_pub_(wheels_twist_pub)
+  , stepper1_position_pub_(stepper1_position_pub)
+  , stepper2_position_pub_(stepper2_position_pub)
+  , servo1_angle_pub_(servo1_angle_pub)
+  , servo2_angle_pub_(servo2_angle_pub)
+  , suntracker_fb_pub_(suntracker_fb_pub)
+  , port_name_(port_name)
+  , baud_rate_(baud_rate)
 {
-  if (getParameters() == 0)
-    sprinter_ = std::make_unique<sprinter::Sprinter>(port_name_, baud_rate_);
+  if (!port_name_.empty() && baud_rate_ > 0)
+    sprinter_ = std::make_unique<ROSbridge::Sprinter>(port_name_, baud_rate_);
 }
 
-bool ROSBridge::getParameters()
-{
-  if (!nh_->getParam("port", port_name_))
-  {
-    ROS_ERROR("Couldn not find 'port' parameter!");
-    return 1;
-  }
-
-  if (!nh_->getParam("baud", baud_rate_))
-  {
-    ROS_ERROR("Couldn not find 'baud' parameter!");
-    return 1;
-  }
-
-  return 0;
-}
-
-void ROSBridge::setup()
+void ROSbridge::ROSBridge::setup()
 {
   sprinter_->connect();
 }
 
-void ROSBridge::update()
+void ROSbridge::ROSBridge::update()
 {
   if (sprinter_.get() != nullptr)
   {
@@ -55,72 +30,48 @@ void ROSBridge::update()
     speed_of_wheels_.right_speed = -15;
     sprinter_->setSpeedOfWheels(speed_of_wheels_);
     sprinter_->readReturns(&returns_);
-    // std::cout << returns_.left_grp_speed << " " << returns_.right_grp_speed << " " << returns_.pose.theta <<
-    // " " << returns_.pose.x << " " << returns_.pose.y << " " << returns_.servo1_current_angle << " " <<
-    // returns_.servo2_current_angle <<
-    // " " << returns_.stepper1_current_steps << " " << returns_.stepper2_current_steps << " " <<
-    // returns_.suntracker_done << std::endl;
-    std_msgs::Int8 left_speed;
-    std_msgs::Int8 right_speed;
-    std_msgs::Int32 stepper1_current_steps;
-    std_msgs::Int32 stepper2_current_steps;
-    std_msgs::Int16 servo1_current_angle;
-    std_msgs::Int16 servo2_current_angle;
-    std_msgs::Bool suntracker_done;
-    left_speed.data = returns_.left_grp_speed;
-    right_speed.data = returns_.right_grp_speed;
-    stepper1_current_steps.data = returns_.stepper1_current_steps;
-    stepper2_current_steps.data = returns_.stepper2_current_steps;
-    servo1_current_angle.data = returns_.servo1_current_angle;
-    servo2_current_angle.data = returns_.servo2_current_angle;
-    suntracker_done.data = returns_.suntracker_done;
 
-    encoders_left_pub_.publish(left_speed);
-    encoders_right_pub_.publish(right_speed);
-    servo1_pub_.publish(servo1_current_angle);
-    servo2_pub_.publish(servo2_current_angle);
-    stepper1_current_pub_.publish(stepper1_current_steps);
-    stepper2_current_pub_.publish(stepper2_current_steps);
-    suntracker_fb_pub_.publish(suntracker_done);
+    wheels_twist_pub_.publish(wheels_twist_msg_);
+    servo1_angle_pub_.publish(servo1_angle_msg_);
+    servo2_angle_pub_.publish(servo2_angle_msg_);
+    stepper1_position_pub_.publish(stepper1_position_msg_);
+    stepper2_position_pub_.publish(stepper2_position_msg_);
+    suntracker_fb_pub_.publish(suntracker_fb_msg_);
   }
 }
 
-void ROSBridge::leftSpeedTargetCallback(const std_msgs::Int8& msg)
+void ROSbridge::ROSBridge::cmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
 }
 
-void ROSBridge::rightSpeedTargetCallback(const std_msgs::Int8& msg)
+void ROSbridge::ROSBridge::tiltTargetVelCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 }
 
-void ROSBridge::tiltSpeedTargetback(const std_msgs::Int8& msg)
+void ROSbridge::ROSBridge::stepper1SetSpeedCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 }
 
-void ROSBridge::stepper1SpeedCallback(const std_msgs::Int16& msg)
+void ROSbridge::ROSBridge::stepper2SetSpeedCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 }
 
-void ROSBridge::stepper2SpeedCallback(const std_msgs::Int16& msg)
+void ROSbridge::ROSBridge::stepper1TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 }
 
-void ROSBridge::stepper1TargetCallback(const std_msgs::Int32& msg)
+void ROSbridge::ROSBridge::stepper2TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 }
 
-void ROSBridge::stepper2TargetCallback(const std_msgs::Int32& msg)
+void ROSbridge::ROSBridge::servo1TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 }
 
-void ROSBridge::servo1TargetCallback(const std_msgs::Int16& msg)
+void ROSbridge::ROSBridge::servo2TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 }
 
-void ROSBridge::servo2TargetCallback(const std_msgs::Int16& msg)
-{
-}
-
-void ROSBridge::suntrackerCmdCallback(const std_msgs::Empty& msg)
+void ROSbridge::ROSBridge::suntrackerCmdCallback(const std_msgs::Empty::ConstPtr& msg)
 {
 }

@@ -11,7 +11,7 @@
 #include <errno.h>
 #include "utility.h"
 
-namespace sprinter
+namespace ROSbridge
 {
 class SerialPort
 {

@@ -9,17 +9,13 @@ TaskManager::TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publishe
 {
 }
 
-void TaskManager::Do()
+void TaskManager::update()
 {
-  geometry_msgs::Pose2D pose_cmd_msg;
-  geometry_msgs::Point printer_cmd_msg;
-  std_msgs::Int8 printer_state_msg;
-
   /* ... */
 
-  pose_cmd_pub_.publish(pose_cmd_msg);
-  printer_cmd_pub_.publish(printer_cmd_msg);
-  printer_state_pub_.publish(printer_state_msg);
+  pose_cmd_pub_.publish(pose_cmd_msg_);
+  printer_cmd_pub_.publish(printer_cmd_msg_);
+  printer_state_pub_.publish(printer_state_msg_);
 }
 
 void TaskManager::poseReached(const std_msgs::Bool::ConstPtr& msg)

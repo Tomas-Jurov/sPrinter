@@ -1,12 +1,12 @@
 #include "../include/sprinter.h"
 #include <iostream>
 
-sprinter::Sprinter::Sprinter(const std::string& port_name, const uint32_t baud_rate)
+ROSbridge::Sprinter::Sprinter(const std::string& port_name, const uint32_t baud_rate)
   : port_name_(port_name), baud_rate_(baud_rate)
 {
 }
 
-bool sprinter::Sprinter::connect()
+bool ROSbridge::Sprinter::connect()
 {
   if (port_name_.empty())
   {
@@ -23,22 +23,22 @@ bool sprinter::Sprinter::connect()
   return 0;
 }
 
-bool sprinter::Sprinter::disconnect()
+bool ROSbridge::Sprinter::disconnect()
 {
   return serial_port_->close();
 }
 
-bool sprinter::Sprinter::readReturns(sprinter::Returns* data)
+bool ROSbridge::Sprinter::readReturns(ROSbridge::Returns* data)
 {
   return readStateOfSprinter(data);
 }
 
-bool sprinter::Sprinter::setSpeedOfWheels(const sprinter::SpeedOfWheels& speed_of_wheels)
+bool ROSbridge::Sprinter::setSpeedOfWheels(const ROSbridge::SpeedOfWheels& speed_of_wheels)
 {
   return writeParameters(SET_SPEED_OF_WHEELS, (constBytePtr)std::addressof(speed_of_wheels), sizeof(SpeedOfWheels));
 }
 
-bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns* data)
+bool ROSbridge::Sprinter::readStateOfSprinter(ROSbridge::Returns* data)
 {
   DataPacket data_packet;
 
@@ -81,7 +81,7 @@ bool sprinter::Sprinter::readStateOfSprinter(sprinter::Returns* data)
   return 0;
 }
 
-bool sprinter::Sprinter::writeParameters(uint8_t command, constBytePtr data, size_t data_size)
+bool ROSbridge::Sprinter::writeParameters(uint8_t command, constBytePtr data, size_t data_size)
 {
   DataPacket data_packet;
 
@@ -107,7 +107,7 @@ bool sprinter::Sprinter::writeParameters(uint8_t command, constBytePtr data, siz
   return 0;
 }
 
-uint32_t sprinter::Sprinter::crc32(const bytePtr data, size_t length)
+uint32_t ROSbridge::Sprinter::crc32(const bytePtr data, size_t length)
 {
   uint32_t crc = 0xFFFFFFFF;
 

@@ -12,11 +12,11 @@ int main(int argc, char** argv)
 
   ros::Subscriber twist_sub = nh.subscribe("wheels/twist", 1, &StateEstimation::twistCallback, &state_estimation);
   ros::Subscriber gps_sub = nh.subscribe("gps/fix", 1, &StateEstimation::gpsCallback, &state_estimation);
-  ros::Subscriber imu_sub = nh.subscribe("imu/data", 1, &StateEstimation::imuCallback, &state_estimation);
+  ros::Subscriber imu_sub = nh.subscribe("imu_data", 1, &StateEstimation::imuCallback, &state_estimation);
   ros::Subscriber stepper1_sub =
-      nh.subscribe("stepper1/current_steps", 1, &StateEstimation::stepper1Callback, &state_estimation);
+      nh.subscribe("stepper1/current_position", 1, &StateEstimation::stepper1Callback, &state_estimation);
   ros::Subscriber stepper2_sub =
-      nh.subscribe("stepper2/current_steps", 1, &StateEstimation::stepper2Callback, &state_estimation);
+      nh.subscribe("stepper2/current_position", 1, &StateEstimation::stepper2Callback, &state_estimation);
   ros::Subscriber servo1_sub =
       nh.subscribe("servo1/current_angle", 1, &StateEstimation::servo1Callback, &state_estimation);
   ros::Subscriber servo2_sub =

@@ -1,9 +1,7 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <std_msgs/Int8.h>
-#include <std_msgs/Int16.h>
-#include <std_msgs/Int32.h>
+#include <std_msgs/Float32.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/Pose2D.h>
@@ -30,13 +28,13 @@ public:
   void update();
 
   // Callbacks
-  void twistCallback(const geometry_msgs::Twist& msg);
-  void gpsCallback(const sensor_msgs::NavSatFix& msg);
-  void imuCallback(const sensor_msgs::Imu& msg);
-  void stepper1Callback(const std_msgs::Int32& msg);
-  void stepper2Callback(const std_msgs::Int32& msg);
-  void servo1Callback(const std_msgs::Int16& msg);
-  void servo2Callback(const std_msgs::Int16& msg);
+  void twistCallback(const geometry_msgs::Twist::ConstPtr& msg);
+  void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& msg);
+  void imuCallback(const sensor_msgs::Imu::ConstPtr& msg);
+  void stepper1Callback(const std_msgs::Float32::ConstPtr& msg);
+  void stepper2Callback(const std_msgs::Float32::ConstPtr& msg);
+  void servo1Callback(const std_msgs::Float32::ConstPtr& msg);
+  void servo2Callback(const std_msgs::Float32::ConstPtr& msg);
 
 private:
   void calculateOdom();
@@ -52,9 +50,13 @@ private:
   tf2_ros::TransformBroadcaster tf_broadcaster_;
   tf2_ros::StaticTransformBroadcaster tf_static_broadcaster_;
 
+  nav_msgs::Odometry odom_msg_;
+  sensor_msgs::JointState joint_state_msg_;
+  geometry_msgs::TransformStamped odom_trans_msg_;
+
   //
-  std_msgs::Int32 stepper1_steps_, stepper2_steps_;
-  std_msgs::Int16 servo1_angle_, servo2_angle_;
+  std_msgs::Float32 stepper1_steps_, stepper2_steps_;
+  std_msgs::Float32 servo1_angle_, servo2_angle_;
   double imu_pitch_;
   double lin_vel_, ang_vel_;
 
