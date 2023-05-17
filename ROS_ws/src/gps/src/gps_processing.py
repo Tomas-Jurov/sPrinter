@@ -3,11 +3,12 @@ import rospy
 from numpy import mean, arctan2
 from std_msgs.msg import Empty, Bool
 from sensor_msgs.msg import NavSatFix
-from geometry_msgs.msg import Pose2D, Quaternion
+from geometry_msgs.msg import Pose2D, TransformStamped
 from suncalc import get_position
 #from sprinter_srvs import GetOrientation, GetOrientationResponse
-from datetime import datetime
 from collections import deque
+from tf2_ros import StaticTransformBroadcaster
+import tf
 
 class GPSProcessing:
     def __init__(self):
@@ -24,7 +25,6 @@ class GPSProcessing:
         self.sub_reached = rospy.Subscriber("/target/pose/reached", Bool, self.callback_reached)
         # Publishers
         self.pub_global = rospy.Publisher("/gps/robot_global_orientation/done", Bool, queue_size=1)
-        self.pub_pos = rospy.Publisher("/tf_static", Pose2D, queue_size=1)
         self.pub = rospy.Publisher("/target/pose/cmd", Pose2D, queue_size=1)
         # Services
         #self.sun_server = rospy.Service('(/gps/get_sun_orientation)', GetOrientation, self.handle_get_sun_orientation)
@@ -52,6 +52,27 @@ class GPSProcessing:
         if data.data:
             self.not_reached = False
 
+    def to_quaternion(self, angle):
+        broadcaster = StaticTransformBroadcaster()
+        static_transformStamped = TransformStamped()
+
+        static_transformStamped.header.stamp = rospy.Time.now()
+        static_transformStamped.header.frame_id = "world"
+        static_transformStamped.child_frame_id = "odom"
+
+        static_transformStamped.transform.translation.x = float(0)
+        static_transformStamped.transform.translation.y = float(0)
+        static_transformStamped.transform.translation.z = float(0)
+
+        quat = tf.transformations.quaternion_from_euler(
+                   float(0),float(0),float(angle))
+        static_transformStamped.transform.rotation.x = quat[0]
+        static_transformStamped.transform.rotation.y = quat[1]
+        static_transformStamped.transform.rotation.z = quat[2]
+        static_transformStamped.transform.rotation.w = quat[3]
+
+        broadcaster.sendTransform(static_transformStamped)
+
     def callback_global(self, data):
         if self.is_done:
             self.pub_global.publish(Bool(data=True))
@@ -63,9 +84,8 @@ class GPSProcessing:
                 rospy.loginfo(first)
                 rate.sleep()
             second = self.measure_position()
-            rospy.loginfo('second!')
             north_angle = arctan2(second.x - first.x, second.y - first.y)
-            self.pub_pos.publish(Pose2D(x=second.x,y=second.y, theta=north_angle))
+            self.to_quaternion(north_angle)
             self.is_done = True
 
 
