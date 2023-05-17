@@ -27,4 +27,6 @@ private:
   geometry_msgs::Pose2D pose_cmd_msg_;
   geometry_msgs::Point printer_cmd_msg_;
   std_msgs::Int8 printer_state_msg_;
+
+  bool pose_reached_, printer_reached_;
 };
