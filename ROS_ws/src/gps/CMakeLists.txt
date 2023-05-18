@@ -6,7 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  sprinter_srvs
+  # sprinter_srvs
 )
 
 include_directories(
