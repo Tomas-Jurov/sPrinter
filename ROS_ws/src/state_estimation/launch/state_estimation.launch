@@ -1,0 +1,4 @@
+<launch>
+	<node name="state_estimation" pkg="state_estimation" type="state_estimation"/> 
+	<include file="$(find sPrinter_description)/launch/display_sprinter.launch"/>
+</launch>

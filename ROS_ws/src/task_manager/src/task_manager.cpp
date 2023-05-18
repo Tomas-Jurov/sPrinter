@@ -1,20 +1,31 @@
 #include "../include/task_manager.h"
 
-void TaskManager::Do()
+TaskManager::TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publisher& printer_cmd_pub,
+                         const ros::Publisher& printer_state_pub, const ros::Publisher& gps_cmd_pub)
+  : pose_cmd_pub_(pose_cmd_pub)
+  , printer_cmd_pub_(printer_cmd_pub)
+  , printer_state_pub_(printer_state_pub)
+  , gps_cmd_pub_(gps_cmd_pub)
 {
-  geometry_msgs::Pose2D vehicle_target;
-  geometry_msgs::Point printer_target;
+}
 
+void TaskManager::update()
+{
   /* ... */
 
-  vehicle_target_pub_.publish(vehicle_target);
-  printer_target_pub_.publish(printer_target);
+  pose_cmd_pub_.publish(pose_cmd_msg_);
+  printer_cmd_pub_.publish(printer_cmd_msg_);
+  printer_state_pub_.publish(printer_state_msg_);
 }
 
-void TaskManager::vehicleFeedback(const std_msgs::Empty& msg)
+void TaskManager::poseReached(const std_msgs::Bool::ConstPtr& msg)
 {
 }
 
-void TaskManager::printerFeedback(const std_msgs::Empty& msg)
+void TaskManager::printerReached(const std_msgs::Bool::ConstPtr& msg)
+{
+}
+
+void TaskManager::gpsFeedback(const std_msgs::Bool::ConstPtr& msg)
 {
 }

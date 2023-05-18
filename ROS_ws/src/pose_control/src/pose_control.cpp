@@ -1,26 +1,24 @@
 #include "../include/pose_control.h"
 
-void PoseControl::Do()
+PoseControl::PoseControl(const ros::Publisher& target_reached_pub, const ros::Publisher& cmd_vel_pub)
+  : target_reached_pub_(target_reached_pub), cmd_vel_pub_(cmd_vel_pub)
 {
-  std_msgs::Int8 cmd_left_speed;
-  std_msgs::Int8 cmd_right_speed;
-  bool target_reached;
+}
 
+void PoseControl::update()
+{
   /* ... */
 
-  left_speed_pub_.publish(cmd_left_speed);
-  right_speed_pub_.publish(cmd_right_speed);
+  cmd_vel_pub_.publish(cmd_vel_msg_);
 
-  if (target_reached)
-  {
-    target_reached_pub_.publish(std_msgs::Empty());
-  }
+  target_reached_msg_.data = target_reached_;
+  target_reached_pub_.publish(target_reached_msg_);
 }
 
-void PoseControl::targetCmdCallback(const geometry_msgs::Pose2D& msg)
+void PoseControl::targetCmdCallback(const geometry_msgs::Pose2D::ConstPtr& msg)
 {
 }
 
-void PoseControl::odomCallback(const nav_msgs::Odometry& msg)
+void PoseControl::odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
 }
