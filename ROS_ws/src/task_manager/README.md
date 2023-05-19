@@ -12,12 +12,13 @@ The `task_manager` node processes input commands from the `sprinter_control` nod
     - performing procedure to acquire initial orientation in the `world` frame
  * **ROBOT READY**
     - robot standstill
-    - `printer_control` state is "home"
+    - lens folded
     - ready to receive pose or printer commands
  * **ROBOT MOVING**
     - `pose_control` node is moving the robot to the target point
  * **PRINTER IDLE**
-    - `printer_control` state is "ready"
+    - `printer_control` ready to receive commands
+    - lens unfolded
  * **PRINTER BUSY**
     - `printer_control` node is moving from/to "home" position or performing the printing procedure
 
@@ -34,8 +35,3 @@ The `task_manager` node processes input commands from the `sprinter_control` nod
 <p align="center">
     Task manager program flowchart
 </p>
-
-## Setup
-
-
-## Usage

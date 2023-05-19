@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  diagnostic_msgs
   std_srvs
   sprinter_srvs
 )
