@@ -8,6 +8,8 @@
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2_ros/transform_listener.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <sprinter_srvs/GetOrientation.h>
 
 #define PRINTER_CONTROL_LOOP_RATE 120
@@ -43,4 +45,7 @@ private:
 
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf_listener_;
+
+private:
+  bool lin_actuator_control(double target_angle);
 };
