@@ -13,8 +13,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <sensor_msgs/JointState.h>
 
-#define B 1.2             // wheel distance [m]
-#define R 0.1             // wheel radius [m]
+#define B 0.7             // wheel distance [m]
+#define R 0.09            // wheel radius [m]
 #define STEP_TO_DIS 0.01  //[m]
 
 class StateEstimation
