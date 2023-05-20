@@ -4,6 +4,8 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "printer_control");
   ros::NodeHandle nh;
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
 
   ros::Publisher target_reached_pub = nh.advertise<std_msgs::Bool>("target/printer/reached", 1);
   ros::Publisher tilt_pub = nh.advertise<std_msgs::Float32>("tilt/target_vel", 1);
@@ -27,11 +29,14 @@ int main(int argc, char** argv)
   ros::Subscriber suntracker_sub =
       nh.subscribe("suntracker/done", 1, &PrinterControl::suntrackerCallback, &printer_control);
 
-  ros::Rate looprate(100);
-  while (nh.ok())
+//  ros::Rate looprate(100);
+
+
+  while (ros::ok())
   {
-    ros::spinOnce();
+//    ros::spinOnce();
+
     printer_control.update();
-    looprate.sleep();
+//    looprate.sleep();
   }
 }

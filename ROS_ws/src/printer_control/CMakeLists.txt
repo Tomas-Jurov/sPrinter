@@ -2,24 +2,46 @@ cmake_minimum_required(VERSION 3.0.2)
 project(printer_control)
 
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  roscpp
-  rospy
-  std_msgs
-  tf2
-  tf2_ros
-  sprinter_srvs
-)
+        geometry_msgs
+        roscpp
+        rospy
+        std_msgs
+        tf
+        tf2
+        tf2_ros
+        sprinter_srvs
+        tf2_geometry_msgs
+        eigen_conversions
+        moveit_core
+        moveit_ros_planning
+        moveit_ros_planning_interface
+        moveit_ros_perception
+        pluginlib
+        geometric_shapes
+        rosbag
+        )
+
+find_package(Eigen3 REQUIRED)
 
 catkin_package(
+        LIBRARIES
+        INCLUDE_DIRS
+        CATKIN_DEPENDS
+        moveit_core
+        moveit_ros_planning_interface
+        tf2_geometry_msgs
+        DEPENDS
 )
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${THIS_PACKAGE_INCLUDE_DIRS})
 
-add_executable(${PROJECT_NAME} src/printer_control_node.cpp src/printer_control.cpp)
+add_executable(${PROJECT_NAME}
+        src/printer_control_node.cpp src/printer_control.cpp src/printer_ik_solver.cpp)
 
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+install(TARGETS
+        ${PROJECT_NAME}  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

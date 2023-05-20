@@ -17,8 +17,40 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , gps_client_(gps_client)
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
+  , tf_listener_ik_(tf_buffer_ik_)
+  , ik_solver_("lens_group")
 {
     //Constructor
+    ROS_INFO_STREAM("Printer control constructor");
+
+    // Define the desired end-effector pose in lens_focal_static_frame frame
+    geometry_msgs::PoseStamped desired_pose;
+    desired_pose.header.frame_id = "lens_focal_static_frame";
+    desired_pose.header.stamp = ros::Time::now();
+    desired_pose.pose.position.x = /*0.138866 +*/ 0.02;
+    desired_pose.pose.position.y = /*-8.1e-05 +*/ 0.05;
+    desired_pose.pose.position.z = /*0.152581 +*/ 0.0;
+    desired_pose.pose.orientation.x = 0.0;
+    desired_pose.pose.orientation.y = 0.0;
+    desired_pose.pose.orientation.z = 0.0;
+    desired_pose.pose.orientation.w = 1.0;
+
+    geometry_msgs::PoseStamped desired_pose_in_base_link_ = tf_buffer_ik_.transform(
+            desired_pose, "base_link");
+
+    ROS_INFO_STREAM("desired_pose_in_base_link_ \nx: " << desired_pose_in_base_link_.pose.position.x <<
+                                               "\ny: "<< desired_pose_in_base_link_.pose.position.y<<
+                                               "\nz: " << desired_pose_in_base_link_.pose.position.z);
+
+    std::vector<double> joint_values;
+    if (ik_solver_.calculateIK(desired_pose_in_base_link_, joint_values))
+    {
+//        ROS_INFO_STREAM("Ik solution found");
+    }
+    else
+    {
+//        ROS_INFO_STREAM("Cannot find solution");
+    }
 }
 
 void PrinterControl::update()
