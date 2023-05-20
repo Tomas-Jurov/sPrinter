@@ -27,21 +27,17 @@
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
     <group_state name="home" group="lens_group">
         <joint name="Lens_X_axis_rot" value="0"/>
-        <joint name="Lens_X_axis_trans" value="0"/>
+        <joint name="Lens_X_axis_trans" value="0.05"/>
         <joint name="Lens_Y_axis_rot" value="0"/>
         <joint name="Lens_Y_axis_trans" value="0"/>
         <joint name="MainFrame_pitch" value="0"/>
-        <joint name="Wheel_left_front" value="0"/>
-        <joint name="Wheel_right_front" value="0"/>
     </group_state>
     <group_state name="work" group="lens_group">
-        <joint name="Lens_X_axis_rot" value="-0.0579"/>
-        <joint name="Lens_X_axis_trans" value="0.6"/>
-        <joint name="Lens_Y_axis_rot" value="-0.1967"/>
+        <joint name="Lens_X_axis_rot" value="0"/>
+        <joint name="Lens_X_axis_trans" value="0.615"/>
+        <joint name="Lens_Y_axis_rot" value="0"/>
         <joint name="Lens_Y_axis_trans" value="0"/>
-        <joint name="MainFrame_pitch" value="0.1996"/>
-        <joint name="Wheel_left_front" value="0"/>
-        <joint name="Wheel_right_front" value="0"/>
+        <joint name="MainFrame_pitch" value="0"/>
     </group_state>
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
     <passive_joint name="Boggie_left"/>
