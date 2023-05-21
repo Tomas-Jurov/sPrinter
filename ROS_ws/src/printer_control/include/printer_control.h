@@ -10,14 +10,28 @@
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/TransformStamped.h>
-//#include <tf2/buffer.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <sprinter_srvs/GetOrientation.h>
+#include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-#define PRINTER_CONTROL_LOOP_RATE 120
+enum PrinterState
+{
+    HOME,
+    IDLE,
+    FAILURE,
+    BUSY
+};
+
+namespace TaskManagerNS{
+    enum TaskManagerState
+    {
+        HOME,
+        IDLE
+    };
+}
 
 class PrinterControl
 {
@@ -53,4 +67,11 @@ private:
   bool lin_actuator_control(double target_angle);
 
   PrinterIKSolver ik_solver_;
+
+  PrinterState  printer_state_;
+  geometry_msgs::Point printing_point_;
+  bool go_home_, go_idle_;
+
+  /*fcn*/
+  geometry_msgs::Quaternion createQuaternionMsg(double roll, double pitch, double yaw);
 };

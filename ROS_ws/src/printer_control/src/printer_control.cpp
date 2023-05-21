@@ -1,5 +1,7 @@
 #include "../include/printer_control.h"
 
+using TaskManagerNS::TaskManagerState;
+
 PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const ros::Publisher& tilt_pub,
                                const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
                                const ros::Publisher& stepper1_target_pub, const ros::Publisher& stepper2_target_pub,
@@ -19,21 +21,27 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , tf_listener_(tf_buffer_)
   , tf_listener_ik_(tf_buffer_ik_)
   , ik_solver_("lens_group")
-{
+  , printer_state_(HOME)
+  , go_home_(true)
+  , go_idle_(true)
+  {
     //Constructor
     ROS_INFO_STREAM("Printer control constructor");
+
+    //create quaternion msg
+    geometry_msgs::Quaternion my_quaternion = createQuaternionMsg(5, 0, 0);
 
     // Define the desired end-effector pose in lens_focal_static_frame frame
     geometry_msgs::PoseStamped desired_pose;
     desired_pose.header.frame_id = "lens_focal_static_frame";
     desired_pose.header.stamp = ros::Time::now();
-    desired_pose.pose.position.x = /*0.138866 +*/ 0.02;
-    desired_pose.pose.position.y = /*-8.1e-05 +*/ 0.05;
-    desired_pose.pose.position.z = /*0.152581 +*/ 0.0;
-    desired_pose.pose.orientation.x = 0.0;
-    desired_pose.pose.orientation.y = 0.0;
-    desired_pose.pose.orientation.z = 0.0;
-    desired_pose.pose.orientation.w = 1.0;
+    desired_pose.pose.position.x = 0;
+    desired_pose.pose.position.y = 0;
+    desired_pose.pose.position.z = 0;
+    desired_pose.pose.orientation.x = my_quaternion.x;
+    desired_pose.pose.orientation.y = my_quaternion.y;
+    desired_pose.pose.orientation.z =  my_quaternion.z;
+    desired_pose.pose.orientation.w = my_quaternion.w;
 
     geometry_msgs::PoseStamped desired_pose_in_base_link_ = tf_buffer_ik_.transform(
             desired_pose, "base_link");
@@ -60,16 +68,60 @@ void PrinterControl::update()
 
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
+    ROS_INFO_STREAM("targetCmdCallback");
+    if (printer_state_ == IDLE)
+    {
+        printing_point_ = *msg;
+        ROS_INFO_STREAM("New printing_point: \nx: " << printing_point_.x << "\ny: " << printing_point_.y << "\nz: " << printing_point_.z) ;
+    }
+    else
+    {
+        ROS_WARN("Cannot update \"printing_point_\", printer is not in state IDLE");
+    }
 
 }
 
 void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
 {
+    if (msg->data == TaskManagerState::HOME)
+    {
+        if (printer_state_ != HOME)
+        {
+            ROS_INFO_STREAM("printerStateCallback: HOME");
+            go_home_ = true;
+        }
+        else
+        {
+            ROS_INFO_STREAM("Printer already HOME");
+        }
+
+    }
+    else if (msg->data == TaskManagerState::IDLE)
+    {
+        /*I do not want to receive IDLE if printer is BUSY*/
+        if (printer_state_ != IDLE && printer_state_ != BUSY)
+        {
+            ROS_INFO_STREAM("printerStateCallback: IDLE");
+            go_idle_ = true;
+        }
+        else if (printer_state_ != BUSY)
+        {
+            ROS_INFO_STREAM("Printer already IDLE");
+        }
+    }
 }
 
 void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
 
+}
+
+geometry_msgs::Quaternion PrinterControl::createQuaternionMsg(double roll_deg, double pitch_deg, double yaw_deg)
+{
+    tf2::Quaternion my_quaternion;
+    my_quaternion.setRPY(roll_deg/180.0*M_PI, pitch_deg/180.0*M_PI, yaw_deg/180.0*M_PI);
+    geometry_msgs::Quaternion my_quaternion_msg = tf2::toMsg(my_quaternion);
+    return my_quaternion_msg;
 }
 
 bool PrinterControl::lin_actuator_control(double target_angle)
