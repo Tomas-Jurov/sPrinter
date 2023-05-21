@@ -51,7 +51,7 @@ namespace TaskManagerNS
     void update();
 
     // Input callbacks
-    void safetyStopCallback(const std_msgs::Bool::ConstPtr& msg);
+    bool safetyStopCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
     void heartbeatCallback(const std_msgs::Empty::ConstPtr& msg);
     bool initializeCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
     bool poseTaskCallback(sprinter_srvs::SetPose2D::Request& req,
@@ -65,18 +65,21 @@ namespace TaskManagerNS
   
   public:
     static constexpr float WATCHDOG_TIMEOUT = 5; // [s]
+  
   private:
+    bool watchdogCheck();
     void safetyStop();
     void setState(TaskManagerNS::State state);
-    void publishStatus(const int8_t logger_level, const std::string &name, 
-                      const std::string& message);
+    void publishStatus(const int8_t logger_level, const std::string& message);
     void publishPoseTarget();
     void publishPrinterTargetCmd();
     void publishPrinterTargetState(const uint8_t state);
     void publishPoseStop();
 
+    void clearPoseTask();
     void clearPrinterTask();
 
+    bool connected_;
     TaskManagerNS::State state_;
     ros::Time watchdog_last_;
 

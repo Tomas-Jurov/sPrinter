@@ -5,7 +5,8 @@ namespace TaskManagerNS
   TaskManager::TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publisher& printer_cmd_pub,
                           const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub,
                           const ros::Publisher& gps_cmd_pub, const ros::Publisher& status_pub)
-    : state_(TaskManagerNS::START)
+    : connected_(true)
+    , state_(TaskManagerNS::START)
     , watchdog_last_(ros::Time::now())
     , pose_cmd_pub_(pose_cmd_pub)
     , printer_cmd_pub_(printer_cmd_pub)
@@ -19,12 +20,7 @@ namespace TaskManagerNS
 
   void TaskManager::update()
   {
-    if (ros::Duration(ros::Time::now() - watchdog_last_).toSec() > WATCHDOG_TIMEOUT)
-    {
-      publishStatus(LOG_LEVEL_T::ERROR, "Task Manager", "Connection lost. Canceling all jobs.");
-      ROS_ERROR("Connection lost. Canceling all jobs.");
-      safetyStop();
-    }
+    watchdogCheck();
     
     if (state_ == INITIALIZING)
     {
@@ -33,7 +29,7 @@ namespace TaskManagerNS
     {
       if (!printer_task_.empty())
       {
-        publishStatus(LOG_LEVEL_T::OK, "Task Manager","Printer request state: READY");
+        publishStatus(LOG_LEVEL_T::OK, "Printer request state: READY");
         publishPrinterTargetState(1);
         setState(PRINTER_BUSY);
       }
@@ -52,16 +48,35 @@ namespace TaskManagerNS
       }
       else if (pose_task_ptr_.get() != nullptr)
       {
-        publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Printer request state: HOME");
+        publishStatus(LOG_LEVEL_T::OK, "Printer request state: HOME");
         publishPrinterTargetState(0);
         setState(PRINTER_BUSY);
       }
     }
   }
 
+  bool TaskManager::watchdogCheck()
+  {
+    if (ros::Duration(ros::Time::now() - watchdog_last_).toSec() > WATCHDOG_TIMEOUT)
+    {
+      if (connected_)
+      {
+        connected_ = false;
+        publishStatus(LOG_LEVEL_T::ERROR, "Connection lost. Canceling all jobs.");
+        ROS_ERROR("Connection lost. Canceling all jobs.");
+        safetyStop();
+      }
+    }
+    else if (!connected_)
+    {
+      ROS_WARN("Connection restored.");
+      connected_ = true;
+    }
+  }
+
   void TaskManager::safetyStop()
   {
-    pose_task_ptr_.release();
+    clearPoseTask();
     clearPrinterTask();
 
     if (state_ != ROBOT_READY)
@@ -70,7 +85,7 @@ namespace TaskManagerNS
       {
         publishPoseStop();
       }
-      else if (state_ == PRINTER_BUSY || PRINTER_IDLE)
+      else if (state_ == PRINTER_BUSY || state_ == PRINTER_IDLE)
       {
         publishPrinterTargetState(PrinterState::HOME);
       }
@@ -82,23 +97,24 @@ namespace TaskManagerNS
     watchdog_last_ = ros::Time::now();
   }
 
-  void TaskManager::safetyStopCallback(const std_msgs::Bool::ConstPtr& msg)
+  bool TaskManager::safetyStopCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
   {
-    publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "SAFETY STOP received! Caneling all jobs.");
+    publishStatus(LOG_LEVEL_T::WARN, "SAFETY STOP received! Caneling all jobs.");
     safetyStop();
+    return true;
   }
 
   bool TaskManager::initializeCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
   {
-    if (state_ = START)
+    if (state_ == START)
     {
-      publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Starting a procedure to estimate global orientation.");
-      publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "Robot will start to move soon!");
+      publishStatus(LOG_LEVEL_T::OK, "Starting a procedure to estimate global orientation.");
+      publishStatus(LOG_LEVEL_T::WARN, "Robot will start to move soon!");
       gps_cmd_pub_.publish(std_msgs::Empty());
       setState(INITIALIZING);
     }
     else
-      publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "Robot has been initialized before. Ignoring.");
+      publishStatus(LOG_LEVEL_T::WARN, "Robot has been initialized before. Ignoring.");
     
     return true;
   }
@@ -106,14 +122,14 @@ namespace TaskManagerNS
   bool TaskManager::poseTaskCallback(sprinter_srvs::SetPose2D::Request& req,
                             sprinter_srvs::SetPose2D::Response& res)
   {
-    if (pose_task_ptr_.get() != nullptr)
+    if (state_ != ROBOT_MOVING)
     {
       pose_task_ptr_ = std::make_unique<geometry_msgs::Pose2D>(req.pose);
-      publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Pose task set successfully.");
+      publishStatus(LOG_LEVEL_T::OK, "Pose task set successfully.");
     }
     else
     {
-      publishStatus(LOG_LEVEL_T::OK, "Task Manager", "The previous pose task hasn't been completed yet. Ignoring.");
+      publishStatus(LOG_LEVEL_T::WARN, "The previous pose task hasn't been completed yet. Ignoring.");
     }
     
     return true;
@@ -123,60 +139,73 @@ namespace TaskManagerNS
   {
     if (req.points.size() > 0)
     {
-      if (printer_task_.empty())
+      if (state_ != PRINTER_BUSY)
       {
         for (auto &point : req.points)
         {
           printer_task_.emplace(point);
         }
-        publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Printer task set successfully.");
+        publishStatus(LOG_LEVEL_T::OK, 
+          "Received " + std::to_string(req.points.size()) + " printing points. Printer task set successfully.");
       }
       else
       {
-        publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "The previous printer task hasn't been completed yet. Ignoring.");
+        publishStatus(LOG_LEVEL_T::WARN, "The previous printer task hasn't been completed yet. Ignoring.");
       }
     }
-    publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "Got an empty printer task. Ignoring.");
-    
+    else
+    {
+      publishStatus(LOG_LEVEL_T::WARN, "Got an empty printer task. Ignoring.");
+    }
 
     return true;
   }
 
   void TaskManager::gpsProcessingCallback(const std_msgs::Bool::ConstPtr& msg)
   {
-    publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Estimation of global orientation finished.");
-    setState(ROBOT_READY);
+    if (state_ == INITIALIZING && msg->data)
+    {
+      publishStatus(LOG_LEVEL_T::OK, "Estimation of global orientation finished.");
+      setState(ROBOT_READY);
+    }
   }
 
   void TaskManager::poseControlCallback(const std_msgs::Bool::ConstPtr& msg)
   {
-    publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Pose task completed successfully.");
-    setState(ROBOT_READY);
+    if (state_ == ROBOT_MOVING)
+    {
+      publishStatus(LOG_LEVEL_T::OK, "Pose task completed successfully.");
+      setState(ROBOT_READY);
+    }
   }
 
   void TaskManager::printerControlCallback(const std_msgs::Int8::ConstPtr& msg)
   {
-    if (msg->data == PrinterState::HOME)
+    if (state_ == PRINTER_BUSY)
     {
-      setState(ROBOT_READY);
-    }
-    else if (msg->data == PrinterState::IDLE)
-    {
-      if (printer_task_.empty())
+      if (msg->data == PrinterState::HOME)
       {
-        publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Printer task completed successfully.");
+        setState(ROBOT_READY);
+      }
+      else if (msg->data == PrinterState::IDLE)
+      {
+        if (printer_task_.empty())
+        {
+          publishStatus(LOG_LEVEL_T::OK, "Printer task completed successfully.");
+          setState(PRINTER_IDLE);
+        }
+        else
+        {
+          publishPrinterTargetCmd();
+        }
+      }
+      else if (msg->data == PrinterState::FAILURE)
+      {
+        publishStatus(LOG_LEVEL_T::ERROR, "Printer Control unable to reach target point. Canceling task.");
+        clearPrinterTask();
         setState(PRINTER_IDLE);
       }
-      else
-      {
-        publishPrinterTargetCmd();
-      }
     }
-    else if (msg->data == PrinterState::FAILURE)
-      publishStatus(LOG_LEVEL_T::ERROR, "Task Manager", 
-                    "Printer Control unable to reach target point. Canceling task.");
-      clearPrinterTask();
-      setState(PRINTER_IDLE);
   }
 
   void TaskManager::setState(State state)
@@ -195,14 +224,13 @@ namespace TaskManagerNS
       default: state_str = "UNDEFINED"; break;
     }
 
-    publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Switching to " + state_str + "state.");
+    publishStatus(LOG_LEVEL_T::OK, "Switching to " + state_str + " state.");
   }
 
-  void TaskManager::publishStatus(const int8_t logger_level, const std::string &name,
-                                  const std::string& message)
+  void TaskManager::publishStatus(const int8_t logger_level, const std::string& message)
   {
     status_msg_.level = logger_level;
-    status_msg_.name = name;
+    status_msg_.name = "Task Manager";
     status_msg_.message = message;
     
     if (!status_msg_.message.empty())
@@ -213,8 +241,8 @@ namespace TaskManagerNS
   {
     if (pose_task_ptr_.get() != nullptr)
     {
-      publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Sending command to Pose Control.");
-      publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "Robot will start to move soon!");
+      publishStatus(LOG_LEVEL_T::OK, "Sending command to Pose Control.");
+      publishStatus(LOG_LEVEL_T::WARN, "Robot will start to move soon!");
       pose_cmd_pub_.publish(*pose_task_ptr_.release());
     }
   }
@@ -223,8 +251,8 @@ namespace TaskManagerNS
   {
     if (!printer_task_.empty())
     {
-      publishStatus(LOG_LEVEL_T::OK, "Task Manager", "Sending command to Printer Control.");
-      publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "WARNING: Lens will start to move soon!");
+      publishStatus(LOG_LEVEL_T::OK, "Sending command to Printer Control.");
+      publishStatus(LOG_LEVEL_T::WARN, "Lens will start to move soon!");
       printer_cmd_pub_.publish(printer_task_.front());
       printer_task_.pop();
     }
@@ -238,15 +266,27 @@ namespace TaskManagerNS
 
   void TaskManager::publishPoseStop()
   {
-    publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "Stopping vehicle.");
+    publishStatus(LOG_LEVEL_T::WARN, "Stopping vehicle.");
     pose_stop_pub_.publish(std_msgs::Empty());
+  }
+
+  void TaskManager::clearPoseTask()
+  {
+    if (pose_task_ptr_.get() != nullptr)
+    {
+      pose_task_ptr_.release();
+      publishStatus(LOG_LEVEL_T::WARN, "Pose task was canceled.");
+    }
   }
 
   void TaskManager::clearPrinterTask()
   {
-    while (!printer_task_.empty())
-          printer_task_.pop();
-    publishStatus(LOG_LEVEL_T::WARN, "Task Manager", "Printer task was canceled.");
+    if (printer_task_.size() > 0)
+    {
+      while (!printer_task_.empty())
+            printer_task_.pop();
+      publishStatus(LOG_LEVEL_T::WARN, "Printer task was canceled.");
+    }
   }
 
 }

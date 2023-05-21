@@ -17,13 +17,13 @@ int main(int argc, char** argv)
 
   ros::Subscriber pose_sub = nh.subscribe("target/pose/reached", 1, &TaskManager::TaskManager::poseControlCallback, &task_manager);
   ros::Subscriber printer_sub = 
-    nh.subscribe("target/printer/reached", 1, &TaskManager::printerControlCallback, &task_manager);
+    nh.subscribe("/printer_control/state", 1, &TaskManager::printerControlCallback, &task_manager);
   ros::Subscriber gps_sub =
     nh.subscribe("gps/get_global_orientation/done", 1, &TaskManager::gpsProcessingCallback, &task_manager);
-  ros::Subscriber stop_sub = 
-    nh.subscribe("sprinter_control/safety_stop", 1, &TaskManager::safetyStopCallback, &task_manager);
   ros::Subscriber heartbeat_sub = 
     nh.subscribe("sprinter_control/heartbeat", 1, &TaskManager::heartbeatCallback, &task_manager);
+  ros::ServiceServer stop_server = 
+    nh.advertiseService("sprinter_control/safety_stop", &TaskManager::safetyStopCallback, &task_manager);
   ros::ServiceServer init_server = 
     nh.advertiseService("task_manager/initialize", &TaskManager::initializeCallback, &task_manager);
   ros::ServiceServer pose_target_server = 

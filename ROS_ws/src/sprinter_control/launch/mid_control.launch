@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <launch>
+    <node pkg="task_manager" type="task_manager" name="task_manager" output="screen"/>
+    
     <node pkg="state_estimation" type="state_estimation" name="state_estimation" output="screen"/>
 
     <node pkg="pose_control" type="pose_control" name="pose_control" output="screen"/>
