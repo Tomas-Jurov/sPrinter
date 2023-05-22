@@ -13,9 +13,10 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <sensor_msgs/JointState.h>
 
-#define B 1.2             // wheel distance [m]
-#define R 0.1             // wheel radius [m]
+#define B 0.7             // wheel distance [m]
+#define R 0.09            // wheel radius [m]
 #define STEP_TO_DIS 0.01  //[m]
+#define DP 100000000      // DECIMAL_PLACES
 
 class StateEstimation
 {
@@ -29,7 +30,6 @@ public:
 
   // Callbacks
   void twistCallback(const geometry_msgs::Twist& msg);
-  void gpsCallback(const sensor_msgs::NavSatFix& msg);
   void imuCallback(const sensor_msgs::Imu& msg);
   void stepper1Callback(const std_msgs::Float32& msg);
   void stepper2Callback(const std_msgs::Float32& msg);

@@ -22,7 +22,7 @@ int main(int argc, char** argv)
       nh.subscribe("servo2/current_angle", 1, &StateEstimation::servo2Callback, &state_estimation);
 
   // set the rate of TF publishing
-  ros::Rate looprate(100);
+  ros::Rate looprate(50);
   while (nh.ok())
   {
     state_estimation.update();
