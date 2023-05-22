@@ -421,7 +421,7 @@
     <parent link="lens_Yrot_frame__1"/>
     <child link="lens_Xrot_frame_1"/>
     <axis xyz="1.0 -0.0 0.0"/>
-    <limit upper="0.698132" lower="-0.698132" effort="100" velocity="100"/>
+    <limit upper="1.2" lower="-1.2" effort="100" velocity="100"/>
   </joint>
 
   <!--middle frame joint-->
@@ -433,14 +433,17 @@
 
   <!--focal work frame joint-->
   <joint name="lens_focal_work_frame_joint" type="fixed">
-    <origin xyz="0.0 0.0 -0.40" rpy="0 0 0"/>    <!-- posun v "z" je konstanta - zmenit -->
+    <origin rpy="0 0 0" xyz="0.0 0.0 -0.50" />
+            <!-- z: ohniskova vzdialenost -->
     <parent link="lens_frame_middle"/>
     <child link="lens_focal_work_frame"/>
   </joint>
 
   <!--focal static frame joint-->
   <joint name="lens_focal_static_frame_joint" type="fixed">
-    <origin xyz="0.74 0.0 0.15" rpy="0 0 0"/>    <!-- posun v "x" a "z" je konstanta -(odcitat z robot-conf, ked sa vysunie sosovka)-->
+    <origin rpy="0 0 0" xyz="0.753764 0.0 0.05" />
+            <!-- z: 55cm - ohniskova vzdialenost = 5cm nad zemou-->
+            <!-- x: 0.753764 je pri 0.615m vysunuti sosovky v x (HOME) ... pod lens_midle frame-->
     <parent link="base_link"/>
     <child link="lens_focal_static_frame"/>
   </joint>
