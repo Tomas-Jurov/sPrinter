@@ -28,19 +28,13 @@ public:
   void update();
 
   // Callbacks
-  void twistCallback(const geometry_msgs::Twist::ConstPtr& msg);
-  void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& msg);
-  void imuCallback(const sensor_msgs::Imu::ConstPtr& msg);
-  void stepper1Callback(const std_msgs::Float32::ConstPtr& msg);
-  void stepper2Callback(const std_msgs::Float32::ConstPtr& msg);
-  void servo1Callback(const std_msgs::Float32::ConstPtr& msg);
-  void servo2Callback(const std_msgs::Float32::ConstPtr& msg);
   void twistCallback(const geometry_msgs::Twist& msg);
+  void gpsCallback(const sensor_msgs::NavSatFix& msg);
   void imuCallback(const sensor_msgs::Imu& msg);
-  void stepper1Callback(const std_msgs::Int32& msg);
-  void stepper2Callback(const std_msgs::Int32& msg);
-  void servo1Callback(const std_msgs::Int16& msg);
-  void servo2Callback(const std_msgs::Int16& msg);
+  void stepper1Callback(const std_msgs::Float32& msg);
+  void stepper2Callback(const std_msgs::Float32& msg);
+  void servo1Callback(const std_msgs::Float32& msg);
+  void servo2Callback(const std_msgs::Float32& msg);
 
 private:
   void calculateOdom();

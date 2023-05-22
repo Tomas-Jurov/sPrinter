@@ -117,7 +117,7 @@ void StateEstimation::publishJointStates()
   joint_state_msg_.position[11] = servo1_angle_.data;
   joint_state_msg_.position[12] = servo2_angle_.data;
 
-  joint_state_pub_.publish(joint_state_msg);
+  joint_state_pub_.publish(joint_state_msg_);
 }
 
 geometry_msgs::Quaternion StateEstimation::createQuaternionMsg(double r, double p, double y)
@@ -129,10 +129,10 @@ geometry_msgs::Quaternion StateEstimation::createQuaternionMsg(double r, double 
   return odom_quaternion;
 }
 
-void StateEstimation::twistCallback(const geometry_msgs::Twist::ConstPtr& msg)
+void StateEstimation::twistCallback(const geometry_msgs::Twist& msg)
 {
-  lin_vel_ = msg->linear.x;
-  ang_vel_ = msg->angular.z;
+  lin_vel_ = msg.linear.x;
+  ang_vel_ = msg.angular.z;
 }
 
 void StateEstimation::imuCallback(const sensor_msgs::Imu& msg)
@@ -145,22 +145,22 @@ void StateEstimation::imuCallback(const sensor_msgs::Imu& msg)
   imu_pitch_ = pitch;
 }
 
-void StateEstimation::stepper1Callback(const std_msgs::Float32::ConstPtr& msg)
+void StateEstimation::stepper1Callback(const std_msgs::Float32& msg)
 {
-  stepper1_steps_.data = msg->data;
+  stepper1_steps_.data = msg.data;
 }
 
-void StateEstimation::stepper2Callback(const std_msgs::Float32::ConstPtr& msg)
+void StateEstimation::stepper2Callback(const std_msgs::Float32& msg)
 {
-  stepper2_steps_.data = msg->data;
+  stepper2_steps_.data = msg.data;
 }
 
-void StateEstimation::servo1Callback(const std_msgs::Float32::ConstPtr& msg)
+void StateEstimation::servo1Callback(const std_msgs::Float32& msg)
 {
-  servo1_angle_.data = msg->data;
+  servo1_angle_.data = msg.data;
 }
 
-void StateEstimation::servo2Callback(const std_msgs::Float32::ConstPtr& msg)
+void StateEstimation::servo2Callback(const std_msgs::Float32& msg)
 {
-  servo2_angle_.data = msg->data;
+  servo2_angle_.data = msg.data;
 }
