@@ -1,6 +1,6 @@
 #ifndef SPRINTER_UTILITY_H
 #define SPRINTER_UTILITY_H
-
+#include <cmath>
 namespace ROSbridge
 {
 typedef uint8_t* bytePtr;

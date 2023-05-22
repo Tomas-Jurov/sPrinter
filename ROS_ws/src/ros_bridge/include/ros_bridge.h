@@ -11,24 +11,30 @@
 
 namespace ROSbridge
 {
-struct TransmissionGains
+struct Params
 {
-  float stepper1;
-  float stepper2;
-  float servo1;
-  float servo2;  
+  std::string port_name;
+  int baud_rate;
+  float stepper1_gain;
+  float stepper2_gain;
+  float servo1_gain;
+  int servo1_offset;
+  float servo2_gain;  
+  int servo2_offset;
 };
+
 class ROSBridge
 {
 public:
   ROSBridge(const ros::Publisher& wheels_twist_pub, const ros::Publisher& stepper1_position_pub,
             const ros::Publisher& stepper2_position_pub, const ros::Publisher& servo1_angle_pub,
-            const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub,
-            const std::string& port_name, const int baud_rate);
+            const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub
+            );
   ~ROSBridge() = default;
 
   void setup();
   void update();
+  void loadParams(const ros::NodeHandle &nh);
 
   // Callbacks
   void cmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
@@ -42,14 +48,13 @@ public:
   void suntrackerCmdCallback(const std_msgs::Empty::ConstPtr& msg);
 
 private:
+  template<class T> void getParam(const ros::NodeHandle &nh, const std::string &name, T* storage) const;
   void getAndPublishReturns();
 
 private:
   ros::Publisher wheels_twist_pub_, stepper1_position_pub_, stepper2_position_pub_, servo1_angle_pub_,
       servo2_angle_pub_, suntracker_fb_pub_;
 
-  std::string port_name_;
-  int baud_rate_;
   std::unique_ptr<ROSbridge::Sprinter> sprinter_;
   ROSbridge::VelocityOfWheels velocity_of_wheels_;
   ROSbridge::Returns returns_;
@@ -57,7 +62,7 @@ private:
   geometry_msgs::Twist wheels_twist_msg_;
   std_msgs::Float32 stepper1_position_msg_, stepper2_position_msg_, servo1_angle_msg_, servo2_angle_msg_,
       suntracker_fb_msg_;
-  TransmissionGains transmission_gains;
+  Params params_;
   
   static constexpr double R = 0.09;
   static constexpr double B = 0.7;
