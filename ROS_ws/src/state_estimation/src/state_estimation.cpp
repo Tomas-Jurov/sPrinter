@@ -1,7 +1,7 @@
 #include "../include/state_estimation.h"
 
 StateEstimation::StateEstimation(const ros::Publisher& odom_pub, const ros::Publisher& joint_state_pub)
-    : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
+  : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
 {
   current_time_ = ros::Time::now();
 }
@@ -103,19 +103,19 @@ void StateEstimation::publishJointStates()
   joint_state_msg_.name[11] = "Lens_Y_axis_rot";
   joint_state_msg_.name[12] = "Lens_X_axis_rot";
 
-  joint_state_msg_.position[0] = round(left_pos_ * DP)/DP;
-  joint_state_msg_.position[1] = round(left_pos_ * DP)/DP;
-  joint_state_msg_.position[2] = round(left_pos_ * DP)/DP;
-  joint_state_msg_.position[3] = round(right_pos_ * DP)/DP;
-  joint_state_msg_.position[4] = round(right_pos_ * DP)/DP;
-  joint_state_msg_.position[5] = round(right_pos_ * DP)/DP;
+  joint_state_msg_.position[0] = round(left_pos_ * DP) / DP;
+  joint_state_msg_.position[1] = round(left_pos_ * DP) / DP;
+  joint_state_msg_.position[2] = round(left_pos_ * DP) / DP;
+  joint_state_msg_.position[3] = round(right_pos_ * DP) / DP;
+  joint_state_msg_.position[4] = round(right_pos_ * DP) / DP;
+  joint_state_msg_.position[5] = round(right_pos_ * DP) / DP;
   joint_state_msg_.position[6] = 0;
   joint_state_msg_.position[7] = 0;
-  joint_state_msg_.position[8] = round(imu_pitch_*DP)/DP;
-  joint_state_msg_.position[9] = round(stepper1_steps_.data * STEP_TO_DIS * DP)/DP;
-  joint_state_msg_.position[10] = round(stepper2_steps_.data * STEP_TO_DIS * DP)/DP;
-  joint_state_msg_.position[11] = round(servo1_angle_.data * DP)/DP;
-  joint_state_msg_.position[12] = round(servo2_angle_.data * DP)/DP;
+  joint_state_msg_.position[8] = round(imu_pitch_ * DP) / DP;
+  joint_state_msg_.position[9] = round(stepper1_steps_.data * STEP_TO_DIS * DP) / DP;
+  joint_state_msg_.position[10] = round(stepper2_steps_.data * STEP_TO_DIS * DP) / DP;
+  joint_state_msg_.position[11] = round(servo1_angle_.data * DP) / DP;
+  joint_state_msg_.position[12] = round(servo2_angle_.data * DP) / DP;
 
   joint_state_pub_.publish(joint_state_msg_);
 }
