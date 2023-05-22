@@ -35,7 +35,8 @@ bool ROSbridge::Sprinter::readReturns(ROSbridge::Returns* data)
 
 bool ROSbridge::Sprinter::setVelocityOfWheels(const ROSbridge::VelocityOfWheels& velocity_of_wheels)
 {
-  return writeParameters(SET_VELOCITY_OF_WHEELS, (constBytePtr)std::addressof(velocity_of_wheels), sizeof(VelocityOfWheels));
+  return writeParameters(SET_VELOCITY_OF_WHEELS, (constBytePtr)std::addressof(velocity_of_wheels),
+                         sizeof(VelocityOfWheels));
 }
 
 bool ROSbridge::Sprinter::setVelocityOfLinearActuator(int8_t velocity_of_actuator)

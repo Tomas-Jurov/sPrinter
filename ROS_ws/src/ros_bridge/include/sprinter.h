@@ -14,7 +14,6 @@ public:
   bool connect();
   bool disconnect();
 
-
   bool readReturns(Returns* data);
   bool setVelocityOfWheels(const VelocityOfWheels& velocity_of_wheels);
   bool setVelocityOfLinearActuator(int8_t velocity_of_actuator);

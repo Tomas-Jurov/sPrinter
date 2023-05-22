@@ -12,7 +12,7 @@ ROSbridge::ROSBridge::ROSBridge(const ros::Publisher& wheels_twist_pub, const ro
 {
 }
 
-void ROSbridge::ROSBridge::loadParams(const ros::NodeHandle &nh)
+void ROSbridge::ROSBridge::loadParams(const ros::NodeHandle& nh)
 {
   getParam(nh, "mcu_serial/port", &params_.port_name);
   getParam(nh, "mcu_serial/baud", &params_.baud_rate);
@@ -24,7 +24,8 @@ void ROSbridge::ROSBridge::loadParams(const ros::NodeHandle &nh)
   getParam(nh, "transmission_params/stepper2", &params_.stepper2_gain);
 }
 
-template<class T> void ROSbridge::ROSBridge::getParam(const ros::NodeHandle &nh, const std::string &name, T* storage) const
+template <class T>
+void ROSbridge::ROSBridge::getParam(const ros::NodeHandle& nh, const std::string& name, T* storage) const
 {
   if (!nh.getParam(name, *storage))
     ROS_ERROR("Failed to get parameter \"%s\" from server\n", name.data());
@@ -55,8 +56,8 @@ void ROSbridge::ROSBridge::getAndPublishReturns()
   stepper1_position_msg_.data = params_.stepper1_gain * returns_.stepper1_current_steps;
   stepper2_position_msg_.data = params_.stepper2_gain * returns_.stepper2_current_steps;
 
-  servo1_angle_msg_.data = params_.servo1_gain * (returns_.servo1_current_angle-params_.servo1_offset);
-  servo2_angle_msg_.data = params_.servo2_gain * (returns_.servo2_current_angle-params_.servo2_offset);
+  servo1_angle_msg_.data = params_.servo1_gain * (returns_.servo1_current_angle - params_.servo1_offset);
+  servo2_angle_msg_.data = params_.servo2_gain * (returns_.servo2_current_angle - params_.servo2_offset);
 
   suntracker_fb_msg_.data = returns_.suntracker_done;
 
@@ -70,7 +71,6 @@ void ROSbridge::ROSBridge::getAndPublishReturns()
 
   suntracker_fb_pub_.publish(suntracker_fb_msg_);
 }
-
 
 void ROSbridge::ROSBridge::cmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
@@ -96,22 +96,22 @@ void ROSbridge::ROSBridge::stepper2SetSpeedCallback(const std_msgs::Int16::Const
 
 void ROSbridge::ROSBridge::stepper1TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
-  sprinter_->stepper1SetTargetSteps(static_cast<int32_t>(msg->data/params_.stepper1_gain));
+  sprinter_->stepper1SetTargetSteps(static_cast<int32_t>(msg->data / params_.stepper1_gain));
 }
 
 void ROSbridge::ROSBridge::stepper2TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
-  sprinter_->stepper2SetTargetSteps(static_cast<int32_t>(msg->data/params_.stepper2_gain));
+  sprinter_->stepper2SetTargetSteps(static_cast<int32_t>(msg->data / params_.stepper2_gain));
 }
 
 void ROSbridge::ROSBridge::servo1TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
-  sprinter_->setAngleOfServo1(static_cast<uint16_t>(msg->data/params_.servo1_gain + params_.servo1_offset));
+  sprinter_->setAngleOfServo1(static_cast<uint16_t>(msg->data / params_.servo1_gain + params_.servo1_offset));
 }
 
 void ROSbridge::ROSBridge::servo2TargetCallback(const std_msgs::Float32::ConstPtr& msg)
 {
-  sprinter_->setAngleOfServo2(static_cast<uint16_t>(msg->data/params_.servo2_gain + params_.servo2_offset));
+  sprinter_->setAngleOfServo2(static_cast<uint16_t>(msg->data / params_.servo2_gain + params_.servo2_offset));
 }
 
 void ROSbridge::ROSBridge::suntrackerCmdCallback(const std_msgs::Empty::ConstPtr& msg)
