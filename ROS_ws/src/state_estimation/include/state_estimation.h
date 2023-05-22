@@ -16,6 +16,7 @@
 #define B 0.7             // wheel distance [m]
 #define R 0.09            // wheel radius [m]
 #define STEP_TO_DIS 0.01  //[m]
+#define DP 100000000 //DECIMAL_PLACES
 
 class StateEstimation
 {
