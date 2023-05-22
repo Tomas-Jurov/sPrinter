@@ -421,7 +421,7 @@
     <parent link="lens_Yrot_frame__1"/>
     <child link="lens_Xrot_frame_1"/>
     <axis xyz="1.0 -0.0 0.0"/>
-    <limit upper="0.698132" lower="-0.698132" effort="100" velocity="100"/>
+    <limit upper="1.2" lower="-1.2" effort="100" velocity="100"/>
   </joint>
 
   <!--middle frame joint-->

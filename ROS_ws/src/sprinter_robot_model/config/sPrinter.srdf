@@ -17,7 +17,6 @@
         <link name="lens_Xrot_frame_1"/>
         <link name="lens_frame_middle"/>
         <link name="lens_focal_work_frame"/>
-        <link name="lens_focal_static_frame"/>
         <joint name="MainFrame_pitch"/>
         <joint name="Lens_Y_axis_trans"/>
         <joint name="Lens_X_axis_trans"/>
@@ -32,8 +31,15 @@
         <joint name="Lens_Y_axis_trans" value="0"/>
         <joint name="MainFrame_pitch" value="0"/>
     </group_state>
-    <group_state name="work" group="lens_group">
+    <group_state name="idle1" group="lens_group">
         <joint name="Lens_X_axis_rot" value="0"/>
+        <joint name="Lens_X_axis_trans" value="0.615"/>
+        <joint name="Lens_Y_axis_rot" value="0"/>
+        <joint name="Lens_Y_axis_trans" value="0"/>
+        <joint name="MainFrame_pitch" value="0"/>
+    </group_state>
+    <group_state name="idle2" group="lens_group">
+        <joint name="Lens_X_axis_rot" value="1.15"/>
         <joint name="Lens_X_axis_trans" value="0.615"/>
         <joint name="Lens_Y_axis_rot" value="0"/>
         <joint name="Lens_Y_axis_trans" value="0"/>

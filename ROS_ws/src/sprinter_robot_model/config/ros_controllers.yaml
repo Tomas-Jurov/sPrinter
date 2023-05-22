@@ -9,10 +9,8 @@ generic_hw_control_loop:
 # Settings for ros_control hardware interface
 hardware_interface:
   joints:
-    - Boggie_left
     - Wheel_left_middle
     - Wheel_left_rear
-    - Boggie_right
     - Wheel_right_middle
     - Wheel_right_rear
     - MainFrame_pitch
