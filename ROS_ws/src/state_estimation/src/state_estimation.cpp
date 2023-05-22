@@ -34,7 +34,7 @@ void StateEstimation::calculateOdom()
 void StateEstimation::publishOdomMsg()
 {
   // Create quaternion from yaw data
-  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
+  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsg(0, 0, theta_);
 
   // next, we'll publish the odometry message over ROS
 
@@ -60,7 +60,7 @@ void StateEstimation::publishOdomMsg()
 void StateEstimation::publishTFMsg()
 {
   // Create quaternion from yaw data
-  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsgFromYaw(theta_);
+  geometry_msgs::Quaternion odom_quaternion = createQuaternionMsg(0, 0, theta_);
 
   // first, we'll publish the transform over tf
   odom_trans_msg_.header.stamp = current_time_;
@@ -120,46 +120,47 @@ void StateEstimation::publishJointStates()
   joint_state_pub_.publish(joint_state_msg_);
 }
 
-geometry_msgs::Quaternion StateEstimation::createQuaternionMsgFromYaw(double theta)
+geometry_msgs::Quaternion StateEstimation::createQuaternionMsg(double r, double p, double y)
 {
   tf2::Quaternion q;
-  q.setRPY(0, 0, theta);
+  q.setRPY(r, p, y);
   geometry_msgs::Quaternion odom_quaternion = tf2::toMsg(q);
 
   return odom_quaternion;
 }
 
-void StateEstimation::twistCallback(const geometry_msgs::Twist::ConstPtr& msg)
+void StateEstimation::twistCallback(const geometry_msgs::Twist& msg)
 {
-  lin_vel_ = msg->linear.x;
-  ang_vel_ = msg->angular.z;
+  lin_vel_ = msg.linear.x;
+  ang_vel_ = msg.angular.z;
 }
 
-void StateEstimation::gpsCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
+void StateEstimation::imuCallback(const sensor_msgs::Imu& msg)
 {
+  double roll, pitch, yaw;
+  tf2::Quaternion q(msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w);
+  tf2::Matrix3x3 m(q);
+  m.getRPY(roll, pitch, yaw);
+
+  imu_pitch_ = pitch;
 }
 
-void StateEstimation::imuCallback(const sensor_msgs::Imu::ConstPtr& msg)
+void StateEstimation::stepper1Callback(const std_msgs::Float32& msg)
 {
-  imu_pitch_ = msg->orientation.y;
+  stepper1_steps_.data = msg.data;
 }
 
-void StateEstimation::stepper1Callback(const std_msgs::Float32::ConstPtr& msg)
+void StateEstimation::stepper2Callback(const std_msgs::Float32& msg)
 {
-  stepper1_steps_.data = msg->data;
+  stepper2_steps_.data = msg.data;
 }
 
-void StateEstimation::stepper2Callback(const std_msgs::Float32::ConstPtr& msg)
+void StateEstimation::servo1Callback(const std_msgs::Float32& msg)
 {
-  stepper2_steps_.data = msg->data;
+  servo1_angle_.data = msg.data;
 }
 
-void StateEstimation::servo1Callback(const std_msgs::Float32::ConstPtr& msg)
+void StateEstimation::servo2Callback(const std_msgs::Float32& msg)
 {
-  servo1_angle_.data = msg->data;
-}
-
-void StateEstimation::servo2Callback(const std_msgs::Float32::ConstPtr& msg)
-{
-  servo2_angle_.data = msg->data;
+  servo2_angle_.data = msg.data;
 }

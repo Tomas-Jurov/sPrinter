@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   ros::Subscriber target_cmd_sub =
       nh.subscribe("target/printer/cmd", 1, &PrinterControl::targetCmdCallback, &printer_control);
   ros::Subscriber target_state_sub =
-      nh.subscribe("target/printer/state", 1, &PrinterControl::targetStateCallback, &printer_control);
+      nh.subscribe("target/printer/state", 1, &PrinterControl::printerStateCallback, &printer_control);
   ros::Subscriber suntracker_sub =
       nh.subscribe("suntracker/done", 1, &PrinterControl::suntrackerCallback, &printer_control);
 

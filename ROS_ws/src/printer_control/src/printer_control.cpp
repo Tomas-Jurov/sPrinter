@@ -18,31 +18,65 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
 {
+  // Constructor
 }
 
 void PrinterControl::update()
 {
-  // just an example how to publish messages using member variables
-  target_reached_pub_.publish(target_reached_msg_);
-  tilt_pub_.publish(tilt_msg_);
-  stepper1_speed_pub_.publish(stepper1_speed_msg_);
-  stepper2_speed_pub_.publish(stepper2_speed_msg_);
-  stepper1_target_pub_.publish(stepper1_target_msg_);
-  stepper2_target_pub_.publish(stepper2_target_msg_);
-  servo1_pub_.publish(servo1_msg_);
-  servo2_pub_.publish(servo2_msg_);
-  suntracker_pub_.publish(suntracker_msg_);
-  gps_client_.call(gps_srv_);
 }
 
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
 }
 
-void PrinterControl::targetStateCallback(const std_msgs::Int8::ConstPtr& msg)
+void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
 {
 }
 
 void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
+}
+
+bool PrinterControl::lin_actuator_control(double target_angle)
+{
+  double current_angle, error;
+  double roll, pitch, yaw;
+  double u, Kp = 200;
+  geometry_msgs::TransformStamped transformStamped;
+  std_msgs::Int8 msg;
+
+  // Read transformation if possible
+  try
+  {
+    transformStamped = tf_buffer_.lookupTransform("base_link", "main_frame_1", ros::Time(0));
+  }
+  catch (tf2::TransformException& ex)
+  {
+    ROS_WARN("%s", ex.what());
+    ros::Duration(1.0).sleep();
+  }
+
+  // Transform quaternion to RPY angles
+  tf2::Quaternion q(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y,
+                    transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
+  tf2::Matrix3x3 m(q);
+  m.getRPY(roll, pitch, yaw);
+
+  // P controller
+  current_angle = pitch;
+  error = target_angle - current_angle;
+  u = Kp * (error);
+
+  // Publish msg
+  msg.data = (int8_t)u;
+  tilt_pub_.publish(msg);
+
+  if (error < 0.017)  // 0.017 = 1 deg
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
