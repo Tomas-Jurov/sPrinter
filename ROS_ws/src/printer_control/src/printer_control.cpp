@@ -18,17 +18,15 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
 {
-    //Constructor
+  // Constructor
 }
 
 void PrinterControl::update()
 {
-
 }
 
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
-
 }
 
 void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
@@ -37,7 +35,6 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
 
 void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-
 }
 
 bool PrinterControl::lin_actuator_control(double target_angle)
@@ -49,29 +46,32 @@ bool PrinterControl::lin_actuator_control(double target_angle)
   std_msgs::Int8 msg;
 
   // Read transformation if possible
-  try{
-    transformStamped = tf_buffer_.lookupTransform("base_link","main_frame_1",ros::Time(0));
+  try
+  {
+    transformStamped = tf_buffer_.lookupTransform("base_link", "main_frame_1", ros::Time(0));
   }
-    catch (tf2::TransformException &ex) {
-    ROS_WARN("%s",ex.what());
+  catch (tf2::TransformException& ex)
+  {
+    ROS_WARN("%s", ex.what());
     ros::Duration(1.0).sleep();
   }
 
   // Transform quaternion to RPY angles
-  tf2::Quaternion q(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y,transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
+  tf2::Quaternion q(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y,
+                    transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
   tf2::Matrix3x3 m(q);
   m.getRPY(roll, pitch, yaw);
 
   // P controller
   current_angle = pitch;
   error = target_angle - current_angle;
-  u = Kp*(error);
+  u = Kp * (error);
 
   // Publish msg
-  msg.data = (int8_t) u;
+  msg.data = (int8_t)u;
   tilt_pub_.publish(msg);
 
-  if(error < 0.017) // 0.017 = 1 deg
+  if (error < 0.017)  // 0.017 = 1 deg
   {
     return true;
   }

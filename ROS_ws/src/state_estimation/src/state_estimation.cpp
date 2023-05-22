@@ -1,7 +1,7 @@
 #include "../include/state_estimation.h"
 
 StateEstimation::StateEstimation(const ros::Publisher& odom_pub, const ros::Publisher& joint_state_pub)
-    : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
+  : odom_pub_(odom_pub), joint_state_pub_(joint_state_pub)
 {
   current_time_ = ros::Time::now();
 }
