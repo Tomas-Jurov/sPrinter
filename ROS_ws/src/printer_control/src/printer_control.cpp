@@ -1,7 +1,5 @@
 #include "../include/printer_control.h"
 
-using TaskManagerNS::TaskManagerState;
-
 PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const ros::Publisher& tilt_pub,
                                const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
                                const ros::Publisher& stepper1_target_pub, const ros::Publisher& stepper2_target_pub,
@@ -19,7 +17,6 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , gps_client_(gps_client)
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
-  , tf_listener_ik_(tf_buffer_ik_)
   , ik_solver_("lens_group")
   , printer_state_(HOME)
   , go_home_(false)
@@ -44,7 +41,7 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
     desired_pose.pose.orientation.z =  my_quaternion.z;
     desired_pose.pose.orientation.w = my_quaternion.w;
 
-    geometry_msgs::PoseStamped desired_pose_in_base_link_ = tf_buffer_ik_.transform(
+    geometry_msgs::PoseStamped desired_pose_in_base_link_ = tf_buffer_.transform(
             desired_pose, "base_link");
 
     ROS_INFO_STREAM("desired_pose_in_base_link_ \nx: " << desired_pose_in_base_link_.pose.position.x <<
@@ -67,8 +64,8 @@ void PrinterControl::update()
     //v1: no GPS included
     if (go_home_)
     {
-        // if state not BUSY -> set state to BUSY
-        // reset timer
+        goHome();
+        // if state not BUSY -> set state to BUSY ...
         // if servos not home -> set home to servos
         // if linear motor not home -> set linear motor home
         // if servos home and steppers not home -> set home for steppers
@@ -130,57 +127,11 @@ void PrinterControl::update()
 
 }
 
-void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
+
+
+void PrinterControl::goHome()
 {
-    ROS_INFO_STREAM("targetCmdCallback");
-    if (printer_state_ == IDLE)
-    {
-        printing_point_ = *msg;
-        go_print_ = true;
-        ROS_INFO_STREAM("New printing_point: \nx: " << printing_point_.x << "\ny: " << printing_point_.y << "\nz: " << printing_point_.z) ;
-    }
-    else
-    {
-        ROS_WARN("Cannot update \"printing_point_\", printer is not in state IDLE");
-    }
-
-}
-
-void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
-{
-    if (msg->data == TaskManagerState::HOME)
-    {
-        if (printer_state_ != HOME)
-        {
-            ROS_INFO_STREAM("printerStateCallback: HOME");
-            go_home_ = true;
-            // reset timers
-            // ...
-        }
-        else
-        {
-            ROS_INFO_STREAM("Printer already HOME");
-        }
-
-    }
-    else if (msg->data == TaskManagerState::IDLE)
-    {
-        /*I do not want to receive IDLE if printer is BUSY*/
-        if (printer_state_ != IDLE && printer_state_ != BUSY)
-        {
-            ROS_INFO_STREAM("printerStateCallback: IDLE");
-            go_idle_ = true;
-        }
-        else if (printer_state_ != BUSY)
-        {
-            ROS_INFO_STREAM("Printer already IDLE");
-        }
-    }
-}
-
-void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
-{
-    // if true -> set lens_initialized_
+    if (printer_state_ != BUSY) printer_state_ = BUSY;
 }
 
 geometry_msgs::Quaternion PrinterControl::createQuaternionMsg(double roll_deg, double pitch_deg, double yaw_deg)
@@ -233,4 +184,75 @@ bool PrinterControl::lin_actuator_control(double target_angle)
   {
     return false;
   }
+}
+
+void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
+{
+    ROS_INFO_STREAM("targetCmdCallback");
+    if (printer_state_ == IDLE)
+    {
+        printing_point_ = *msg;
+        go_print_ = true;
+        ROS_INFO_STREAM("New printing_point: \nx: " << printing_point_.x << "\ny: " << printing_point_.y << "\nz: " << printing_point_.z) ;
+    }
+    else
+    {
+        ROS_WARN("Cannot update \"printing_point_\", printer is not in state IDLE");
+    }
+
+}
+
+void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
+{
+    if (msg->data == PrinterState::HOME)
+    {
+        if (printer_state_ != HOME)
+        {
+            ROS_INFO_STREAM("printerStateCallback: HOME");
+            go_home_ = true;
+            // reset timers
+            // ...
+        }
+        else
+        {
+            ROS_INFO_STREAM("Printer already HOME");
+        }
+
+    }
+    else if (msg->data == PrinterState::IDLE)
+    {
+        /*I do not want to receive IDLE if printer is BUSY*/
+        if (printer_state_ != IDLE && printer_state_ != BUSY)
+        {
+            ROS_INFO_STREAM("printerStateCallback: IDLE");
+            go_idle_ = true;
+        }
+        else if (printer_state_ != BUSY)
+        {
+            ROS_INFO_STREAM("Printer already IDLE");
+        }
+    }
+}
+
+void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
+{
+    // if true -> set lens_initialized_
+}
+
+void PrinterControl::jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
+{
+    // Process received joint state message
+    std::vector<std::string> jointNames = msg->name;
+    std::vector<double> jointPositions = msg->position;
+    std::vector<double> jointVelocities = msg->velocity;
+    std::vector<double> jointEfforts = msg->effort;
+
+    // Print joint state information
+    for (size_t i = 0; i < jointNames.size(); ++i)
+    {
+        ROS_INFO("Joint Name: %s", jointNames[i].c_str());
+        ROS_INFO("Position: %f", jointPositions[i]);
+        ROS_INFO("Velocity: %f", jointVelocities[i]);
+        ROS_INFO("Effort: %f", jointEfforts[i]);
+    }
 }

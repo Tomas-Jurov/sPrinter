@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../include/printer_ik_solver.h"
+#include "../include/printer_state.h"
 
 #include "stdio.h"
 #include <ros/ros.h>
@@ -17,23 +18,6 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-enum PrinterState
-{
-    HOME,
-    IDLE,
-    FAILURE,
-    BUSY,
-    INIT,
-    PRINTING
-};
-
-namespace TaskManagerNS{
-    enum TaskManagerState
-    {
-        HOME,
-        IDLE
-    };
-}
 
 class PrinterControl
 {
@@ -49,6 +33,7 @@ public:
   void targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg);
   void printerStateCallback(const std_msgs::Int8::ConstPtr& msg);
   void suntrackerCallback(const std_msgs::Bool::ConstPtr& msg);
+  void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
   /*methods*/
   void update();
@@ -58,15 +43,15 @@ private:
       stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_;
   ros::ServiceClient gps_client_;
 
-  tf2_ros::Buffer tf_buffer_, tf_buffer_ik_;
-  tf2_ros::TransformListener tf_listener_, tf_listener_ik_;
+  tf2_ros::Buffer tf_buffer_;
+  tf2_ros::TransformListener tf_listener_;
   std_msgs::Bool target_reached_msg_;
   std_msgs::Float32 tilt_msg_, stepper1_speed_msg_, stepper2_speed_msg_, stepper1_target_msg_, stepper2_target_msg_,
       servo1_msg_, servo2_msg_;
   std_msgs::Empty suntracker_msg_;
   sprinter_srvs::GetOrientation gps_srv_;
+
 private:
-  bool lin_actuator_control(double target_angle);
 
   PrinterIKSolver ik_solver_;
 
@@ -75,5 +60,7 @@ private:
   bool go_home_, go_idle_, go_print_, need_initialize_;
 
   /*fcn*/
+  bool lin_actuator_control(double target_angle);
+  void goHome();
   geometry_msgs::Quaternion createQuaternionMsg(double roll, double pitch, double yaw);
 };

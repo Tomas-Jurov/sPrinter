@@ -28,15 +28,11 @@ int main(int argc, char** argv)
       nh.subscribe("target/printer/state", 1, &PrinterControl::printerStateCallback, &printer_control);
   ros::Subscriber suntracker_sub =
       nh.subscribe("suntracker/done", 1, &PrinterControl::suntrackerCallback, &printer_control);
-
-//  ros::Rate looprate(100);
-
+//  ros::Subscriber joint_state_sub =
+//      nh.subscribe("/joint_states", 1, &PrinterControl::jointStateCallback, &printer_control);
 
   while (ros::ok())
   {
-//    ros::spinOnce();
-
     printer_control.update();
-//    looprate.sleep();
   }
 }

@@ -25,7 +25,7 @@
 
 
     <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
-    <include file="$(find sprinter_robot_model)/launch/move_group.launch">
+    <include file="$(find sprinter_robot_model)/launch/move_group_custom.launch">
         <arg name="allow_trajectory_execution" value="false"/>
         <arg name="fake_execution" value="false"/>
         <arg name="execution_type" value="interpolate"/>
