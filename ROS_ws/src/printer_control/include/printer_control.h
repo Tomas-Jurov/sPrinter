@@ -22,7 +22,9 @@ enum PrinterState
     HOME,
     IDLE,
     FAILURE,
-    BUSY
+    BUSY,
+    INIT,
+    PRINTING
 };
 
 namespace TaskManagerNS{
@@ -70,7 +72,7 @@ private:
 
   PrinterState  printer_state_;
   geometry_msgs::Point printing_point_;
-  bool go_home_, go_idle_;
+  bool go_home_, go_idle_, go_print_, need_initialize_;
 
   /*fcn*/
   geometry_msgs::Quaternion createQuaternionMsg(double roll, double pitch, double yaw);

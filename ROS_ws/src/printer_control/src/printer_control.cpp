@@ -22,13 +22,14 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , tf_listener_ik_(tf_buffer_ik_)
   , ik_solver_("lens_group")
   , printer_state_(HOME)
-  , go_home_(true)
-  , go_idle_(true)
+  , go_home_(false)
+  , go_idle_(false)
+  , go_print_(false)
+  , need_initialize_(true)
   {
     //Constructor
-    ROS_INFO_STREAM("Printer control constructor");
 
-    //create quaternion msg
+/*    //create quaternion msg
     geometry_msgs::Quaternion my_quaternion = createQuaternionMsg(5, 0, 0);
 
     // Define the desired end-effector pose in lens_focal_static_frame frame
@@ -58,11 +59,74 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
     else
     {
 //        ROS_INFO_STREAM("Cannot find solution");
-    }
+    }*/
 }
 
 void PrinterControl::update()
 {
+    //v1: no GPS included
+    if (go_home_)
+    {
+        // if state not BUSY -> set state to BUSY
+        // reset timer
+        // if servos not home -> set home to servos
+        // if linear motor not home -> set linear motor home
+        // if servos home and steppers not home -> set home for steppers
+        // if steppers home and linear home and servos home -> set state HOME & (pub)
+        // reset go_home_
+
+    }
+
+    if (go_idle_)
+    {
+        // if state not BUSY || not INIT-> set state to BUSY
+        // if steppers not idle -> set idle to steppers
+        // if linear motor not idle -> set linear motor idle
+/*        // if steppers idle and servos not idle -> set servos idle*/ // toto nechcem pre pripadne chyby s offsetmi
+        // if steppers idle and linear idle /*and servos idle*/ ->
+        //          -> if need_initialize_ and state is not INIT-> set state to INIT and initialize lens
+        //          -> else set state IDLE & (pub)
+        //
+        // if INIT and lens_initialized_ -> set state IDLE & (pub) and reset need_initialize_
+        // reset go_idle_
+    }
+
+    if (go_print_)
+    {
+        // if state not BUSY -> set state to BUSY
+        // compute IK via  success = calculateIK(...) [print]
+        // if not success
+        //      -> set state to FAILURE (pub)
+        //      -> reset go_print_
+        //      -> break
+        // if steppers not print -> set print to steppers
+        // if linear motor not print -> set linear motor print
+        // if steppers and linear motor print -> set servos print
+        // if steppers and linear motor print and servos print
+        //          -> set state to PRINTING
+        //          -> reset go_print_
+        //          -> set timer
+
+    }
+
+    if (printer_state_ == PRINTING)
+    {
+        // timer update
+        // if timer > preset time
+        //      -> reset timer
+        //      -> set state to IDLE (pub)
+        //      -> start timer for idle
+    }
+
+    if (0/*timer for idle > 2 &&*/)
+    {
+        // if servo y != idle2 and printer_state_ != BUSY
+        //      -> set state to BUSY
+        //      -> set servo y to idle2
+        // else if servo y == idle2
+        //      -> set state to IDLE (do not PUBLISH)
+        //      -> reset timer for idle
+    }
 
 }
 
@@ -72,6 +136,7 @@ void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg
     if (printer_state_ == IDLE)
     {
         printing_point_ = *msg;
+        go_print_ = true;
         ROS_INFO_STREAM("New printing_point: \nx: " << printing_point_.x << "\ny: " << printing_point_.y << "\nz: " << printing_point_.z) ;
     }
     else
@@ -89,6 +154,8 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         {
             ROS_INFO_STREAM("printerStateCallback: HOME");
             go_home_ = true;
+            // reset timers
+            // ...
         }
         else
         {
@@ -113,7 +180,7 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
 
 void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-
+    // if true -> set lens_initialized_
 }
 
 geometry_msgs::Quaternion PrinterControl::createQuaternionMsg(double roll_deg, double pitch_deg, double yaw_deg)
