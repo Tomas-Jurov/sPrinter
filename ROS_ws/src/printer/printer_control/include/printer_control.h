@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../include/printer_ik_solver.h"
-#include "../include/printer_state.h"
+#include "printer_state.h"
 
 #include "stdio.h"
 #include <ros/ros.h>
@@ -17,6 +16,8 @@
 #include <sprinter_srvs/GetOrientation.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <sensor_msgs/JointState.h>
 
 
 class PrinterControl
@@ -53,7 +54,6 @@ private:
 
 private:
 
-  PrinterIKSolver ik_solver_;
 
   PrinterState  printer_state_;
   geometry_msgs::Point printing_point_;

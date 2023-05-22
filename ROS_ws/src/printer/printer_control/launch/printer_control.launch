@@ -1,13 +1,10 @@
 <launch>
-
     <include file="$(find state_estimation)/launch/state_estimation.launch" />
-    <include file="$(find printer_control)/launch/load_robot_info.launch" />
-
-<!--    <include file="$(find sprinter_robot_model)/launch/demo.launch" />-->
 
     <node name="printer_control" pkg="printer_control" type="printer_control"
           respawn="false" output="screen">
     </node>
 
-    <param name="/use_sim_time" value="false" />
+    <include file="$(find printer_ik_solver)/launch/printer_ik_solver.launch" />
+
 </launch>

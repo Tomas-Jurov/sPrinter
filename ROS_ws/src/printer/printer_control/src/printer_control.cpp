@@ -17,7 +17,6 @@ PrinterControl::PrinterControl(const ros::Publisher& target_reached_pub, const r
   , gps_client_(gps_client)
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
-  , ik_solver_("lens_group")
   , printer_state_(HOME)
   , go_home_(false)
   , go_idle_(false)
@@ -241,18 +240,18 @@ void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
 
 void PrinterControl::jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
-    // Process received joint state message
-    std::vector<std::string> jointNames = msg->name;
-    std::vector<double> jointPositions = msg->position;
-    std::vector<double> jointVelocities = msg->velocity;
-    std::vector<double> jointEfforts = msg->effort;
-
-    // Print joint state information
-    for (size_t i = 0; i < jointNames.size(); ++i)
-    {
-        ROS_INFO("Joint Name: %s", jointNames[i].c_str());
-        ROS_INFO("Position: %f", jointPositions[i]);
-        ROS_INFO("Velocity: %f", jointVelocities[i]);
-        ROS_INFO("Effort: %f", jointEfforts[i]);
-    }
+//    // Process received joint state message
+//    std::vector<std::string> jointNames = msg->name;
+//    std::vector<double> jointPositions = msg->position;
+//    std::vector<double> jointVelocities = msg->velocity;
+//    std::vector<double> jointEfforts = msg->effort;
+//
+//    // Print joint state information
+//    for (size_t i = 0; i < jointNames.size(); ++i)
+//    {
+//        ROS_INFO("Joint Name: %s", jointNames[i].c_str());
+//        ROS_INFO("Position: %f", jointPositions[i]);
+//        ROS_INFO("Velocity: %f", jointVelocities[i]);
+//        ROS_INFO("Effort: %f", jointEfforts[i]);
+//    }
 }

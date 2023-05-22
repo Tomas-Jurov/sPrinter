@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>printer_control</name>
+  <name>printer_ik_solver</name>
   <version>0.0.0</version>
-  <description>The printer_control package</description>
+  <description>The printer_ik_solver package</description>
 
-  <maintainer email="todo@todo.todo">todo</maintainer>
+  <maintainer email="jakub@todo.todo">jakub</maintainer>
 
   <license>TODO</license>
 
@@ -60,5 +60,4 @@
   <exec_depend>pluginlib</exec_depend>
   <exec_depend>geometric_shapes</exec_depend>
   <exec_depend>rosbag</exec_depend>
-
 </package>

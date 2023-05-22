@@ -12,13 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
         sprinter_srvs
         tf2_geometry_msgs
         eigen_conversions
-        moveit_core
-        moveit_ros_planning
-        moveit_ros_planning_interface
-        moveit_ros_perception
-        pluginlib
-        geometric_shapes
-        rosbag
         )
 
 find_package(Eigen3 REQUIRED)
@@ -27,8 +20,6 @@ catkin_package(
         LIBRARIES
         INCLUDE_DIRS
         CATKIN_DEPENDS
-        moveit_core
-        moveit_ros_planning_interface
         tf2_geometry_msgs
         DEPENDS
 )
@@ -37,7 +28,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}
-        src/printer_control_node.cpp src/printer_control.cpp src/printer_ik_solver.cpp)
+        src/printer_control_node.cpp src/printer_control.cpp )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 

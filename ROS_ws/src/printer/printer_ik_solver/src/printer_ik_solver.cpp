@@ -1,10 +1,10 @@
 #include "../include/printer_ik_solver.h"
 
-PrinterIKSolver::PrinterIKSolver(const std::string& group_name) :
-move_group_(group_name),
-planning_group_(group_name),
+PrinterIKSolver::PrinterIKSolver() :
+move_group_(planning_group_),
 move_group_interface_(planning_group_)
 {
+    ROS_INFO_STREAM("... ... ... ");
     /*Constructor*/
     moveit::core::RobotModelConstPtr robot_model = move_group_interface_.getRobotModel();
     moveit::core::RobotStatePtr robot_state(new moveit::core::RobotState(robot_model));
@@ -16,8 +16,8 @@ move_group_interface_(planning_group_)
     robot_state_ = robot_state;
     joint_model_group_ = joint_model_group;
 
-//    ROS_INFO_STREAM("End effector: " << move_group_.getEndEffectorLink()); // lens_focal_work_frame
-//    ROS_INFO_STREAM("Reference frame: " << move_group_.getPoseReferenceFrame()); // base link
+    ROS_INFO_STREAM("End effector: " << move_group_.getEndEffectorLink()); // lens_focal_work_frame
+    ROS_INFO_STREAM("Reference frame: " << move_group_.getPoseReferenceFrame()); // base link
 }
 
 /*Calculate inverse kinematics for sPrinter robot lens, arguments:
