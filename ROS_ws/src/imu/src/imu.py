@@ -11,7 +11,7 @@ from geometry_msgs.msg import Vector3
 from time import time
 from tf.transformations import quaternion_from_euler 
 
-
+earth_accelartion = 9.81
 
 def publisher():
     # define the actions the publisher will make
@@ -43,9 +43,9 @@ def publisher():
         yaw = 0
 
         #construct linear acceleration message 
-        msg.linear_acceleration.x = xa
-        msg.linear_acceleration.y = ya
-        msg.linear_acceleration.z = za
+        msg.linear_acceleration.x = xa*earth_accelartion
+        msg.linear_acceleration.y = ya*earth_accelartion
+        msg.linear_acceleration.z = za*earth_accelartion
 
         #conctruct angular velocity message
         msg.angular_velocity.x = rollv 
