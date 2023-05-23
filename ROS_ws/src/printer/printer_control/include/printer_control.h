@@ -14,6 +14,9 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <sprinter_srvs/GetOrientation.h>
+#include <../../../../devel/include/sprinter_srvs/GetOrientation.h>
+#include <sprinter_srvs/GetIkSolution.h>
+#include <../../../../devel/include/sprinter_srvs/GetIkSolution.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -27,7 +30,8 @@ public:
                  const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
                  const ros::Publisher& stepper1_target_pub, const ros::Publisher& stepper2_target_pub,
                  const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub,
-                 const ros::Publisher& suntracker_pub, const ros::ServiceClient& gps_client);
+                 const ros::Publisher& suntracker_pub, const ros::ServiceClient& gps_client,
+                 const ros::ServiceClient& ik_client);
   ~PrinterControl() = default;
 
   /*callbacks*/
@@ -43,6 +47,7 @@ private:
   ros::Publisher target_reached_pub_, tilt_pub_, stepper1_speed_pub_, stepper2_speed_pub_, stepper1_target_pub_,
       stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_;
   ros::ServiceClient gps_client_;
+  ros::ServiceClient ik_client_;
 
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf_listener_;
@@ -51,6 +56,7 @@ private:
       servo1_msg_, servo2_msg_;
   std_msgs::Empty suntracker_msg_;
   sprinter_srvs::GetOrientation gps_srv_;
+  sprinter_srvs::GetIkSolution ik_srv_;
 
 private:
 

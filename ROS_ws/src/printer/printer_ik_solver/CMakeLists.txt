@@ -31,6 +31,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
         LIBRARIES
         INCLUDE_DIRS
+        INCLUDE_DIRS include
         CATKIN_DEPENDS
         moveit_core
         moveit_ros_planning_interface
@@ -39,6 +40,7 @@ catkin_package(
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS/sprinter_srvs})
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}

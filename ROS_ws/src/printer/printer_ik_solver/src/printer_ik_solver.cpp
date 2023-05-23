@@ -1,8 +1,10 @@
 #include "../include/printer_ik_solver.h"
 
 PrinterIKSolver::PrinterIKSolver() :
-move_group_(planning_group_),
-move_group_interface_(planning_group_)
+tf_buffer_(),
+tf_listener_(tf_buffer_),
+move_group_(PLANNING_GROUP),
+move_group_interface_(PLANNING_GROUP)
 {
     ROS_INFO_STREAM("... ... ... ");
     /*Constructor*/
@@ -11,7 +13,7 @@ move_group_interface_(planning_group_)
     move_group_interface_.setStartStateToCurrentState();
 
     const moveit::core::JointModelGroup* joint_model_group =
-            move_group_interface_.getCurrentState()->getJointModelGroup(planning_group_);
+            move_group_interface_.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
     robot_state_ = robot_state;
     joint_model_group_ = joint_model_group;
@@ -24,8 +26,6 @@ move_group_interface_(planning_group_)
  * desired pose in base_link frame and returned vector of joint values */
 bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose, std::vector<double>& joint_values_ik)
 {
-    ROS_INFO_STREAM("Calculate ik init");
-
     robot_state_->setToDefaultValues();
     bool ik_found = robot_state_->setFromIK(joint_model_group_, desired_pose.pose, 0.1);
 
@@ -47,6 +47,22 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
         ROS_ERROR("Failed to compute IK solution");
         return false;
     }
-    
+
+    return true;
+}
+
+bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& req, sprinter_srvs::GetIkSolution::Response& res)
+{
+    ROS_INFO_STREAM("Called calculateIkService");
+    try
+    {
+        calculateIK(req.pose, res.joint_states );
+    }
+    catch(...)
+    {
+        ROS_ERROR("ERROR when computing IK");
+    }
+
+
     return true;
 }
