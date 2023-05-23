@@ -18,22 +18,20 @@
 
 class SprinterControl
 {
-    public:
-			SprinterControl(const ros::Publisher &safety_stop_pub
-										, const ros::Publisher &heartbeat_pub
-										, const ros::ServiceClient &initialize_client
-										, const ros::ServiceClient &set_pose_client
-										, const ros::ServiceClient &set_printer_client);
-			~SprinterControl() = default;
+public:
+  SprinterControl(const ros::Publisher& safety_stop_pub, const ros::Publisher& heartbeat_pub,
+                  const ros::ServiceClient& initialize_client, const ros::ServiceClient& set_pose_client,
+                  const ros::ServiceClient& set_printer_client);
+  ~SprinterControl() = default;
 
-			void update();
+  void update();
 
-			void taskManagerStatusCallback(const diagnostic_msgs::DiagnosticStatus::ConstPtr &msg);
+  void taskManagerStatusCallback(const diagnostic_msgs::DiagnosticStatus::ConstPtr& msg);
 
-    public:
-      static constexpr float HEARTBEAT_INTERVAL = 1.0;	// [s]
-    private:
-			ros::Publisher safety_stop_pub_, heartbeat_pub_;
-			ros::ServiceClient initialize_client_, set_pose_client_, set_printer_client_;
-			ros::Time heartbeat_last_;
+public:
+  static constexpr float HEARTBEAT_INTERVAL = 1.0;  // [s]
+private:
+  ros::Publisher safety_stop_pub_, heartbeat_pub_;
+  ros::ServiceClient initialize_client_, set_pose_client_, set_printer_client_;
+  ros::Time heartbeat_last_;
 };
