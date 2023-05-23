@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GetOrientation.srv
+  SetPointArr.srv
+  SetPose2D.srv
 )
 
 generate_messages(
