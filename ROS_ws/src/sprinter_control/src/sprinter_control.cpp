@@ -16,7 +16,7 @@ SprinterControl::SprinterControl(const ros::Publisher &safety_stop_pub
 
 void SprinterControl::update()
 {
-	if (ros::Duration(ros::Time::now() - heartbeat_last_).toSec() > HEARTBEAT_INT)
+	if (ros::Duration(ros::Time::now() - heartbeat_last_).toSec() > HEARTBEAT_INTERVAL)
 		{
 			heartbeat_pub_.publish(std_msgs::Empty());
 			heartbeat_last_ = ros::Time::now();

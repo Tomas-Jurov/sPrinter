@@ -20,7 +20,8 @@ namespace TaskManagerNS
 
   void TaskManager::update()
   {
-    watchdogCheck();
+    if (!watchdogCheck())
+      return;
     
     if (state_ == INITIALIZING)
     {
@@ -29,8 +30,7 @@ namespace TaskManagerNS
     {
       if (!printer_task_.empty())
       {
-        publishStatus(LOG_LEVEL_T::OK, "Printer request state: READY");
-        publishPrinterTargetState(1);
+        publishPrinterTargetState(PrinterState::IDLE);
         setState(PRINTER_BUSY);
       }
       else if (pose_task_ptr_.get() != nullptr)
@@ -48,8 +48,7 @@ namespace TaskManagerNS
       }
       else if (pose_task_ptr_.get() != nullptr)
       {
-        publishStatus(LOG_LEVEL_T::OK, "Printer request state: HOME");
-        publishPrinterTargetState(0);
+        publishPrinterTargetState(PrinterState::HOME);
         setState(PRINTER_BUSY);
       }
     }
@@ -66,11 +65,16 @@ namespace TaskManagerNS
         ROS_ERROR("Connection lost. Canceling all jobs.");
         safetyStop();
       }
+      return false;
     }
-    else if (!connected_)
+    else 
     {
-      ROS_WARN("Connection restored.");
-      connected_ = true;
+      if (!connected_)
+      {
+        ROS_WARN("Connection restored.");
+        connected_ = true;
+      }
+      return true;
     }
   }
 
@@ -79,7 +83,7 @@ namespace TaskManagerNS
     clearPoseTask();
     clearPrinterTask();
 
-    if (state_ != ROBOT_READY)
+    if ((state_ != ROBOT_READY) && (state_ != START))
     {
       if (state_ == ROBOT_MOVING)
       {
@@ -89,6 +93,7 @@ namespace TaskManagerNS
       {
         publishPrinterTargetState(PrinterState::HOME);
       }
+      setState(STOPPING);
     }
   }
 
@@ -172,9 +177,16 @@ namespace TaskManagerNS
 
   void TaskManager::poseControlCallback(const std_msgs::Bool::ConstPtr& msg)
   {
-    if (state_ == ROBOT_MOVING)
+    if (state_ == ROBOT_MOVING || state_ == STOPPING)
     {
-      publishStatus(LOG_LEVEL_T::OK, "Pose task completed successfully.");
+      if (state_ == ROBOT_MOVING)
+      {
+        publishStatus(LOG_LEVEL_T::OK, "Pose task completed successfully.");
+      }
+      else if (state_ == STOPPING)
+      {
+        publishStatus(LOG_LEVEL_T::OK, "Vehicle is safe now.");
+      }
       setState(ROBOT_READY);
     }
   }
@@ -185,7 +197,10 @@ namespace TaskManagerNS
     {
       if (msg->data == PrinterState::HOME)
       {
-        setState(ROBOT_READY);
+        if (pose_task_ptr_.get() != nullptr)
+        {
+          setState(ROBOT_READY);
+        }
       }
       else if (msg->data == PrinterState::IDLE)
       {
@@ -205,11 +220,20 @@ namespace TaskManagerNS
         clearPrinterTask();
         setState(PRINTER_IDLE);
       }
+      else
+        publishStatus(LOG_LEVEL_T::WARN, "Unknown Printer Control state obrained. Ignoring.");
+    }
+    else if (state_ == STOPPING && msg->data == HOME)
+    {
+      publishStatus(LOG_LEVEL_T::OK, "Vehicle is safe now.");
+      setState(ROBOT_READY);
     }
   }
 
   void TaskManager::setState(State state)
   {
+    if (state == state_)
+      return;
     state_ = state;
     
     std::string state_str;
@@ -221,6 +245,7 @@ namespace TaskManagerNS
       case ROBOT_MOVING : state_str = "ROBOT MOVING"; break;
       case PRINTER_BUSY : state_str = "PRINTER BUSY"; break;
       case PRINTER_IDLE : state_str = "PRINTER IDLE"; break;
+      case STOPPING     : state_str = "STOPPING"; break;
       default: state_str = "UNDEFINED"; break;
     }
 
@@ -258,8 +283,18 @@ namespace TaskManagerNS
     }
   }
 
-  void TaskManager::publishPrinterTargetState(const uint8_t state)
+  void TaskManager::publishPrinterTargetState(const PrinterState state)
   {
+    std::string state_str;
+    switch (state)
+    {
+      case PrinterState::HOME    : state_str = "HOME"; break;
+      case PrinterState::IDLE    : state_str = "IDLE"; break;
+      case PrinterState::FAILURE : state_str = "FAILURE"; break;
+      default                    : state_str = "UNDEFINED"; break;
+    }
+    publishStatus(LOG_LEVEL_T::OK, "Printer request state: " + state_str);
+    
     printer_state_msg_.data = state;
     printer_state_pub_.publish(printer_state_msg_);
   }

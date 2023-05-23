@@ -30,7 +30,8 @@ namespace TaskManagerNS
     ROBOT_READY,
     ROBOT_MOVING,
     PRINTER_BUSY,
-    PRINTER_IDLE
+    PRINTER_IDLE,
+    STOPPING
   };
 
   enum PrinterState
@@ -73,7 +74,7 @@ namespace TaskManagerNS
     void publishStatus(const int8_t logger_level, const std::string& message);
     void publishPoseTarget();
     void publishPrinterTargetCmd();
-    void publishPrinterTargetState(const uint8_t state);
+    void publishPrinterTargetState(const PrinterState state);
     void publishPoseStop();
 
     void clearPoseTask();

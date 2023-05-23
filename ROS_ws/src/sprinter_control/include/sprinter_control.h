@@ -31,7 +31,7 @@ class SprinterControl
 			void taskManagerStatusCallback(const diagnostic_msgs::DiagnosticStatus::ConstPtr &msg);
 
     public:
-      static constexpr float HEARTBEAT_INT = 0.2;	// [s]
+      static constexpr float HEARTBEAT_INTERVAL = 1.0;	// [s]
     private:
 			ros::Publisher safety_stop_pub_, heartbeat_pub_;
 			ros::ServiceClient initialize_client_, set_pose_client_, set_printer_client_;
