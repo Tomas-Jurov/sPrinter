@@ -7,7 +7,7 @@ int main(int argc, char** argv)
   ros::AsyncSpinner spinner(1);
   spinner.start();
 
-  ros::Publisher target_reached_pub = nh.advertise<std_msgs::Bool>("target/printer/reached", 1);
+  ros::Publisher printer_state_pub = nh.advertise<std_msgs::Int8>("printer_control/state", 1);
   ros::Publisher tilt_pub = nh.advertise<std_msgs::Float32>("tilt/target_vel", 1);
   ros::Publisher stepper1_speed_pub = nh.advertise<std_msgs::Float32>("stepper1/set_speed", 1);
   ros::Publisher stepper2_speed_pub = nh.advertise<std_msgs::Float32>("stepper2/set_speed", 1);
@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   ros::Publisher suntracker_pub = nh.advertise<std_msgs::Empty>("suntracker/do", 1);
   ros::ServiceClient gps_client = nh.serviceClient<sprinter_srvs::GetOrientation>("gps/get_sun_orientation");
     ros::ServiceClient ik_client = nh.serviceClient<sprinter_srvs::GetIkSolution>("ik/get_solution");
-  PrinterControl printer_control(target_reached_pub, tilt_pub, stepper1_speed_pub, stepper2_speed_pub,
+  PrinterControl printer_control(printer_state_pub, tilt_pub, stepper1_speed_pub, stepper2_speed_pub,
                                  stepper1_target_pub, stepper2_target_pub, servo1_pub, servo2_pub, suntracker_pub,
                                  gps_client, ik_client);
 

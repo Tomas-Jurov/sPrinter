@@ -1,8 +1,15 @@
 #pragma once
 
+#define MAX_ERR_ANG 0.017 //1deg
+#define MAX_ERR_POS 0.005 //5mm
+#define KP_GAIN 200
+#define PRINTING_TIMEOUT 600 //10min
+#define IDLE_TIMEOUT 5 //5s
+#define PRINTING_FRAME "lens_focal_static_frame"
+
 #include "printer_state.h"
 
-#include "stdio.h"
+#include <stdio.h>
 #include <ros/ros.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/Bool.h>
@@ -22,6 +29,18 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/JointState.h>
 
+/*
+     * MainFrame_pitch 0
+     * Lens_Y_axis_trans 1
+     * Lens_X_axis_trans 2
+     * Lens_Y_axis_rot 3
+     * Lens_X_axis_rot 4
+     * */
+
+struct actuatorStruct{
+    bool is_set = false;
+    bool is_on_pos = false;
+} ;
 
 class PrinterControl
 {
@@ -44,7 +63,7 @@ public:
   void update();
 
 private:
-  ros::Publisher target_reached_pub_, tilt_pub_, stepper1_speed_pub_, stepper2_speed_pub_, stepper1_target_pub_,
+  ros::Publisher printer_state_pub_, tilt_pub_, stepper1_speed_pub_, stepper2_speed_pub_, stepper1_target_pub_,
       stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_;
   ros::ServiceClient gps_client_;
   ros::ServiceClient ik_client_;
@@ -63,10 +82,29 @@ private:
 
   PrinterState  printer_state_;
   geometry_msgs::Point printing_point_;
-  bool go_home_, go_idle_, go_print_, need_initialize_;
+  bool go_home_, go_idle_, go_print_, need_initialize_, printing_pose_found_;
+  std::vector<double> joint_positions_, joint_positions_target_;
+  actuatorStruct servo1, servo2, stepper1, stepper2, lin_actuator;
+  geometry_msgs::Quaternion quaternion_world_sun;
+  geometry_msgs::PoseStamped printing_pose_;
+  ros::Time printing_start_timestamp_, idle_start_timestamp_;
 
   /*fcn*/
+  void servo2Update(bool condition);
+  void servo2Update();
+  void servo1Update(bool condition);
+  void servo1Update();
+  void linActuatorUpdate();
+  void stepper2Update(bool condition);
+  void stepper2Update();
+  void stepper1Update(bool condition);
+  void stepper1Update();
+  void resetActuatorsStruct();
+  bool servosOnPos();
+  bool steppersOnPos();
   bool lin_actuator_control(double target_angle);
   void goHome();
+  void goIdle();
+  void goPrint();
   geometry_msgs::Quaternion createQuaternionMsg(double roll, double pitch, double yaw);
 };

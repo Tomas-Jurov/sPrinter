@@ -25,7 +25,6 @@ catkin_package(
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
-include_directories(${THIS_PACKAGE_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}
         src/printer_control_node.cpp src/printer_control.cpp )

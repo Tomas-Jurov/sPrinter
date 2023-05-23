@@ -12,7 +12,8 @@ enum PrinterState
     FAILURE,
     BUSY,
     INIT,
-    PRINTING
+    PRINTING,
+    IDLE2
 };
 
 #endif //SRC_PRINTER_STATE_H
