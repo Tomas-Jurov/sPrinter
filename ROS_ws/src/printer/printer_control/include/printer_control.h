@@ -29,14 +29,6 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/JointState.h>
 
-/*
-     * MainFrame_pitch 0
-     * Lens_Y_axis_trans 1
-     * Lens_X_axis_trans 2
-     * Lens_Y_axis_rot 3
-     * Lens_X_axis_rot 4
-     * */
-
 struct actuatorStruct{
     bool is_set = false;
     bool is_on_pos = false;
@@ -82,7 +74,7 @@ private:
 
   PrinterState  printer_state_;
   geometry_msgs::Point printing_point_;
-  bool go_home_, go_idle_, go_print_, need_initialize_, printing_pose_found_;
+  bool go_home_, go_idle_, go_print_, need_initialize_, printing_pose_found_, need_go_home_;
   std::vector<double> joint_positions_, joint_positions_target_;
   actuatorStruct servo1, servo2, stepper1, stepper2, lin_actuator;
   geometry_msgs::Quaternion quaternion_world_sun;
@@ -102,9 +94,9 @@ private:
   void resetActuatorsStruct();
   bool servosOnPos();
   bool steppersOnPos();
+  bool isInIdle2();
   bool lin_actuator_control(double target_angle);
   void goHome();
   void goIdle();
   void goPrint();
-  geometry_msgs::Quaternion createQuaternionMsg(double roll, double pitch, double yaw);
 };

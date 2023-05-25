@@ -20,12 +20,18 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
   , ik_client_(ik_client)
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
-  , printer_state_(IDLE)
+  , printer_state_(HOME)
   , go_home_(false), go_idle_(false), go_print_(false)
   , need_initialize_(true)
+  , need_go_home_(false)
   , printing_pose_found_(false)
   {
     //Constructor
+
+//      quaternion_world_sun.x = 0;
+//      quaternion_world_sun.y = 0;
+//      quaternion_world_sun.z = 0;
+//      quaternion_world_sun.w = 1;
 
 }
 
@@ -37,22 +43,35 @@ void PrinterControl::update()
 
     if (go_print_) goPrint();
 
-    if (printer_state_ == PRINTING &&
-            printing_start_timestamp_.sec-ros::Time::now().sec > PRINTING_TIMEOUT)
+    /*check if need to go to home pos*/
+    if (printer_state_ == IDLE && need_go_home_)
     {
+        go_home_ = true;
+        need_go_home_ = false;
+        joint_positions_target_ = joint_positions_home_;
+    }
+
+    /*check if printing finished*/
+    if (printer_state_ == PRINTING &&
+            abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()) > PRINTING_TIMEOUT)
+    {
+        ROS_INFO_STREAM("PRINTING_TIMEOUT");
         printer_state_ = IDLE;
         std_msgs::Int8 msg;
         msg.data = printer_state_;
         printer_state_pub_.publish(msg);
+        idle_start_timestamp_ = ros::Time::now();
     }
 
+    /*idle2*/
     if (printer_state_ == IDLE &&
-            idle_start_timestamp_.sec-ros::Time::now().sec > IDLE_TIMEOUT)
+            abs(idle_start_timestamp_.toSec()-ros::Time::now().toSec()) > IDLE_TIMEOUT)
     {
         joint_positions_target_ = joint_positions_idle2_;
         go_idle_ = true;
+        if (!need_initialize_) need_initialize_ = true;
+        ROS_INFO_STREAM("Need initialize cause printer_state_ = idle2");
     }
-
 }
 
 void PrinterControl::goPrint()
@@ -60,7 +79,16 @@ void PrinterControl::goPrint()
     if (printer_state_ != BUSY) printer_state_ = BUSY;
     if (!printing_pose_found_)
     {
-        printing_pose_.pose.orientation = quaternion_world_sun;
+        geometry_msgs::PoseStamped tmp;
+        tmp.pose.orientation = quaternion_world_sun;
+        tmp.header.frame_id = PRINTING_FRAME;
+
+        //transform orientation to sun from world to lens_focal_static_frame
+        geometry_msgs::PoseStamped pose_static_sun = tf_buffer_.transform(
+                tmp, PRINTING_FRAME);
+
+        //set printing pose in lens_focal_static_frame
+        printing_pose_.pose.orientation = pose_static_sun.pose.orientation;
         printing_pose_.pose.position = printing_point_;
         printing_pose_.header.frame_id = PRINTING_FRAME;
         printing_pose_.header.stamp = ros::Time::now();
@@ -70,18 +98,27 @@ void PrinterControl::goPrint()
 
         ROS_INFO_STREAM("desired_pose_in_base_link_ \nx: " << printing_pose_in_base_link_.pose.position.x <<
                                                            "\ny: "<< printing_pose_in_base_link_.pose.position.y<<
-                                                           "\nz: " << printing_pose_in_base_link_.pose.position.z);
+                                                           "\nz: " << printing_pose_in_base_link_.pose.position.z <<
+                                                           "\no-w: "<< printing_pose_in_base_link_.pose.orientation.w<<
+                                                           "\no-x: "<< printing_pose_in_base_link_.pose.orientation.x<<
+                                                           "\no-y: "<< printing_pose_in_base_link_.pose.orientation.y<<
+                                                           "\no-z: "<< printing_pose_in_base_link_.pose.orientation.z);
 
         ik_srv_.request.pose = printing_pose_in_base_link_;
         ik_client_.call(ik_srv_);
+
         if (!ik_srv_.response.joint_states.size())
         {
+            ROS_INFO_STREAM("[P] IK failure");
             printer_state_ = FAILURE;
             std_msgs::Int8 msg;
             msg.data = printer_state_;
             printer_state_pub_.publish(msg);
             joint_positions_target_ = joint_positions_; //important
         }
+
+        joint_positions_target_ = ik_srv_.response.joint_states;
+        printing_pose_found_ = true;
     }
 
     stepper2Update();
@@ -93,6 +130,7 @@ void PrinterControl::goPrint()
     // on printing pos
     if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
     {
+        ROS_INFO_STREAM("[P] on printing position");
         printer_state_ = PRINTING;
         std_msgs::Int8 msg;
         msg.data = printer_state_;
@@ -107,23 +145,75 @@ void PrinterControl::goIdle()
 {
     if (need_initialize_)
     {
+        ROS_INFO_STREAM("[P] initializing");
         printer_state_ = INIT;
         gps_client_.call(gps_srv_);
         quaternion_world_sun = gps_srv_.response.orientation;
+
+//        //check if quaternion is filled
+//        if (isnan(quaternion_world_sun.x) ||
+//            isnan(quaternion_world_sun.y) ||
+//            isnan(quaternion_world_sun.z) ||
+//            isnan(quaternion_world_sun.w))
+//        {
+//            quaternion_world_sun.x = 0;
+//            quaternion_world_sun.y = 0;
+//            quaternion_world_sun.z = 0;
+//            quaternion_world_sun.w = 1;
+//        }
+
+        try
+        {
+            if (sqrt(pow(quaternion_world_sun.x,2)+
+                pow(quaternion_world_sun.y,2)+
+                pow(quaternion_world_sun.z,2)+
+                pow(quaternion_world_sun.w,2))
+                == 1.0)
+            {
+                ROS_INFO_STREAM("GPS node sent valid orientation to sun");
+            }
+            else
+            {
+                ROS_INFO_STREAM("GPS node Err");
+                quaternion_world_sun.x = 0;
+                quaternion_world_sun.y = 0;
+                quaternion_world_sun.z = 0;
+                quaternion_world_sun.w = 1;
+            }
+        }
+        catch(...)
+        {
+            ROS_INFO_STREAM("Err initializing");
+        }
+
         need_initialize_ = false;
         printer_state_ = BUSY;
+        ROS_INFO_STREAM("[P] initializing finished");
     }
     else if (printer_state_ != BUSY) printer_state_ = BUSY;
 
-    stepper2Update();
-    stepper1Update();
-    linActuatorUpdate();
-    servo2Update(steppersOnPos());
-    servo1Update(steppersOnPos());
+    if (need_go_home_)
+    {
+        servo2Update(steppersOnPos());
+        servo1Update(steppersOnPos());
+        linActuatorUpdate();
+        stepper2Update();
+        stepper1Update();
+    }
+    else
+    {
+        stepper2Update();
+        stepper1Update();
+        linActuatorUpdate();
+        servo2Update(steppersOnPos());
+        servo1Update(steppersOnPos());
+    }
+
 
     // on idle pos
     if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
     {
+        ROS_INFO_STREAM("[P] on idle position");
         printer_state_ = IDLE;
         std_msgs::Int8 msg;
         msg.data = printer_state_;
@@ -131,6 +221,7 @@ void PrinterControl::goIdle()
         go_idle_ = false;
         resetActuatorsStruct();
         idle_start_timestamp_ = ros::Time::now();
+        if (isInIdle2()) printer_state_ = IDLE2;
     }
 
 }
@@ -148,6 +239,7 @@ void PrinterControl::goHome()
     // on home pos
     if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
     {
+        ROS_INFO_STREAM("[P] on home pos");
         printer_state_ = HOME;
         std_msgs::Int8 msg;
         msg.data = printer_state_;
@@ -160,12 +252,13 @@ void PrinterControl::goHome()
 void PrinterControl::servo1Update(bool condition)
 {
     // servo1 Lens_X_axis_rot
-    if (abs(joint_positions_home_[4]-joint_positions_[4]) >= MAX_ERR_ANG)
+    if (abs(joint_positions_target_[4]-joint_positions_[4]) >= MAX_ERR_ANG)
     {
         if (!servo1.is_set && condition)
         {
+            ROS_INFO_STREAM("[P] target on servo1:" << joint_positions_target_[4]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_home_[4];
+            msg.data = joint_positions_target_[4];
             servo1_pub_.publish(msg);
             servo1.is_set = true;
         }
@@ -181,12 +274,13 @@ void PrinterControl::servo1Update()
 void PrinterControl::servo2Update(bool condition)
 {
     // servo2 Lens_Y_axis_rot
-    if (abs(joint_positions_home_[3]-joint_positions_[3]) >= MAX_ERR_ANG)
+    if (abs(joint_positions_target_[3]-joint_positions_[3]) >= MAX_ERR_ANG)
     {
         if (!servo2.is_set && condition)
         {
+            ROS_INFO_STREAM("[P] target on servo2:" << joint_positions_target_[3]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_home_[3];
+            msg.data = joint_positions_target_[3];
             servo2_pub_.publish(msg);
             servo2.is_set = true;
         }
@@ -202,12 +296,13 @@ void PrinterControl::servo2Update()
 void PrinterControl::stepper1Update(bool condition)
 {
     // stepper1 Lens_X_axis_trans
-    if (abs(joint_positions_home_[2]-joint_positions_[2]) >= MAX_ERR_POS)
+    if (abs(joint_positions_target_[2]-joint_positions_[2]) >= MAX_ERR_POS)
     {
         if (!stepper1.is_set && condition)
         {
+            ROS_INFO_STREAM("[P] target on stepper1:" << joint_positions_target_[2]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_home_[2];
+            msg.data = joint_positions_target_[2];
             stepper1_target_pub_.publish(msg);
             stepper1.is_set = true;
         }
@@ -223,12 +318,13 @@ void PrinterControl::stepper1Update()
 void PrinterControl::stepper2Update(bool condition)
 {
     // stepper2 Lens_Y_axis_trans
-    if (abs(joint_positions_home_[1]-joint_positions_[1]) >= MAX_ERR_POS)
+    if (abs(joint_positions_target_[1]-joint_positions_[1]) >= MAX_ERR_POS)
     {
         if (!stepper2.is_set && condition)
         {
+            ROS_INFO_STREAM("[P] target on stepper2:" << joint_positions_target_[1]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_home_[1];
+            msg.data = joint_positions_target_[1];
             stepper2_target_pub_.publish(msg);
             stepper2.is_set = true;
         }
@@ -245,7 +341,7 @@ void PrinterControl::linActuatorUpdate()
 {
     // linear motor MainFrame_pitch
     if (!lin_actuator.is_on_pos &&
-        lin_actuator_control(joint_positions_home_[0] - joint_positions_[0]))
+        lin_actuator_control(joint_positions_target_[0] - joint_positions_[0]))
     {
         lin_actuator.is_on_pos = true;
     }
@@ -274,12 +370,19 @@ bool PrinterControl::steppersOnPos()
     return (stepper2.is_on_pos && stepper1.is_on_pos);
 }
 
-geometry_msgs::Quaternion PrinterControl::createQuaternionMsg(double roll_deg, double pitch_deg, double yaw_deg)
+bool PrinterControl::isInIdle2()
 {
-    tf2::Quaternion my_quaternion;
-    my_quaternion.setRPY(roll_deg/180.0*M_PI, pitch_deg/180.0*M_PI, yaw_deg/180.0*M_PI);
-    geometry_msgs::Quaternion my_quaternion_msg = tf2::toMsg(my_quaternion);
-    return my_quaternion_msg;
+    if (abs(joint_positions_idle2_[0]-joint_positions_[0]) < MAX_ERR_ANG &&
+    abs(joint_positions_idle2_[1]-joint_positions_[1]) < MAX_ERR_POS && // stepper
+    abs(joint_positions_idle2_[2]-joint_positions_[2]) < MAX_ERR_POS && // stepper
+    abs(joint_positions_idle2_[3]-joint_positions_[3]) < MAX_ERR_ANG&&
+    abs(joint_positions_idle2_[4]-joint_positions_[4]) <MAX_ERR_ANG)
+    {
+        ROS_INFO_STREAM("[P] on idle2 position");
+        return true;
+    }
+
+    return false;
 }
 
 bool PrinterControl::lin_actuator_control(double error)
@@ -309,7 +412,7 @@ bool PrinterControl::lin_actuator_control(double error)
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
     ROS_INFO_STREAM("targetCmdCallback");
-    if (printer_state_ == IDLE)
+    if (printer_state_ == IDLE || printer_state_ == IDLE2)
     {
         printing_pose_found_ = false;
         printing_point_ = *msg;
@@ -330,18 +433,28 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         if (printer_state_ != HOME)
         {
             ROS_INFO_STREAM("printerStateCallback: HOME");
-            go_home_ = true;
-            joint_positions_target_ = joint_positions_home_;
-            // reset timers
-            // ...
+            resetActuatorsStruct();
+
+            if (printer_state_ == IDLE)
+            {
+                go_home_ = true;
+                joint_positions_target_ = joint_positions_home_;
+            }
+            else
+            {
+                go_idle_ = true;
+                need_go_home_ = true;
+                joint_positions_target_ = joint_positions_idle1_;
+            }
+
         }
         else
         {
-            ROS_INFO_STREAM("Printer already HOME");
+            ROS_INFO_STREAM("printerStateCallback: (already) HOME");
         }
 
     }
-    else if (msg->data == PrinterState::IDLE)
+    else if (msg->data == IDLE)
     {
         /*I do not want to receive IDLE if printer is BUSY*/
         if (printer_state_ != IDLE && printer_state_ != BUSY)
@@ -352,7 +465,7 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         }
         else if (printer_state_ != BUSY)
         {
-            ROS_INFO_STREAM("Printer already IDLE");
+            ROS_INFO_STREAM("printerStateCallback: (already) IDLE");
         }
     }
 }
