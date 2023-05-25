@@ -8,9 +8,9 @@ int main(int argc, char** argv)
   spinner.start();
 
   ros::Publisher printer_state_pub = nh.advertise<std_msgs::Int8>("printer_control/state", 1);
-  ros::Publisher tilt_pub = nh.advertise<std_msgs::Float32>("tilt/target_vel", 1);
-  ros::Publisher stepper1_speed_pub = nh.advertise<std_msgs::Float32>("stepper1/set_speed", 1);
-  ros::Publisher stepper2_speed_pub = nh.advertise<std_msgs::Float32>("stepper2/set_speed", 1);
+  ros::Publisher tilt_pub = nh.advertise<std_msgs::Int8>("tilt/target_vel", 1);
+  ros::Publisher stepper1_speed_pub = nh.advertise<std_msgs::Int16>("stepper1/set_speed", 1);
+  ros::Publisher stepper2_speed_pub = nh.advertise<std_msgs::Int16>("stepper2/set_speed", 1);
   ros::Publisher stepper1_target_pub = nh.advertise<std_msgs::Float32>("stepper1/target_position", 1);
   ros::Publisher stepper2_target_pub = nh.advertise<std_msgs::Float32>("stepper2/target_position", 1);
   ros::Publisher servo1_pub = nh.advertise<std_msgs::Float32>("servo1/target_angle", 1);

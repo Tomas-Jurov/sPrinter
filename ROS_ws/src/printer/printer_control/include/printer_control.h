@@ -1,8 +1,9 @@
 #pragma once
 
-#define MAX_ERR_ANG 0.017 //1deg
-#define MAX_ERR_POS 0.005 //5mm
+#define ERR_TRESHOLD_ANG 0.017 //1deg tolerance
+#define ERR_TRESHOLD_POS 0.005 //5mm
 #define KP_GAIN 200
+#define KI_GAIN 10
 #define PRINTING_TIMEOUT 600 //10min
 #define IDLE_TIMEOUT 5 //5s
 #define PRINTING_FRAME "lens_focal_static_frame"
@@ -14,6 +15,7 @@
 #include <std_msgs/Empty.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int8.h>
+#include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/TransformStamped.h>
@@ -63,8 +65,9 @@ private:
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf_listener_;
   std_msgs::Bool target_reached_msg_;
-  std_msgs::Float32 tilt_msg_, stepper1_speed_msg_, stepper2_speed_msg_, stepper1_target_msg_, stepper2_target_msg_,
-      servo1_msg_, servo2_msg_;
+  std_msgs::Float32  stepper1_target_msg_, stepper2_target_msg_, servo1_msg_, servo2_msg_;
+  std_msgs::Int8 tilt_msg_;
+  std_msgs::Int16 stepper1_speed_msg_, stepper2_speed_msg_;
   std_msgs::Empty suntracker_msg_;
   sprinter_srvs::GetOrientation gps_srv_;
   sprinter_srvs::GetIkSolution ik_srv_;
@@ -79,7 +82,8 @@ private:
   actuatorStruct servo1, servo2, stepper1, stepper2, lin_actuator;
   geometry_msgs::Quaternion quaternion_world_sun;
   geometry_msgs::PoseStamped printing_pose_;
-  ros::Time printing_start_timestamp_, idle_start_timestamp_;
+  ros::Time printing_start_timestamp_, idle_start_timestamp_, lin_actuator_last_time_;
+  double integrator_ = 0.0;
 
   /*fcn*/
   void servo2Update(bool condition);

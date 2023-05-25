@@ -25,6 +25,7 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
   , need_initialize_(true)
   , need_go_home_(false)
   , printing_pose_found_(false)
+  , lin_actuator_last_time_(ros::Time::now())
   {
     //Constructor
 
@@ -76,6 +77,7 @@ void PrinterControl::update()
 
 void PrinterControl::goPrint()
 {
+    lin_actuator_last_time_ = ros::Time::now();
     if (printer_state_ != BUSY) printer_state_ = BUSY;
     if (!printing_pose_found_)
     {
@@ -143,6 +145,7 @@ void PrinterControl::goPrint()
 
 void PrinterControl::goIdle()
 {
+    lin_actuator_last_time_ = ros::Time::now();
     if (need_initialize_)
     {
         ROS_INFO_STREAM("[P] initializing");
@@ -228,6 +231,7 @@ void PrinterControl::goIdle()
 
 void PrinterControl::goHome()
 {
+    lin_actuator_last_time_ = ros::Time::now();
     if (!need_initialize_) need_initialize_ = true;
     if (printer_state_ != BUSY) printer_state_ = BUSY;
     servo2Update();
@@ -252,7 +256,7 @@ void PrinterControl::goHome()
 void PrinterControl::servo1Update(bool condition)
 {
     // servo1 Lens_X_axis_rot
-    if (abs(joint_positions_target_[4]-joint_positions_[4]) >= MAX_ERR_ANG)
+    if (abs(joint_positions_target_[4]-joint_positions_[4]) >= ERR_TRESHOLD_ANG)
     {
         if (!servo1.is_set && condition)
         {
@@ -274,7 +278,7 @@ void PrinterControl::servo1Update()
 void PrinterControl::servo2Update(bool condition)
 {
     // servo2 Lens_Y_axis_rot
-    if (abs(joint_positions_target_[3]-joint_positions_[3]) >= MAX_ERR_ANG)
+    if (abs(joint_positions_target_[3]-joint_positions_[3]) >= ERR_TRESHOLD_ANG)
     {
         if (!servo2.is_set && condition)
         {
@@ -296,7 +300,7 @@ void PrinterControl::servo2Update()
 void PrinterControl::stepper1Update(bool condition)
 {
     // stepper1 Lens_X_axis_trans
-    if (abs(joint_positions_target_[2]-joint_positions_[2]) >= MAX_ERR_POS)
+    if (abs(joint_positions_target_[2]-joint_positions_[2]) >= ERR_TRESHOLD_POS)
     {
         if (!stepper1.is_set && condition)
         {
@@ -318,7 +322,7 @@ void PrinterControl::stepper1Update()
 void PrinterControl::stepper2Update(bool condition)
 {
     // stepper2 Lens_Y_axis_trans
-    if (abs(joint_positions_target_[1]-joint_positions_[1]) >= MAX_ERR_POS)
+    if (abs(joint_positions_target_[1]-joint_positions_[1]) >= ERR_TRESHOLD_POS)
     {
         if (!stepper2.is_set && condition)
         {
@@ -372,11 +376,11 @@ bool PrinterControl::steppersOnPos()
 
 bool PrinterControl::isInIdle2()
 {
-    if (abs(joint_positions_idle2_[0]-joint_positions_[0]) < MAX_ERR_ANG &&
-    abs(joint_positions_idle2_[1]-joint_positions_[1]) < MAX_ERR_POS && // stepper
-    abs(joint_positions_idle2_[2]-joint_positions_[2]) < MAX_ERR_POS && // stepper
-    abs(joint_positions_idle2_[3]-joint_positions_[3]) < MAX_ERR_ANG&&
-    abs(joint_positions_idle2_[4]-joint_positions_[4]) <MAX_ERR_ANG)
+    if (abs(joint_positions_idle2_[0]-joint_positions_[0]) < ERR_TRESHOLD_ANG &&
+    abs(joint_positions_idle2_[1]-joint_positions_[1]) < ERR_TRESHOLD_POS && // stepper
+    abs(joint_positions_idle2_[2]-joint_positions_[2]) < ERR_TRESHOLD_POS && // stepper
+    abs(joint_positions_idle2_[3]-joint_positions_[3]) < ERR_TRESHOLD_ANG&&
+    abs(joint_positions_idle2_[4]-joint_positions_[4]) <ERR_TRESHOLD_ANG)
     {
         ROS_INFO_STREAM("[P] on idle2 position");
         return true;
@@ -387,24 +391,26 @@ bool PrinterControl::isInIdle2()
 
 bool PrinterControl::lin_actuator_control(double error)
 {
-    std_msgs::Float32 msg;
+    std_msgs::Int8 msg;
 
-    if (error < MAX_ERR_ANG)
+    if (error < ERR_TRESHOLD_ANG)
     {
         msg.data = 0;
         tilt_pub_.publish(msg);
+        integrator_ = 0;
         return true;
     }
 
-    // P controller
-    double u = KP_GAIN * (error);
-
-    //saturation ?
-//    if (u > 1000) u=1000;
+    // PI controller
+    ros::Duration dt = ros::Time::now() - lin_actuator_last_time_;
+    integrator_ += error * dt.toSec();
+    double u = KP_GAIN * (error) + KI_GAIN*integrator_;
 
     // Publish msg
     msg.data = (int8_t)u;
     tilt_pub_.publish(msg);
+
+    ROS_INFO_STREAM("linear motor speed: "<< u);
 
     return false;
 }
