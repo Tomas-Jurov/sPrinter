@@ -10,6 +10,7 @@
     
     <include file="$(find printer_control)/launch/printer_control.launch"/>
 
-    <node pkg="task_manager" type="task_manager" name="task_manager" output="screen"/>
+    <include file="$(find pose_control)/launch/pose_control.launch"/>
     
+    <node pkg="task_manager" type="task_manager" name="task_manager" output="screen"/>
 </launch>

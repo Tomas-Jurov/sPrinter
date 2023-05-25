@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <rosparam command="load" file="$(find pose_control)/params/pose_control.yaml"/>
+    <node pkg="pose_control" type="pose_control" name="pose_control" output="screen"/>
+</launch>

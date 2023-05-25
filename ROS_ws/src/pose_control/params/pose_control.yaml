@@ -1,0 +1,6 @@
+pose_control:
+  max_lin_speed                : 0.1   # [m/s]
+  max_ang_speed                : 0.2   # [rad/s]
+  target_position_tolerance    : 0.2 # [m]
+  target_orientation_tolerance : 0.5 # [rad]
+  look_ahead_distance          : 1.0 # [m]
