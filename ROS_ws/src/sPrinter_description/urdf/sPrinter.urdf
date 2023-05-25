@@ -656,15 +656,15 @@
     </joint>
     <!--focal work frame joint-->
     <joint name="lens_focal_work_frame_joint" type="fixed">
-        <origin rpy="0 0 0" xyz="0.0 0.0 -0.50" />
+        <origin rpy="0 0 0" xyz="0.0 0.0 -0.55" />
         <!-- z: ohniskova vzdialenost -->
         <parent link="lens_frame_middle" />
         <child link="lens_focal_work_frame" />
     </joint>
     <!--focal static frame joint-->
     <joint name="lens_focal_static_frame_joint" type="fixed">
-        <origin rpy="0 0 0" xyz="0.753764 0.0 0.05" />
-        <!-- z: 55cm - ohniskova vzdialenost = 5cm nad zemou-->
+        <origin rpy="0 0 0" xyz="0.753764 0.0 -0.0" />
+        <!-- z: -55cm - ohniskova vzdialenost = 0cm nad rovinou zeme-->
         <!-- x: 0.753764 je pri 0.615m vysunuti sosovky v x (HOME) ... pod lens_midle frame-->
         <parent link="base_link" />
         <child link="lens_focal_static_frame" />
@@ -1421,15 +1421,15 @@
 </joint>
         <!--focal work frame joint-->
 <joint name="lens_focal_work_frame_joint" type="fixed">
-<origin rpy="0 0 0" xyz="0.0 0.0 -0.50" />
+<origin rpy="0 0 0" xyz="0.0 0.0 -0.55" />
 <!-- z: ohniskova vzdialenost -->
 <parent link="lens_frame_middle" />
 <child link="lens_focal_work_frame" />
 </joint>
         <!--focal static frame joint-->
 <joint name="lens_focal_static_frame_joint" type="fixed">
-<origin rpy="0 0 0" xyz="0.753764 0.0 0.05" />
-<!-- z: 55cm - ohniskova vzdialenost = 5cm nad zemou-->
+<origin rpy="0 0 0" xyz="0.753764 0.0 -0.0" />
+<!-- z: -55cm - ohniskova vzdialenost = 0cm nad rovinou zeme-->
 <!-- x: 0.753764 je pri 0.615m vysunuti sosovky v x (HOME) ... pod lens_midle frame-->
 <parent link="base_link" />
 <child link="lens_focal_static_frame" />
@@ -1569,4 +1569,4 @@
     <robotNamespace>/</robotNamespace>
 </plugin>
 </gazebo>
-        </robot>
+</robot>
