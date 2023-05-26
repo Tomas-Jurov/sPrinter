@@ -83,7 +83,8 @@ private:
   geometry_msgs::Quaternion quaternion_world_sun;
   geometry_msgs::PoseStamped printing_pose_;
   ros::Time printing_start_timestamp_, idle_start_timestamp_, lin_actuator_last_time_;
-  double integrator_ = 0.0;
+  double integrator_;
+  int counter_printing_point_;
 
   /*fcn*/
   void servo2Update(bool condition);
@@ -103,4 +104,5 @@ private:
   void goHome();
   void goIdle();
   void goPrint();
+  void reset_goes();
 };
