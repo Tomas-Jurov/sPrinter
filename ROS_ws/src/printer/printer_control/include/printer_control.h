@@ -31,6 +31,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/JointState.h>
 
+
 struct actuatorStruct{
     bool is_set = false;
     bool is_on_pos = false;
@@ -77,7 +78,7 @@ private:
 
   PrinterState  printer_state_;
   geometry_msgs::Point printing_point_;
-  bool go_home_, go_idle_, go_print_, need_initialize_, printing_pose_found_, need_go_home_;
+  bool go_home_, go_idle_, go_print_, need_initialize_, printing_pose_found_, need_go_home_, printing_time_blocked_;
   std::vector<double> joint_positions_, joint_positions_abs_target_, joint_positions_rel_target_;
   actuatorStruct servo1, servo2, stepper1, stepper2, lin_actuator;
   geometry_msgs::Quaternion quaternion_world_sun;
@@ -106,4 +107,5 @@ private:
   void goIdle();
   void goPrint();
   void reset_goes();
+  void displayPrintingTime();
 };

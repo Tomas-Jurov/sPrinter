@@ -24,7 +24,7 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
   , go_home_(false), go_idle_(false), go_print_(false)
   , need_initialize_(true)
   , need_go_home_(false)
-  , printing_pose_found_(false)
+  , printing_pose_found_(false), printing_time_blocked_(false)
   , lin_actuator_last_time_(ros::Time::now())
   , counter_printing_point_(0), integrator_(0.0)
   {
@@ -51,7 +51,7 @@ void PrinterControl::update()
 
     /*check if printing finished*/
     if (printer_state_ == PRINTING &&
-            abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()) > PRINTING_TIMEOUT)
+            abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()) >= PRINTING_TIMEOUT)
     {
         counter_printing_point_++;
         printer_state_ = IDLE;
@@ -62,30 +62,48 @@ void PrinterControl::update()
         ROS_INFO_STREAM("[Printer Control] printing of point [" << counter_printing_point_ << "] finished");
     }
 
+    /*if robot printing, display remaining printing time*/
+    displayPrintingTime();
+
     /*idle2*/
     if (printer_state_ == IDLE &&
             abs(idle_start_timestamp_.toSec()-ros::Time::now().toSec()) > IDLE_TIMEOUT)
     {
         setAbsAndRelTargets(joint_positions_idle2_);
         go_idle_ = true;
-        if (!need_initialize_) need_initialize_ = true;
         ROS_INFO_STREAM("[Printer Control] idle position timeout - moving to IDLE2 position");
         ROS_INFO_STREAM("[Printer Control] need initialize cause printer_state_ = IDLE2");
     }
-
-//    /*if robot printing, display remaining printing time*/
-//    if(printer_state_ == PRINTING &&
-//            (int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()) % 60 == 0)
-//    {
-//        ROS_INFO_STREAM("[Printer Control] remaining printing time: " << (int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()) / 60 << "min");
-//    }
-
 }
 
 void PrinterControl::goPrint()
 {
     lin_actuator_last_time_ = ros::Time::now();
-    if (printer_state_ != BUSY) printer_state_ = BUSY;
+
+    if (need_initialize_)
+    {
+        ROS_INFO_STREAM("[Printer Control] initializing");
+        printer_state_ = INIT;
+        if (gps_client_.call(gps_srv_))
+        {
+            quaternion_world_sun = gps_srv_.response.orientation;
+        }
+        else
+        {
+            ROS_ERROR("[Printer Control]  non-valid orientation to sun");
+            ROS_WARN("[Printer Control] setting default values for orientation to sun");
+            quaternion_world_sun.x = 0;
+            quaternion_world_sun.y = 0;
+            quaternion_world_sun.z = 0;
+            quaternion_world_sun.w = 1;
+        }
+
+        need_initialize_ = false;
+        printer_state_ = BUSY;
+        ROS_INFO_STREAM("[Printer Control] initializing finished");
+    }
+    else if (printer_state_ != BUSY) printer_state_ = BUSY;
+
     if (!printing_pose_found_)
     {
         geometry_msgs::PoseStamped tmp;
@@ -154,43 +172,7 @@ void PrinterControl::goPrint()
 void PrinterControl::goIdle()
 {
     lin_actuator_last_time_ = ros::Time::now();
-    if (need_initialize_)
-    {
-        ROS_INFO_STREAM("[Printer Control] initializing");
-        printer_state_ = INIT;
-        gps_client_.call(gps_srv_);
-        quaternion_world_sun = gps_srv_.response.orientation;
-        
-        try
-        {
-            if (sqrt(pow(quaternion_world_sun.x,2)+
-                pow(quaternion_world_sun.y,2)+
-                pow(quaternion_world_sun.z,2)+
-                pow(quaternion_world_sun.w,2))
-                == 1.0)
-            {
-                ROS_INFO_STREAM("[Printer Control] GPS node sent valid orientation to sun");
-            }
-            else
-            {
-                ROS_ERROR("[Printer Control] received non-valid orientation to sun");
-                ROS_WARN("[Printer Control] setting default values for orientation to sun");
-                quaternion_world_sun.x = 0;
-                quaternion_world_sun.y = 0;
-                quaternion_world_sun.z = 0;
-                quaternion_world_sun.w = 1;
-            }
-        }
-        catch(...)
-        {
-            ROS_ERROR("[Printer Control] err initializing [try-catch]");
-        }
-
-        need_initialize_ = false;
-        printer_state_ = BUSY;
-        ROS_INFO_STREAM("[Printer Control] initializing finished");
-    }
-    else if (printer_state_ != BUSY) printer_state_ = BUSY;
+    if (printer_state_ != BUSY) printer_state_ = BUSY;
 
     if (need_go_home_)
     {
@@ -432,6 +414,24 @@ void PrinterControl::setAbsAndRelTargets(std::vector<double> joint_positions_abs
     }
 }
 
+void PrinterControl::displayPrintingTime()
+{
+    if(printer_state_ == PRINTING &&
+       ((int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec())) % 60 == 0 /* &&
+       (PRINTING_TIMEOUT - (int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec())) / 60 != 0*/)
+    {
+        if (!printing_time_blocked_)
+        {
+            ROS_INFO_STREAM("[Printer Control] remaining printing time: " <<(PRINTING_TIMEOUT - (int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec())) / 60 << "min");
+            printing_time_blocked_ = true;
+        }
+    }
+    else if (printing_time_blocked_)
+    {
+        printing_time_blocked_ = false;
+    }
+}
+
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
     ROS_INFO_STREAM("[Printer Control] targetCmdCallback");
@@ -440,7 +440,10 @@ void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg
         printing_pose_found_ = false;
         printing_point_ = *msg;
         go_print_ = true;
+        if (printer_state_ == IDLE2) need_initialize_ = true;
         ROS_INFO_STREAM("[Printer Control] new printing_point: \nx: " << printing_point_.x << "\ny: " << printing_point_.y << "\nz: " << printing_point_.z) ;
+
+
     }
     else
     {
