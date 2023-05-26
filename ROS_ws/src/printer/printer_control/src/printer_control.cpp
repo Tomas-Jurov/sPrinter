@@ -29,6 +29,7 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
   , counter_printing_point_(0), integrator_(0.0)
   {
     //Constructor
+      joint_positions_rel_target_.resize(5);
 
 }
 
@@ -45,7 +46,7 @@ void PrinterControl::update()
     {
         go_home_ = true;
         need_go_home_ = false;
-        joint_positions_target_ = joint_positions_home_;
+        setAbsAndRelTargets(joint_positions_home_);
     }
 
     /*check if printing finished*/
@@ -65,7 +66,7 @@ void PrinterControl::update()
     if (printer_state_ == IDLE &&
             abs(idle_start_timestamp_.toSec()-ros::Time::now().toSec()) > IDLE_TIMEOUT)
     {
-        joint_positions_target_ = joint_positions_idle2_;
+        setAbsAndRelTargets(joint_positions_idle2_);
         go_idle_ = true;
         if (!need_initialize_) need_initialize_ = true;
         ROS_INFO_STREAM("[Printer Control] idle position timeout - moving to IDLE2 position");
@@ -122,10 +123,10 @@ void PrinterControl::goPrint()
             std_msgs::Int8 msg;
             msg.data = printer_state_;
             printer_state_pub_.publish(msg);
-            joint_positions_target_ = joint_positions_; //important
+            setAbsAndRelTargets(joint_positions_); //important
         }
 
-        joint_positions_target_ = ik_srv_.response.joint_states;
+        setAbsAndRelTargets(ik_srv_.response.joint_states);
         printing_pose_found_ = true;
     }
 
@@ -257,13 +258,13 @@ void PrinterControl::goHome()
 void PrinterControl::servo1Update(bool condition)
 {
     // servo1 Lens_X_axis_rot
-    if (abs(joint_positions_target_[4]-joint_positions_[4]) >= ERR_TRESHOLD_ANG)
+    if (abs(joint_positions_abs_target_[4]-joint_positions_[4]) >= ERR_TRESHOLD_ANG)
     {
         if (!servo1.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on servo1: " << joint_positions_target_[4]);
+            ROS_INFO_STREAM("[Printer Control] target on servo1: \nabs:" << joint_positions_abs_target_[4]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_target_[4];
+            msg.data = joint_positions_abs_target_[4];
             servo1_pub_.publish(msg);
             servo1.is_set = true;
         }
@@ -279,13 +280,13 @@ void PrinterControl::servo1Update()
 void PrinterControl::servo2Update(bool condition)
 {
     // servo2 Lens_Y_axis_rot
-    if (abs(joint_positions_target_[3]-joint_positions_[3]) >= ERR_TRESHOLD_ANG)
+    if (abs(joint_positions_abs_target_[3]-joint_positions_[3]) >= ERR_TRESHOLD_ANG)
     {
         if (!servo2.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on servo2: " << joint_positions_target_[3]);
+            ROS_INFO_STREAM("[Printer Control] target on servo2: \nabs:" << joint_positions_abs_target_[3]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_target_[3];
+            msg.data = joint_positions_abs_target_[3];
             servo2_pub_.publish(msg);
             servo2.is_set = true;
         }
@@ -301,13 +302,14 @@ void PrinterControl::servo2Update()
 void PrinterControl::stepper1Update(bool condition)
 {
     // stepper1 Lens_X_axis_trans
-    if (abs(joint_positions_target_[2]-joint_positions_[2]) >= ERR_TRESHOLD_POS)
+    if (abs(joint_positions_abs_target_[2]-joint_positions_[2]) >= ERR_TRESHOLD_POS)
     {
         if (!stepper1.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on stepper1: " << joint_positions_target_[2]);
+            ROS_INFO_STREAM("[Printer Control] target on stepper1: \nabs:" << joint_positions_abs_target_[2] <<
+                                                                         "\nrel: " << joint_positions_rel_target_[2]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_target_[2];
+            msg.data = joint_positions_rel_target_[2];
             stepper1_target_pub_.publish(msg);
             stepper1.is_set = true;
         }
@@ -323,13 +325,14 @@ void PrinterControl::stepper1Update()
 void PrinterControl::stepper2Update(bool condition)
 {
     // stepper2 Lens_Y_axis_trans
-    if (abs(joint_positions_target_[1]-joint_positions_[1]) >= ERR_TRESHOLD_POS)
+    if (abs(joint_positions_abs_target_[1]-joint_positions_[1]) >= ERR_TRESHOLD_POS)
     {
         if (!stepper2.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on stepper2: " << joint_positions_target_[1]);
+            ROS_INFO_STREAM("[Printer Control] target on stepper2: \nabs:" << joint_positions_abs_target_[1] <<
+                                                                           "\nrel: " << joint_positions_rel_target_[1]);
             std_msgs::Float32 msg;
-            msg.data = joint_positions_target_[1];
+            msg.data = joint_positions_rel_target_[1];
             stepper2_target_pub_.publish(msg);
             stepper2.is_set = true;
         }
@@ -346,7 +349,7 @@ void PrinterControl::linActuatorUpdate()
 {
     // linear motor MainFrame_pitch
     if (!lin_actuator.is_on_pos &&
-        lin_actuator_control(joint_positions_target_[0] - joint_positions_[0]))
+        lin_actuator_control(joint_positions_abs_target_[0] - joint_positions_[0]))
     {
         lin_actuator.is_on_pos = true;
     }
@@ -420,6 +423,15 @@ void PrinterControl::reset_goes()
     go_idle_ = false;
 }
 
+void PrinterControl::setAbsAndRelTargets(std::vector<double> joint_positions_abs_target)
+{
+    joint_positions_abs_target_ = joint_positions_abs_target;
+    for (int i=0; i<joint_positions_home_.size(); i++)
+    {
+        joint_positions_rel_target_[i] = joint_positions_abs_target[i]-joint_positions_[i];
+    }
+}
+
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
     ROS_INFO_STREAM("[Printer Control] targetCmdCallback");
@@ -450,13 +462,13 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
             if (printer_state_ == IDLE)
             {
                 go_home_ = true;
-                joint_positions_target_ = joint_positions_home_;
+                setAbsAndRelTargets(joint_positions_home_);
             }
             else
             {
                 go_idle_ = true;
                 need_go_home_ = true;
-                joint_positions_target_ = joint_positions_idle1_;
+                setAbsAndRelTargets(joint_positions_idle1_);
             }
         }
         else
@@ -471,7 +483,8 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         if (printer_state_ == HOME)
         {
             ROS_INFO_STREAM("[Printer Control] printerStateCallback: IDLE");
-            joint_positions_target_ = joint_positions_idle1_;
+            setAbsAndRelTargets(joint_positions_idle1_);
+            ROS_INFO_STREAM("OK");
             go_idle_ = true;
         }
         else
