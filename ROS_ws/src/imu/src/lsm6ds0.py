@@ -87,20 +87,20 @@ def lsm6sl_get_gyro():
     return [roll,pitch,yaw]
     
 
-def fulfill_last10_rolls_pichs():
-    last10_rolls_temp =  [1.2]*10
-    last10_pitchs_temp = [1.2]*10
+def fulfill_last20_rolls_pitchs():
+    last20_rolls_temp =  [1.2]*20
+    last20_pitchs_temp = [1.2]*20
     #acc_local = [1.2]*3
-    for i in range(10):
+    for i in range(20):
         acc_local = lsm6ds0_get_acc()
         #print("acc_local",acc_local)
-        last10_pitchs_temp[i] = comp.compute_roll(acc_local)
-        last10_rolls_temp[i] = comp.compute_pitch(acc_local)
+        last20_pitchs_temp[i] = comp.compute_roll(acc_local)
+        last20_rolls_temp[i] = comp.compute_pitch(acc_local)
 
 
-    #print("last10_pitchs_temp",last10_pitchs_temp)
-    #print("last10_rolls_temp",last10_rolls_temp)
-    comp.set_last10_rolls_pitchs(last10_rolls_temp,last10_pitchs_temp) 
+    #print("last20_pitchs_temp",last20_pitchs_temp)
+    #print("last20_rolls_temp",last20_rolls_temp)
+    comp.set_last20_rolls_pitchs(last20_rolls_temp,last20_pitchs_temp) 
 
 def lsm6dsl_init():
     status = 1
@@ -143,6 +143,6 @@ def lsm6dsl_init():
     ctrl12_l = [int(ctrl12)]
     lsm6dsl_write_byte(LSM6DSL_ADDRESS_CTRL2,ctrl12_l)
 
-    fulfill_last10_rolls_pichs()
+    fulfill_last20_rolls_pitchs()
 
     return status
