@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
         sprinter_srvs
         tf2_geometry_msgs
         eigen_conversions
+        diagnostic_msgs
         )
 
 find_package(Eigen3 REQUIRED)

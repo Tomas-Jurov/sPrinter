@@ -5,8 +5,8 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
                                const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
                                const ros::Publisher& stepper1_target_pub, const ros::Publisher& stepper2_target_pub,
                                const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub,
-                               const ros::Publisher& suntracker_pub, const ros::ServiceClient& gps_client,
-                               const ros::ServiceClient& ik_client)
+                               const ros::Publisher& suntracker_pub, const ros::Publisher& status_pub,
+                               const ros::ServiceClient& gps_client, const ros::ServiceClient& ik_client)
   : printer_state_pub_(printer_state_pub)
   , tilt_pub_(tilt_pub)
   , stepper1_speed_pub_(stepper1_speed_pub)
@@ -16,6 +16,7 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
   , servo1_pub_(servo1_pub)
   , servo2_pub_(servo2_pub)
   , suntracker_pub_(suntracker_pub)
+  , status_pub_(status_pub)
   , gps_client_(gps_client)
   , ik_client_(ik_client)
   , tf_buffer_()
@@ -59,7 +60,7 @@ void PrinterControl::update()
         msg.data = printer_state_;
         printer_state_pub_.publish(msg);
         idle_start_timestamp_ = ros::Time::now();
-        ROS_INFO_STREAM("[Printer Control] printing of point [" << counter_printing_point_ << "] finished");
+        publishStatus(LOG_LEVEL_T::OK, "Printing of point [" + std::to_string(counter_printing_point_) + "] finished");
     }
 
     /*if robot printing, display remaining printing time*/
@@ -71,8 +72,7 @@ void PrinterControl::update()
     {
         setAbsAndRelTargets(joint_positions_idle2_);
         go_idle_ = true;
-        ROS_INFO_STREAM("[Printer Control] idle position timeout - moving to IDLE2 position");
-        ROS_INFO_STREAM("[Printer Control] need initialize cause printer_state_ = IDLE2");
+        publishStatus(LOG_LEVEL_T::WARN, "Idle position timeout - moving to IDLE2 position");
     }
 }
 
@@ -82,7 +82,7 @@ void PrinterControl::goPrint()
 
     if (need_initialize_)
     {
-        ROS_INFO_STREAM("[Printer Control] initializing");
+        publishStatus(LOG_LEVEL_T::OK, "Initializing");
         printer_state_ = INIT;
         if (gps_client_.call(gps_srv_))
         {
@@ -90,8 +90,8 @@ void PrinterControl::goPrint()
         }
         else
         {
-            ROS_ERROR("[Printer Control]  non-valid orientation to sun");
-            ROS_WARN("[Printer Control] setting default values for orientation to sun");
+            publishStatus(LOG_LEVEL_T::ERROR, "Non-valid orientation to sun");
+            publishStatus(LOG_LEVEL_T::WARN, "Setting default values for orientation to sun");
             quaternion_world_sun.x = 0;
             quaternion_world_sun.y = 0;
             quaternion_world_sun.z = 0;
@@ -100,7 +100,7 @@ void PrinterControl::goPrint()
 
         need_initialize_ = false;
         printer_state_ = BUSY;
-        ROS_INFO_STREAM("[Printer Control] initializing finished");
+        publishStatus(LOG_LEVEL_T::OK, "Initializing finished");
     }
     else if (printer_state_ != BUSY) printer_state_ = BUSY;
 
@@ -123,20 +123,21 @@ void PrinterControl::goPrint()
         geometry_msgs::PoseStamped printing_pose_in_base_link_ = tf_buffer_.transform(
                 printing_pose_, "base_link");
 
-        ROS_INFO_STREAM("[Printer Control] desired_pose_in_base_link_ \npose\nx: " << printing_pose_in_base_link_.pose.position.x <<
-                                                           "\ny: "<< printing_pose_in_base_link_.pose.position.y<<
-                                                           "\nz: " << printing_pose_in_base_link_.pose.position.z <<
-                                                           "\norientation\nw: "<< printing_pose_in_base_link_.pose.orientation.w<<
-                                                           "\nx: "<< printing_pose_in_base_link_.pose.orientation.x<<
-                                                           "\ny: "<< printing_pose_in_base_link_.pose.orientation.y<<
-                                                           "\nz: "<< printing_pose_in_base_link_.pose.orientation.z);
+        publishStatus(LOG_LEVEL_T::OK,
+                      "Desired_pose_in_base_link_ \npose\nx: " + std::to_string(printing_pose_in_base_link_.pose.position.x) +
+                                                                                                  "\ny: "+ std::to_string(printing_pose_in_base_link_.pose.position.y)+
+                                                                                                  "\nz: " + std::to_string(printing_pose_in_base_link_.pose.position.z) +
+                                                                                                  "\norientation\nw: "+ std::to_string(printing_pose_in_base_link_.pose.orientation.w)+
+                                                                                                  "\nx: "+ std::to_string(printing_pose_in_base_link_.pose.orientation.x)+
+                                                                                                  "\ny: "+ std::to_string(printing_pose_in_base_link_.pose.orientation.y)+
+                                                                                                  "\nz: "+ std::to_string(printing_pose_in_base_link_.pose.orientation.z));
 
         ik_srv_.request.pose = printing_pose_in_base_link_;
         ik_client_.call(ik_srv_);
 
         if (!ik_srv_.response.joint_states.size())
         {
-            ROS_INFO_STREAM("[Printer Control] IK failure");
+            publishStatus(LOG_LEVEL_T::ERROR, "IK failure");
             printer_state_ = FAILURE;
             std_msgs::Int8 msg;
             msg.data = printer_state_;
@@ -157,7 +158,7 @@ void PrinterControl::goPrint()
     // on printing pos
     if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
     {
-        ROS_INFO_STREAM("[Printer Control] on printing position");
+        publishStatus(LOG_LEVEL_T::OK, "On printing position");
         printer_state_ = PRINTING;
         std_msgs::Int8 msg;
         msg.data = printer_state_;
@@ -165,7 +166,7 @@ void PrinterControl::goPrint()
         go_print_ = false;
         resetActuatorsStruct();
         printing_start_timestamp_ = ros::Time::now();
-        ROS_INFO_STREAM("[Printer Control] printing started");
+        publishStatus(LOG_LEVEL_T::OK, "Printing started");
     }
 }
 
@@ -206,9 +207,9 @@ void PrinterControl::goIdle()
         if (isInIdle2())
         {
             printer_state_ = IDLE2;
-            ROS_INFO_STREAM("[Printer Control] on IDLE2 position");
+            publishStatus(LOG_LEVEL_T::OK, "On IDLE2 position");
         }
-        else ROS_INFO_STREAM("[Printer Control] on IDLE position");
+        else publishStatus(LOG_LEVEL_T::OK, "On IDLE position");
     }
 
 }
@@ -227,7 +228,7 @@ void PrinterControl::goHome()
     // on home pos
     if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
     {
-        ROS_INFO_STREAM("[Printer Control] on HOME position");
+        publishStatus(LOG_LEVEL_T::OK, "On HOME position");
         printer_state_ = HOME;
         std_msgs::Int8 msg;
         msg.data = printer_state_;
@@ -244,7 +245,7 @@ void PrinterControl::servo1Update(bool condition)
     {
         if (!servo1.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on servo1: \nabs:" << joint_positions_abs_target_[4]);
+            publishStatus(LOG_LEVEL_T::OK, "Target on servo1: \nabs:" + std::to_string(joint_positions_abs_target_[4]));
             std_msgs::Float32 msg;
             msg.data = joint_positions_abs_target_[4];
             servo1_pub_.publish(msg);
@@ -266,7 +267,7 @@ void PrinterControl::servo2Update(bool condition)
     {
         if (!servo2.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on servo2: \nabs:" << joint_positions_abs_target_[3]);
+            publishStatus(LOG_LEVEL_T::OK, "Target on servo2: \nabs:" + std::to_string(joint_positions_abs_target_[3]));
             std_msgs::Float32 msg;
             msg.data = joint_positions_abs_target_[3];
             servo2_pub_.publish(msg);
@@ -288,8 +289,8 @@ void PrinterControl::stepper1Update(bool condition)
     {
         if (!stepper1.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on stepper1: \nabs:" << joint_positions_abs_target_[2] <<
-                                                                         "\nrel: " << joint_positions_rel_target_[2]);
+            publishStatus(LOG_LEVEL_T::OK, "Target on stepper1: \nabs:" + std::to_string(joint_positions_abs_target_[2]) +
+                                           "\nrel: " + std::to_string(joint_positions_rel_target_[2]));
             std_msgs::Float32 msg;
             msg.data = joint_positions_rel_target_[2];
             stepper1_target_pub_.publish(msg);
@@ -311,8 +312,8 @@ void PrinterControl::stepper2Update(bool condition)
     {
         if (!stepper2.is_set && condition)
         {
-            ROS_INFO_STREAM("[Printer Control] target on stepper2: \nabs:" << joint_positions_abs_target_[1] <<
-                                                                           "\nrel: " << joint_positions_rel_target_[1]);
+            publishStatus(LOG_LEVEL_T::OK, "Target on stepper2: \nabs:" + std::to_string(joint_positions_abs_target_[1]) +
+                                                                                          "\nrel: " + std::to_string(joint_positions_rel_target_[1]));
             std_msgs::Float32 msg;
             msg.data = joint_positions_rel_target_[1];
             stepper2_target_pub_.publish(msg);
@@ -393,7 +394,7 @@ bool PrinterControl::lin_actuator_control(double error)
     msg.data = (int8_t)u;
     tilt_pub_.publish(msg);
 
-    ROS_INFO_STREAM("[Printer Control] linear motor speed: "<< u);
+    publishStatus(LOG_LEVEL_T::OK, "Linear motor speed: "+ std::to_string(u)); //std::to_string
 
     return false;
 }
@@ -422,7 +423,8 @@ void PrinterControl::displayPrintingTime()
     {
         if (!printing_time_blocked_)
         {
-            ROS_INFO_STREAM("[Printer Control] remaining printing time: " <<(PRINTING_TIMEOUT - (int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec())) / 60 << "min");
+            publishStatus(LOG_LEVEL_T::OK, "Remaining printing time: "
+            + std::to_string((PRINTING_TIMEOUT - (int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec())) / 60) + "min");
             printing_time_blocked_ = true;
         }
     }
@@ -432,22 +434,32 @@ void PrinterControl::displayPrintingTime()
     }
 }
 
+void PrinterControl::publishStatus(const int8_t logger_level, const std::string& message)
+{
+    status_msg_.level = logger_level;
+    status_msg_.name = "Printer Control";
+    status_msg_.message = message;
+
+    if (!status_msg_.message.empty())
+        status_pub_.publish(status_msg_);
+}
+
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
-    ROS_INFO_STREAM("[Printer Control] targetCmdCallback");
+    publishStatus(LOG_LEVEL_T::OK, "TargetCmdCallback");
     if (printer_state_ == IDLE || printer_state_ == IDLE2)
     {
         printing_pose_found_ = false;
         printing_point_ = *msg;
         go_print_ = true;
         if (printer_state_ == IDLE2) need_initialize_ = true;
-        ROS_INFO_STREAM("[Printer Control] new printing_point: \nx: " << printing_point_.x << "\ny: " << printing_point_.y << "\nz: " << printing_point_.z) ;
+        publishStatus(LOG_LEVEL_T::OK, "New printing_point: \nx: " +std::to_string(printing_point_.x) + "\ny: " + std::to_string(printing_point_.y) + "\nz: "  +std::to_string(printing_point_.z));
 
 
     }
     else
     {
-        ROS_WARN("[Printer Control] cannot update \"printing_point_\", printer is not in state IDLE");
+        publishStatus(LOG_LEVEL_T::WARN, "Cannot update \"printing_point_\", printer is not in state IDLE");
     }
 
 }
@@ -458,7 +470,7 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
     {
         if (printer_state_ != HOME)
         {
-            ROS_INFO_STREAM("[Printer Control] printerStateCallback: HOME");
+            publishStatus(LOG_LEVEL_T::OK, "PrinterStateCallback: HOME");
             resetActuatorsStruct();
             reset_goes();
 
@@ -476,7 +488,7 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         }
         else
         {
-            ROS_WARN("[Printer Control] printerStateCallback: (already) HOME");
+            publishStatus(LOG_LEVEL_T::WARN, "PinterStateCallback: (already) HOME");
         }
 
     }
@@ -485,14 +497,13 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         /*I do not want to receive IDLE if printer is BUSY*/
         if (printer_state_ == HOME)
         {
-            ROS_INFO_STREAM("[Printer Control] printerStateCallback: IDLE");
+            publishStatus(LOG_LEVEL_T::OK, "PrinterStateCallback: IDLE");
             setAbsAndRelTargets(joint_positions_idle1_);
-            ROS_INFO_STREAM("OK");
             go_idle_ = true;
         }
         else
         {
-            ROS_WARN("[Printer Control] printerStateCallback: (already) IDLE");
+            publishStatus(LOG_LEVEL_T::WARN, "PrinterStateCallback: (already) IDLE");
         }
     }
 }

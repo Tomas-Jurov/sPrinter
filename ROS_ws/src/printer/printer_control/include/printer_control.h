@@ -30,7 +30,9 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/JointState.h>
+#include <diagnostic_msgs/DiagnosticStatus.h>
 
+typedef diagnostic_msgs::DiagnosticStatus LOG_LEVEL_T;
 
 struct actuatorStruct{
     bool is_set = false;
@@ -44,7 +46,8 @@ public:
                  const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
                  const ros::Publisher& stepper1_target_pub, const ros::Publisher& stepper2_target_pub,
                  const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub,
-                 const ros::Publisher& suntracker_pub, const ros::ServiceClient& gps_client,
+                 const ros::Publisher& suntracker_pub, const ros::Publisher& status_pub,
+                 const ros::ServiceClient& gps_client,
                  const ros::ServiceClient& ik_client);
   ~PrinterControl() = default;
 
@@ -59,7 +62,7 @@ public:
 
 private:
   ros::Publisher printer_state_pub_, tilt_pub_, stepper1_speed_pub_, stepper2_speed_pub_, stepper1_target_pub_,
-      stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_;
+      stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_, status_pub_;
   ros::ServiceClient gps_client_;
   ros::ServiceClient ik_client_;
 
@@ -78,6 +81,7 @@ private:
 
   PrinterState  printer_state_;
   geometry_msgs::Point printing_point_;
+  diagnostic_msgs::DiagnosticStatus status_msg_;
   bool go_home_, go_idle_, go_print_, need_initialize_, printing_pose_found_, need_go_home_, printing_time_blocked_;
   std::vector<double> joint_positions_, joint_positions_abs_target_, joint_positions_rel_target_;
   actuatorStruct servo1, servo2, stepper1, stepper2, lin_actuator;
@@ -108,4 +112,5 @@ private:
   void goPrint();
   void reset_goes();
   void displayPrintingTime();
+  void publishStatus(const int8_t logger_level, const std::string& message);
 };
