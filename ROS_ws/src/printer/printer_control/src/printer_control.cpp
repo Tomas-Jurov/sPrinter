@@ -492,7 +492,7 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         }
         else
         {
-            publishStatus(LOG_LEVEL_T::WARN, "PinterStateCallback: (already) HOME");
+            publishStatus(LOG_LEVEL_T::WARN, "PrinterStateCallback: (already) HOME");
         }
 
     }
@@ -508,7 +508,8 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
         }
         else
         {
-            publishStatus(LOG_LEVEL_T::WARN, "PrinterStateCallback: (already) IDLE");
+            publishStatus(LOG_LEVEL_T::WARN, "PrinterStateCallback: printer state is not HOME, "
+                                             "cannot update to state IDLE");
         }
     }
 }

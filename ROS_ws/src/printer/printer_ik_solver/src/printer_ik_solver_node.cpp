@@ -8,7 +8,10 @@ int main(int argc, char** argv)
     spinner.start();
 //    ros::waitForShutdown();
 
-    PrinterIKSolver printer_ik_solver; //err
+
+
+    ros::Publisher status_pub = nh.advertise<diagnostic_msgs::DiagnosticStatus>("sprinter_status", 50);
+    PrinterIKSolver printer_ik_solver(status_pub);
 
     ros::ServiceServer get_ik_service =
             nh.advertiseService("ik/get_solution", &PrinterIKSolver::calculateIkService, &printer_ik_solver) ;

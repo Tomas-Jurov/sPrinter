@@ -12,12 +12,14 @@
 #include <../../../../devel/include/sprinter_srvs/GetIkSolution.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <diagnostic_msgs/DiagnosticStatus.h>
 
+typedef diagnostic_msgs::DiagnosticStatus LOG_LEVEL_T;
 
 class PrinterIKSolver
 {
 public:
-    PrinterIKSolver();
+    PrinterIKSolver(const ros::Publisher& status_pub);
 //    ~PrinterIKSolver() = default;
 
     bool calculateIkService(sprinter_srvs::GetIkSolution::Request& req,
@@ -34,9 +36,14 @@ private:
     const std::string reference_frame_ = "lens_focal_static_frame";
     const std::string robot_description_ = "robot_description";
 
+    ros::Publisher status_pub_;
+
+    diagnostic_msgs::DiagnosticStatus status_msg_;
     ros::ServiceServer get_ik_service_;
     tf2_ros::Buffer tf_buffer_;
     tf2_ros::TransformListener tf_listener_;
+
+    void publishStatus(const int8_t logger_level, const std::string& message);
 
 };
 

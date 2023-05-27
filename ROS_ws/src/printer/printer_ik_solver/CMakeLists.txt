@@ -25,6 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
         pluginlib
         geometric_shapes
         rosbag
+        diagnostic_msgs
 )
 
 
