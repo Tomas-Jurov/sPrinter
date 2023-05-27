@@ -1,11 +1,12 @@
 #pragma once
 
-#define ERR_TRESHOLD_ANG 0.017 //1deg tolerance
-#define ERR_TRESHOLD_POS 0.005 //5mm
+#define ERR_TRESHOLD_ANG 0.017 // [rad]; angle tolerance
+#define ERR_TRESHOLD_POS 0.005 // [m]
 #define KP_GAIN 200
-#define KI_GAIN 10
-#define PRINTING_TIMEOUT 600 //10min
-#define IDLE_TIMEOUT 5 //5s
+#define KI_GAIN 20000
+#define K_DIR 10 // the direct u in order to overcome the deadzone
+#define PRINTING_TIMEOUT 60 // [s]
+#define IDLE_TIMEOUT 5 // [s]
 #define PRINTING_FRAME "lens_focal_static_frame"
 
 #include "printer_state.h"
@@ -80,13 +81,12 @@ private:
   PrinterState  printer_state_;
   geometry_msgs::Point printing_point_;
   diagnostic_msgs::DiagnosticStatus status_msg_;
-  bool go_home_, go_idle_, go_print_, need_initialize_, printing_pose_found_, need_go_home_, printing_time_blocked_;
+  bool go_home_, go_idle_, go_print_, need_initialize_, ik_pose_found_, need_go_home_, printing_time_blocked_;
   std::vector<double> joint_positions_, joint_positions_abs_target_, joint_positions_rel_target_;
   actuatorStruct servo1, servo2, stepper1, stepper2, lin_actuator;
   geometry_msgs::Quaternion quaternion_world_sun;
   geometry_msgs::PoseStamped printing_pose_;
   ros::Time printing_start_timestamp_, idle_start_timestamp_, lin_actuator_last_time_;
-  double integrator_;
   int counter_printing_point_;
 
   /*fcn*/
@@ -111,4 +111,5 @@ private:
   void reset_goes();
   void displayPrintingTime();
   void publishStatus(const int8_t logger_level, const std::string& message);
+  std::vector<double> computeIdle2JointPositions();
 };
