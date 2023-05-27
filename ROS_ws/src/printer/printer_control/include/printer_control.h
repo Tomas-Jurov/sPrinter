@@ -46,7 +46,7 @@ public:
                  const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
                  const ros::Publisher& stepper1_target_pub, const ros::Publisher& stepper2_target_pub,
                  const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub,
-                 const ros::Publisher& suntracker_pub, const ros::Publisher& status_pub,
+                 const ros::Publisher& status_pub,
                  const ros::ServiceClient& gps_client,
                  const ros::ServiceClient& ik_client);
   ~PrinterControl() = default;
@@ -54,7 +54,6 @@ public:
   /*callbacks*/
   void targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg);
   void printerStateCallback(const std_msgs::Int8::ConstPtr& msg);
-  void suntrackerCallback(const std_msgs::Bool::ConstPtr& msg);
   void jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
   /*methods*/
@@ -62,7 +61,7 @@ public:
 
 private:
   ros::Publisher printer_state_pub_, tilt_pub_, stepper1_speed_pub_, stepper2_speed_pub_, stepper1_target_pub_,
-      stepper2_target_pub_, servo1_pub_, servo2_pub_, suntracker_pub_, status_pub_;
+      stepper2_target_pub_, servo1_pub_, servo2_pub_, status_pub_;
   ros::ServiceClient gps_client_;
   ros::ServiceClient ik_client_;
 
@@ -72,7 +71,6 @@ private:
   std_msgs::Float32  stepper1_target_msg_, stepper2_target_msg_, servo1_msg_, servo2_msg_;
   std_msgs::Int8 tilt_msg_;
   std_msgs::Int16 stepper1_speed_msg_, stepper2_speed_msg_;
-  std_msgs::Empty suntracker_msg_;
   sprinter_srvs::GetOrientation gps_srv_;
   sprinter_srvs::GetIkSolution ik_srv_;
 
@@ -106,7 +104,7 @@ private:
   bool servosOnPos();
   bool steppersOnPos();
   bool isInIdle2();
-  bool lin_actuator_control(double target_angle);
+  bool linActuatorControl(double target_angle);
   void goHome();
   void goIdle();
   void goPrint();

@@ -5,7 +5,7 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
                                const ros::Publisher& stepper1_speed_pub, const ros::Publisher& stepper2_speed_pub,
                                const ros::Publisher& stepper1_target_pub, const ros::Publisher& stepper2_target_pub,
                                const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub,
-                               const ros::Publisher& suntracker_pub, const ros::Publisher& status_pub,
+                               const ros::Publisher& status_pub,
                                const ros::ServiceClient& gps_client, const ros::ServiceClient& ik_client)
   : printer_state_pub_(printer_state_pub)
   , tilt_pub_(tilt_pub)
@@ -15,7 +15,6 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
   , stepper2_target_pub_(stepper2_target_pub)
   , servo1_pub_(servo1_pub)
   , servo2_pub_(servo2_pub)
-  , suntracker_pub_(suntracker_pub)
   , status_pub_(status_pub)
   , gps_client_(gps_client)
   , ik_client_(ik_client)
@@ -47,6 +46,7 @@ void PrinterControl::update()
     {
         go_home_ = true;
         need_go_home_ = false;
+        lin_actuator_last_time_ = ros::Time::now();
         setAbsAndRelTargets(joint_positions_home_);
     }
 
@@ -72,6 +72,7 @@ void PrinterControl::update()
     {
         setAbsAndRelTargets(joint_positions_idle2_);
         go_idle_ = true;
+        lin_actuator_last_time_ = ros::Time::now();
         publishStatus(LOG_LEVEL_T::WARN, "Idle position timeout - moving to IDLE2 position");
     }
 }
@@ -332,7 +333,7 @@ void PrinterControl::linActuatorUpdate()
 {
     // linear motor MainFrame_pitch
     if (!lin_actuator.is_on_pos &&
-        lin_actuator_control(joint_positions_abs_target_[0] - joint_positions_[0]))
+            linActuatorControl(joint_positions_abs_target_[0] - joint_positions_[0]))
     {
         lin_actuator.is_on_pos = true;
     }
@@ -373,7 +374,7 @@ bool PrinterControl::isInIdle2()
     return false;
 }
 
-bool PrinterControl::lin_actuator_control(double error)
+bool PrinterControl::linActuatorControl(double error)
 {
     std_msgs::Int8 msg;
 
@@ -452,6 +453,7 @@ void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg
         printing_pose_found_ = false;
         printing_point_ = *msg;
         go_print_ = true;
+        lin_actuator_last_time_ = ros::Time::now();
         if (printer_state_ == IDLE2) need_initialize_ = true;
         publishStatus(LOG_LEVEL_T::OK, "New printing_point: \nx: " +std::to_string(printing_point_.x) + "\ny: " + std::to_string(printing_point_.y) + "\nz: "  +std::to_string(printing_point_.z));
 
@@ -477,12 +479,14 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
             if (printer_state_ == IDLE)
             {
                 go_home_ = true;
+                lin_actuator_last_time_ = ros::Time::now();
                 setAbsAndRelTargets(joint_positions_home_);
             }
             else
             {
                 go_idle_ = true;
                 need_go_home_ = true;
+                lin_actuator_last_time_ = ros::Time::now();
                 setAbsAndRelTargets(joint_positions_idle1_);
             }
         }
@@ -500,16 +504,13 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
             publishStatus(LOG_LEVEL_T::OK, "PrinterStateCallback: IDLE");
             setAbsAndRelTargets(joint_positions_idle1_);
             go_idle_ = true;
+            lin_actuator_last_time_ = ros::Time::now();
         }
         else
         {
             publishStatus(LOG_LEVEL_T::WARN, "PrinterStateCallback: (already) IDLE");
         }
     }
-}
-
-void PrinterControl::suntrackerCallback(const std_msgs::Bool::ConstPtr& msg)
-{
 }
 
 void PrinterControl::jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
