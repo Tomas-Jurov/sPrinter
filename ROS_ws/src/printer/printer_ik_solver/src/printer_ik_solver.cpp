@@ -18,8 +18,6 @@ move_group_interface_(PLANNING_GROUP)
     robot_state_ = robot_state;
     joint_model_group_ = joint_model_group;
 
-    publishStatus(LOG_LEVEL_T::OK, "End effector: " + move_group_.getEndEffectorLink());// lens_focal_work_frame
-    publishStatus(LOG_LEVEL_T::OK, "Reference frame: " + move_group_.getPoseReferenceFrame());// base link
 }
 
 /*Calculate inverse kinematics for sPrinter robot lens, arguments:
@@ -34,13 +32,13 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
          /*Get the resulting joint state values*/
         robot_state_->copyJointGroupPositions(joint_model_group_, joint_values_ik);
 
-        publishStatus(LOG_LEVEL_T::OK, "IK solution found");
-        publishStatus(LOG_LEVEL_T::OK, "IK solution found\nJoint values: "
+        ROS_INFO_STREAM("IK solution found\nJoint values: "
                                        "\njoint 9 MainFrame_pitch: " + std::to_string(joint_values_ik[0]) +
-                                                                     "\njoint 10 Lens_Y_axis_trans: " + std::to_string(joint_values_ik[1]) +
-                                                                     "\njoint 11 Lens_X_axis_trans: " + std::to_string(joint_values_ik[2]) +
-                                                                     "\njoint 12 Lens_Y_axis_rot: " + std::to_string(joint_values_ik[3]) +
-                                                                     "\njoint 13 Lens_X_axis_rot: " + std::to_string(joint_values_ik[4]));
+                                       "\njoint 10 Lens_Y_axis_trans: " + std::to_string(joint_values_ik[1]) +
+                                       "\njoint 11 Lens_X_axis_trans: " + std::to_string(joint_values_ik[2]) +
+                                       "\njoint 12 Lens_Y_axis_rot: " + std::to_string(joint_values_ik[3]) +
+                                       "\njoint 13 Lens_X_axis_rot: " + std::to_string(joint_values_ik[4]));
+        publishStatus(LOG_LEVEL_T::OK, "IK solution found");
     }
     else
     {
@@ -53,7 +51,6 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
 
 bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& req, sprinter_srvs::GetIkSolution::Response& res)
 {
-    publishStatus(LOG_LEVEL_T::OK, "Called calculateIkService");
     try
     {
         calculateIK(req.pose, res.joint_states );
@@ -61,6 +58,7 @@ bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& 
     catch(...)
     {
         publishStatus(LOG_LEVEL_T::ERROR, "Fatal error when computing IK [try-catch]");
+        ROS_ERROR( "Fatal error when computing IK [try-catch]");
     }
 
 
