@@ -14,7 +14,8 @@ void PoseControl::loadParams(const ros::NodeHandle& nh)
   getParam(nh, "pose_control/max_ang_speed", &params_.max_ang_speed);
   getParam(nh, "pose_control/target_position_tolerance", &params_.target_position_tolerance);
   getParam(nh, "pose_control/target_orientation_tolerance", &params_.target_orientation_tolerance);
-  getParam(nh, "pose_control/look_ahead_distance", &params_.look_ahead_distance_);
+  getParam(nh, "pose_control/look_ahead_distance", &params_.look_ahead_distance);
+  getParam(nh, "pose_control/ang_vel_gain", &params_.ang_vel_gain);
 }
 
 void PoseControl::update()
@@ -36,10 +37,18 @@ void PoseControl::update()
       {
         turn_error = -1 * sgn(turn_error) * (2*M_PI - std::abs(turn_error));
       }
-      // Pure Pursuit
-      r = params_.look_ahead_distance_ / (2 * sin(turn_error));
-      cmd_vel_msg_.linear.x = params_.max_lin_speed;
-      cmd_vel_msg_.angular.z = params_.max_lin_speed / r;
+
+      if (abs(turn_error) > M_PI_2)
+      {
+        cmd_vel_msg_.linear.x = 0.0;
+        cmd_vel_msg_.angular.z = sgn(turn_error) * params_.max_ang_speed;
+      }
+      else
+      { // Pure Pursuit
+        cmd_vel_msg_.linear.x = params_.max_lin_speed;
+        cmd_vel_msg_.angular.z = std::min(params_.ang_vel_gain * abs(turn_error), static_cast<double>(params_.max_ang_speed)) 
+                                * sgn(turn_error);
+      }
     }
     else
     { 
@@ -65,7 +74,7 @@ void PoseControl::update()
   }
   
   cmd_vel_pub_.publish(cmd_vel_msg_);
-  if (target_reached_msg_.data != target_reached_);
+  if (target_reached_msg_.data != target_reached_)
   {
     target_reached_msg_.data = target_reached_;
     target_reached_pub_.publish(target_reached_msg_);

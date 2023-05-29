@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <ros/ros.h>
 #include <tf/tf.h>
 #include <std_msgs/Empty.h>
@@ -17,7 +18,8 @@ struct Params
   float max_ang_speed;
   float target_position_tolerance;
   float target_orientation_tolerance;
-  float look_ahead_distance_;
+  float look_ahead_distance;
+  float ang_vel_gain;
 };
 
 class PoseControl

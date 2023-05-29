@@ -176,7 +176,7 @@ void TaskManager::gpsProcessingCallback(const std_msgs::Bool::ConstPtr& msg)
 
 void TaskManager::poseControlCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-  if (state_ == ROBOT_MOVING || state_ == STOPPING)
+  if (msg->data && (state_ == ROBOT_MOVING || state_ == STOPPING))
   {
     if (state_ == ROBOT_MOVING)
     {
