@@ -14,7 +14,7 @@ int main(int argc, char** argv)
             nh.advertiseService("ik/get_solution", &PrinterIKSolver::calculateIkService, &printer_ik_solver) ;
 
 
-    ros::Rate loop_rate(80);
+    ros::Rate loop_rate(40);
     while (ros::ok())
     {
         loop_rate.sleep();

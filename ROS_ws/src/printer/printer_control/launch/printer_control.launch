@@ -1,5 +1,4 @@
 <launch>
-    <include file="$(find state_estimation)/launch/state_estimation.launch" />
 
     <node name="printer_control" pkg="printer_control" type="printer_control"
           respawn="false" output="screen">

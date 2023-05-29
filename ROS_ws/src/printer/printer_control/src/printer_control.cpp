@@ -7,29 +7,29 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
                                const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub,
                                const ros::Publisher& status_pub,
                                const ros::ServiceClient& gps_client, const ros::ServiceClient& ik_client)
-  : printer_state_pub_(printer_state_pub)
-  , tilt_pub_(tilt_pub)
-  , stepper1_speed_pub_(stepper1_speed_pub)
-  , stepper2_speed_pub_(stepper2_speed_pub)
-  , stepper1_target_pub_(stepper1_target_pub)
-  , stepper2_target_pub_(stepper2_target_pub)
-  , servo1_pub_(servo1_pub)
-  , servo2_pub_(servo2_pub)
-  , status_pub_(status_pub)
-  , gps_client_(gps_client)
-  , ik_client_(ik_client)
-  , tf_buffer_()
-  , tf_listener_(tf_buffer_)
-  , printer_state_(HOME)
-  , go_home_(false), go_idle_(false), go_print_(false)
-  , need_initialize_(true)
-  , need_go_home_(false)
-  , ik_pose_found_(false), printing_time_blocked_(false)
-  , lin_actuator_last_time_(ros::Time::now())
-  , counter_printing_point_(0)
-  {
+        : printer_state_pub_(printer_state_pub)
+        , tilt_pub_(tilt_pub)
+        , stepper1_speed_pub_(stepper1_speed_pub)
+        , stepper2_speed_pub_(stepper2_speed_pub)
+        , stepper1_target_pub_(stepper1_target_pub)
+        , stepper2_target_pub_(stepper2_target_pub)
+        , servo1_pub_(servo1_pub)
+        , servo2_pub_(servo2_pub)
+        , status_pub_(status_pub)
+        , gps_client_(gps_client)
+        , ik_client_(ik_client)
+        , tf_buffer_()
+        , tf_listener_(tf_buffer_)
+        , printer_state_(HOME)
+        , go_home_(false), go_idle_(false), go_print_(false)
+        , need_initialize_(true)
+        , need_go_home_(false)
+        , ik_pose_found_(false), printing_time_blocked_(false)
+        , lin_actuator_last_time_(ros::Time::now())
+        , counter_printing_point_(0)
+{
     //Constructor
-      joint_positions_rel_target_.resize(5);
+    joint_positions_rel_target_.resize(5);
 
 }
 
@@ -52,7 +52,7 @@ void PrinterControl::update()
 
     /*check if printing finished*/
     if (printer_state_ == PRINTING &&
-            abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()) >= PRINTING_TIMEOUT)
+        abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()) >= PRINTING_TIMEOUT)
     {
         counter_printing_point_++;
         printer_state_ = IDLE;
@@ -69,7 +69,7 @@ void PrinterControl::update()
 
     /*idle2*/
     if ((printer_state_ == IDLE || printer_state_ == FAILURE) &&
-            abs(idle_start_timestamp_.toSec()-ros::Time::now().toSec()) > IDLE_TIMEOUT)
+        abs(idle_start_timestamp_.toSec()-ros::Time::now().toSec()) > IDLE_TIMEOUT)
     {
         setAbsAndRelTargets(computeIdle2JointPositions());
         go_idle_ = true;
@@ -160,7 +160,7 @@ void PrinterControl::goPrint()
         stepper1Update();
         linActuatorUpdate();
         servo2Update(steppersOnPos());
-        servo1Update(steppersOnPos());    
+        servo1Update(steppersOnPos());
     }
 
     // on printing pos
@@ -356,7 +356,7 @@ void PrinterControl::linActuatorUpdate()
 {
     // linear motor MainFrame_pitch
     if (!lin_actuator.is_on_pos &&
-            linActuatorControl(joint_positions_abs_target_[0] - joint_positions_[0]))
+        linActuatorControl(joint_positions_abs_target_[0] - joint_positions_[0]))
     {
         lin_actuator.is_on_pos = true;
     }
@@ -398,7 +398,7 @@ bool PrinterControl::linActuatorControl(double error)
     bool returnVal = false;
     double u;
     static double integrator(0.0);
-    
+
     if (std::abs(error) < ERR_TRESHOLD_ANG)
     {
         u = 0;
@@ -408,10 +408,10 @@ bool PrinterControl::linActuatorControl(double error)
     else
     {
 
-    // PI controller
-    ros::Duration dt = ros::Time::now() - lin_actuator_last_time_;
-    integrator += error * dt.toSec();
-    u = KP_GAIN * (error) + KI_GAIN * integrator + K_DIR * (error / std::abs(error));
+        // PI controller
+        ros::Duration dt = ros::Time::now() - lin_actuator_last_time_;
+        integrator += error * dt.toSec();
+        u = KP_GAIN * (error) + KI_GAIN * integrator + K_DIR * (error / std::abs(error));
     }
 
     // Publish msg
