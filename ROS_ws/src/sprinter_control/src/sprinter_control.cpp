@@ -21,7 +21,7 @@ void SprinterControl::update()
   }
 }
 
-void SprinterControl::taskManagerStatusCallback(const diagnostic_msgs::DiagnosticStatus::ConstPtr& msg)
+void SprinterControl::statusCallback(const diagnostic_msgs::DiagnosticStatus::ConstPtr& msg)
 {
   ros::console::Level log_level;
   switch (msg->level)

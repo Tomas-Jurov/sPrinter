@@ -26,7 +26,7 @@ public:
 
   void update();
 
-  void taskManagerStatusCallback(const diagnostic_msgs::DiagnosticStatus::ConstPtr& msg);
+  void statusCallback(const diagnostic_msgs::DiagnosticStatus::ConstPtr& msg);
 
 public:
   static constexpr float HEARTBEAT_INTERVAL = 1.0;  // [s]
