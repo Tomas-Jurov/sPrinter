@@ -28,7 +28,7 @@ int main(int argc, char** argv)
   ros::Subscriber joint_state_sub =
       nh.subscribe("/joint_states", 1, &PrinterControl::jointStateCallback, &printer_control);
 
-  ros::Rate loop_rate(60);
+  ros::Rate loop_rate(50);
   while (ros::ok())
   {
     ros::spinOnce();
