@@ -14,23 +14,11 @@ int main(int argc, char** argv)
   ros::Publisher servo2_angle_pub = nh.advertise<std_msgs::Float32>("servo2/current_angle", 1);
   ros::Publisher suntracker_fb_pub = nh.advertise<std_msgs::Bool>("suntracker/done", 1);
 
-  // Parameters
-  std::string port_name;
-  if (!nh.getParam("/mcu_serial/port", port_name))
-  {
-    ROS_ERROR("Could not find '/mcu_serial/port' parameter!");
-  }
-
-  int baud_rate(0);
-  if (!nh.getParam("/mcu_serial/baud", baud_rate))
-  {
-    ROS_ERROR("Could not find '/mcu_serial/baud' parameter!");
-  }
-  ROS_INFO_STREAM("LOADED PARAMETERS: " << baud_rate << " " << port_name);
-
   ROSbridge::ROSBridge ros_bridge(wheels_twist_pub, stepper1_position_pub, stepper2_position_pub, servo1_angle_pub,
-                                  servo2_angle_pub, suntracker_fb_pub, port_name, baud_rate);
+                                  servo2_angle_pub, suntracker_fb_pub);
 
+  // Parameters
+  ros_bridge.loadParams(nh);
   // Subscribed topics
   ros::Subscriber cmd_vel_sub = nh.subscribe("cmd_vel", 1, &ROSbridge::ROSBridge::cmdVelCallback, &ros_bridge);
   ros::Subscriber tilt_target_vel_sub =

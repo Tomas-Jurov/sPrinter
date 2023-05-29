@@ -24,8 +24,8 @@ union DataPacket
 
 enum Command
 {
-  SET_SPEED_OF_WHEELS = 0x00,
-  SET_SPEED_OF_LIN_ACTUATOR = 0x01,
+  SET_VELOCITY_OF_WHEELS = 0x00,
+  SET_VELOCITY_OF_LIN_ACTUATOR = 0x01,
   SET_STEPPER1_SPEED = 0x02,
   SET_STEPPER2_SPEED = 0x03,
   SET_STEPPER1_TARG_STEPS = 0x04,
@@ -35,16 +35,16 @@ enum Command
   START_SUNTRACKING = 0x08
 };
 
-struct SpeedOfWheels
+struct VelocityOfWheels
 {
-  short left_speed : 8;
-  short right_speed : 8;
+  short left : 8;
+  short right : 8;
 } __attribute__((packed));
 
 struct Returns
 {
-  short left_grp_speed : 8;
-  short right_grp_speed : 8;
+  short left_grp_velocity : 8;
+  short right_grp_velocity : 8;
   int stepper1_current_steps : 32;
   int stepper2_current_steps : 32;
   short servo1_current_angle : 16;

@@ -15,7 +15,15 @@ public:
   bool disconnect();
 
   bool readReturns(Returns* data);
-  bool setSpeedOfWheels(const SpeedOfWheels& speed_of_wheels);
+  bool setVelocityOfWheels(const VelocityOfWheels& velocity_of_wheels);
+  bool setVelocityOfLinearActuator(int8_t velocity_of_actuator);
+  bool setAngleOfServo1(uint16_t angle);
+  bool setAngleOfServo2(uint16_t angle);
+  bool stepper1SetTargetSteps(int32_t steps);
+  bool stepper2SetTargetSteps(int32_t steps);
+  bool setSpeedOfStepper1(uint16_t speed);
+  bool setSpeedOfStepper2(uint16_t speed);
+  bool runSunTracking(void);
 
 private:
   bool readStateOfSprinter(Returns* data);
