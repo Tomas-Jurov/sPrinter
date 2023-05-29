@@ -5,7 +5,7 @@ Computes inverse kinematics of linear motor, servo motors and stepper motors acc
 
 
 <p align="center">
-    <img src="../../../doc/sPrinter_design_diagram-Printer_control.svg">
+    <img src="../../../../doc/sPrinter_design_diagram-Printer_control.svg">
 </p>
 
 ## Setup

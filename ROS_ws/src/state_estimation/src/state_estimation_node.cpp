@@ -11,7 +11,7 @@ int main(int argc, char** argv)
   StateEstimation state_estimation(odom_pub, joint_state_pub);
 
   ros::Subscriber twist_sub = nh.subscribe("wheels/twist", 1, &StateEstimation::twistCallback, &state_estimation);
-  ros::Subscriber imu_sub = nh.subscribe("imu/data", 1, &StateEstimation::imuCallback, &state_estimation);
+  ros::Subscriber imu_sub = nh.subscribe("imu_data", 1, &StateEstimation::imuCallback, &state_estimation);
   ros::Subscriber stepper1_sub =
       nh.subscribe("stepper1/current_position", 1, &StateEstimation::stepper1Callback, &state_estimation);
   ros::Subscriber stepper2_sub =

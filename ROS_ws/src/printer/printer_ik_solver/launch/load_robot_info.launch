@@ -1,0 +1,37 @@
+<launch>
+    <!-- Load universal robot description format (URDF) -->
+<!--    <param name="robot_description" command="xacro  '$(find sPrinter_description)/urdf/sPrinter.xacro'"/>-->
+
+    <!-- The semantic description that corresponds to the URDF -->
+    <param name="robot_description_semantic" textfile="$(find sprinter_robot_model)/config/sPrinter.srdf" />
+
+    <!-- Load updated joint limits (override information from URDF) -->
+    <group ns="robot_description_planning">
+        <rosparam command="load" file="$(find sprinter_robot_model)/config/joint_limits.yaml"/>
+        <rosparam command="load" file="$(find sprinter_robot_model)/config/cartesian_limits.yaml"/>
+    </group>
+
+    <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
+    <group ns="robot_description_kinematics">
+        <rosparam command="load" file="$(find sprinter_robot_model)/config/kinematics.yaml"/>
+    </group>
+
+    <!-- Run robot state publisher -->
+<!--    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />-->
+
+    <!--    do not change-->
+    <param name="printer_control_planning_group" type="str" value="lens_group"/>
+
+
+
+    <!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+    <include file="$(find sprinter_robot_model)/launch/move_group_custom.launch">
+        <arg name="allow_trajectory_execution" value="false"/>
+        <arg name="fake_execution" value="false"/>
+        <arg name="execution_type" value="interpolate"/>
+        <arg name="info" value="true"/>
+        <arg name="debug" value="false"/>
+        <arg name="pipeline" value="ompl"/>
+        <arg name="load_robot_description" value="false"/>
+    </include>
+</launch>

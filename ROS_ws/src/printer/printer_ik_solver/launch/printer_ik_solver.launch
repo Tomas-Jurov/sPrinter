@@ -1,0 +1,8 @@
+<launch>
+
+    <include file="$(find printer_ik_solver)/launch/load_robot_info.launch" />
+
+    <node name="printer_ik_solver" pkg="printer_ik_solver" type="printer_ik_solver"
+          respawn="false" output="screen">
+    </node>
+</launch>

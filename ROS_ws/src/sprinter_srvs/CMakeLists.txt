@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GetOrientation.srv
+  GetIkSolution.srv
   SetPointArr.srv
   SetPose2D.srv
 )
