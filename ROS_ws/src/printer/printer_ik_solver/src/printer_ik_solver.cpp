@@ -1,11 +1,11 @@
 #include "../include/printer_ik_solver.h"
 
 PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub) :
-status_pub_(status_pub),
-tf_buffer_(),
-tf_listener_(tf_buffer_),
-move_group_(PLANNING_GROUP),
-move_group_interface_(PLANNING_GROUP)
+        status_pub_(status_pub),
+        tf_buffer_(),
+        tf_listener_(tf_buffer_),
+        move_group_(PLANNING_GROUP),
+        move_group_interface_(PLANNING_GROUP)
 {
     /*Constructor*/
     moveit::core::RobotModelConstPtr robot_model = move_group_interface_.getRobotModel();
@@ -29,15 +29,15 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
 
     if (ik_found)
     {
-         /*Get the resulting joint state values*/
+        /*Get the resulting joint state values*/
         robot_state_->copyJointGroupPositions(joint_model_group_, joint_values_ik);
 
         ROS_INFO_STREAM("IK solution found\nJoint values: "
-                                       "\njoint 9 MainFrame_pitch: " + std::to_string(joint_values_ik[0]) +
-                                       "\njoint 10 Lens_Y_axis_trans: " + std::to_string(joint_values_ik[1]) +
-                                       "\njoint 11 Lens_X_axis_trans: " + std::to_string(joint_values_ik[2]) +
-                                       "\njoint 12 Lens_Y_axis_rot: " + std::to_string(joint_values_ik[3]) +
-                                       "\njoint 13 Lens_X_axis_rot: " + std::to_string(joint_values_ik[4]));
+                        "\njoint 9 MainFrame_pitch: " + std::to_string(joint_values_ik[0]) +
+                        "\njoint 10 Lens_Y_axis_trans: " + std::to_string(joint_values_ik[1]) +
+                        "\njoint 11 Lens_X_axis_trans: " + std::to_string(joint_values_ik[2]) +
+                        "\njoint 12 Lens_Y_axis_rot: " + std::to_string(joint_values_ik[3]) +
+                        "\njoint 13 Lens_X_axis_rot: " + std::to_string(joint_values_ik[4]));
         publishStatus(LOG_LEVEL_T::OK, "IK solution found");
     }
     else

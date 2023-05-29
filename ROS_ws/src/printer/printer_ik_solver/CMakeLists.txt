@@ -26,7 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
         geometric_shapes
         rosbag
         diagnostic_msgs
-)
+        )
 
 
 catkin_package(
