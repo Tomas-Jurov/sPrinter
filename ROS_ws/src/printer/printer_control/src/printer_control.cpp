@@ -33,6 +33,7 @@ PrinterControl::PrinterControl(const ros::Publisher& printer_state_pub, const ro
 
 }
 
+/// \brief Called in every spin, updates printer control node.
 void PrinterControl::update()
 {
     if (go_home_) goHome();
@@ -78,6 +79,12 @@ void PrinterControl::update()
     }
 }
 
+/// \brief Called when variable go_print_ is set.
+/// If needed, initializing (gps_serv_) is executed.
+/// Then service for Inverse Kinematics is called and if succeed,
+/// the response is used as new joint states absolute target. Updates actuators.
+/// Afterwards, if actuator are on desired position, IDLE state is returned.
+/// If IK didn't find the solution, there is a FAILURE state set and robot does not move.
 void PrinterControl::goPrint()
 {
     lin_actuator_last_time_ = ros::Time::now();
@@ -179,6 +186,9 @@ void PrinterControl::goPrint()
     }
 }
 
+/// \brief Called when variable go_idle_ is set. Updates actuators.
+/// There are 2 orders for udpating actuator - when going from home/to home.
+/// If actuators are on desired position, IDLE state is returned.
 void PrinterControl::goIdle()
 {
     lin_actuator_last_time_ = ros::Time::now();
@@ -237,6 +247,8 @@ void PrinterControl::goIdle()
 
 }
 
+/// \brief Called when variable go_home_ is set. Updates actuators.
+/// If actuators are on desired position, IDLE state is returned.
 void PrinterControl::goHome()
 {
     lin_actuator_last_time_ = ros::Time::now();
@@ -262,6 +274,8 @@ void PrinterControl::goHome()
     }
 }
 
+/// \brief Set absolute target to servo1 if not already done.
+/// \param condition Affects setting target to servo, behaves as blocker if false.
 void PrinterControl::servo1Update(bool condition)
 {
     // servo1 Lens_X_axis_rot
@@ -279,11 +293,14 @@ void PrinterControl::servo1Update(bool condition)
     else servo1.is_on_pos = true;
 }
 
+/// Override servo1Update(bool condition)
 void PrinterControl::servo1Update()
 {
     servo1Update(true);
 }
 
+/// \brief Set absolute target to servo2 if not already done.
+/// \param condition Affects setting target to servo, behaves as blocker if false.
 void PrinterControl::servo2Update(bool condition)
 {
     // servo2 Lens_Y_axis_rot
@@ -301,11 +318,14 @@ void PrinterControl::servo2Update(bool condition)
     else servo2.is_on_pos = true;
 }
 
+/// Override servo2Update(bool condition)
 void PrinterControl::servo2Update()
 {
     servo2Update(true);
 }
 
+/// \brief Set relative target to stepper1 if not already done.
+/// \param condition Affects setting target to stepper, behaves as blocker if false.
 void PrinterControl::stepper1Update(bool condition)
 {
     // stepper1 Lens_X_axis_trans
@@ -324,11 +344,14 @@ void PrinterControl::stepper1Update(bool condition)
     else stepper1.is_on_pos = true;
 }
 
+/// Override stepper1Update(bool condition)
 void PrinterControl::stepper1Update()
 {
     stepper1Update(true);
 }
 
+/// \brief Set relative target to stepper2 if not already done.
+/// \param condition Affects setting target to stepper, behaves as blocker if false.
 void PrinterControl::stepper2Update(bool condition)
 {
     // stepper2 Lens_Y_axis_trans
@@ -347,11 +370,13 @@ void PrinterControl::stepper2Update(bool condition)
     else stepper2.is_on_pos = true;
 }
 
+/// Override stepper2Update(bool condition)
 void PrinterControl::stepper2Update()
 {
     stepper2Update(true);
 }
 
+/// \brief Set error to linActuatorControl(error).
 void PrinterControl::linActuatorUpdate()
 {
     // linear motor MainFrame_pitch
@@ -362,6 +387,7 @@ void PrinterControl::linActuatorUpdate()
     }
 }
 
+/// \brief Resets structs for actuators actuator.is_on_pos = false, actuator.is_set = false.
 void PrinterControl::resetActuatorsStruct()
 {
     servo1.is_on_pos = false;
@@ -375,23 +401,31 @@ void PrinterControl::resetActuatorsStruct()
     lin_actuator.is_on_pos = false;
 }
 
+/// \brief
+/// \return True if both servos are on desired position, false otherwise.
 bool PrinterControl::servosOnPos()
 {
     return (servo2.is_on_pos && servo1.is_on_pos);
 }
 
+/// \brief
+/// \return True if both steppers are on desired position, false otherwise.
 bool PrinterControl::steppersOnPos()
 {
     return (stepper2.is_on_pos && stepper1.is_on_pos);
 }
 
+/// \brief
+/// \return True if printer is on IDLE2 position (servo1 is rotated away from the sun), false otherwise.
 bool PrinterControl::isInIdle2()
 {
     if ( abs(joint_positions_idle2_[4]-joint_positions_[4]) <ERR_TRESHOLD_ANG) return true;
 
     return false;
 }
-
+/// \brief Continuously updates linear motor's speeds.
+/// \param error difference between target and actual joint state
+/// \return True if abs(error) is under treshold, false otherwise.
 bool PrinterControl::linActuatorControl(double error)
 {
     std_msgs::Int8 msg;
@@ -420,6 +454,7 @@ bool PrinterControl::linActuatorControl(double error)
     return returnVal;
 }
 
+/// \brief Reset go_print_, go_home_, go_idle_.
 void PrinterControl::reset_goes()
 {
     go_print_ = false;
@@ -427,6 +462,9 @@ void PrinterControl::reset_goes()
     go_idle_ = false;
 }
 
+/// \brief Set absolute and relative joint states target.
+/// Relative target is used only for steppers since we control them by adding the distance to the actual position.
+/// \param joint_positions_abs_target
 void PrinterControl::setAbsAndRelTargets(std::vector<double> joint_positions_abs_target)
 {
     joint_positions_abs_target_ = joint_positions_abs_target;
@@ -436,6 +474,9 @@ void PrinterControl::setAbsAndRelTargets(std::vector<double> joint_positions_abs
     }
 }
 
+/// \brief Set idle2 joint states position.
+/// Servo1 (joint_positions[4]) is rotated away from the sun, others joint positions remains the same.
+/// \return idle2 joint states position
 std::vector<double> PrinterControl::computeIdle2JointPositions()
 {
     std::vector<double> joint_positions = joint_positions_;
@@ -443,6 +484,9 @@ std::vector<double> PrinterControl::computeIdle2JointPositions()
     return joint_positions;
 }
 
+/// \brief Displays remaining printing time if printing.
+/// Interval is set to display time every minute and if time under 1min, display also in 10s intervals
+/// (eg 3min, 2min, 1min, 50s, 40s ...)
 void PrinterControl::displayPrintingTime()
 {
     int diff_s = ((int)abs(printing_start_timestamp_.toSec()-ros::Time::now().toSec()));
@@ -475,6 +519,9 @@ void PrinterControl::displayPrintingTime()
     }
 }
 
+/// \brief Publish status to status topic.
+/// \param logger_level Level as OK, WARN, ERROR
+/// \param message
 void PrinterControl::publishStatus(const int8_t logger_level, const std::string& message)
 {
     status_msg_.level = logger_level;
@@ -485,6 +532,8 @@ void PrinterControl::publishStatus(const int8_t logger_level, const std::string&
         status_pub_.publish(status_msg_);
 }
 
+/// \brief Processes new printing point if received in state IDLE
+/// \param msg
 void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg)
 {
 
@@ -511,6 +560,8 @@ void PrinterControl::targetCmdCallback(const geometry_msgs::Point::ConstPtr& msg
 
 }
 
+/// \brief Processes printer state change request from Task Manager node
+/// \param msg
 void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
 {
     if (msg->data == PrinterState::HOME)
@@ -561,6 +612,8 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
     }
 }
 
+/// \brief Processes joint states, set them to member variable.
+/// \param msg
 void PrinterControl::jointStateCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
     std::vector<double>::const_iterator first = msg->position.begin() + 8;
