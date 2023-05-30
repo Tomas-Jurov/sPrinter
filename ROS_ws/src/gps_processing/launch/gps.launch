@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-	<node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="gps_node" output="screen" 
-        args="_port:=/dev/ttyUSB0  _baud:=115200" ns="gps">
-    </node>
-    
-</launch>
