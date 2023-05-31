@@ -17,11 +17,12 @@ where the lens must be folded (to home position). Therefore, the HOME state is p
 
 The second state `IDLE` is processed only when printer is in state HOME.
 If printer is in state IDLE, the Task Manager can send printing point on topic `target/printer/cmd`. 
-If so, service to Printer IK Solver node is called and Printer Control awaits response. Success means moving 
+If so, service to Printer IK Solver node is called and Printer Control awaits response. There is also a service called to
+GPS node in order to get orientation to the sun if initializing of the lens is needed. Success in get_ik_ service means moving 
 to state PRINTING to joint state positions obtained from service call. If failure and IK solver couldn't find IK solution,
 the FAILURE state is set to printer and Task manager should handle it.
 
-If IK solver returns joint state positions for printing, PRINTING is started. The duration is preset and user is informed about remaining time.
+If IK solver returns joint state positions for printing, PRINTING is started. The duration is preset and user is informed about remaining time. 
 
 If printing commands are not sent, printer will move its servo1 (on axis x) away from the sun in order to not print anything.
 This state is marked as IDLE2 internally, but when reached position, IDLE state is sent on topic `printer_control/state`.
