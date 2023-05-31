@@ -1,9 +1,15 @@
 <launch>
+<!--    <include file="$(find state_estimation)/launch/state_estimation.launch" />-->
 
     <node name="printer_control" pkg="printer_control" type="printer_control"
           respawn="false" output="screen">
     </node>
 
     <include file="$(find printer_ik_solver)/launch/printer_ik_solver.launch" />
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui">
+        <rosparam param="source_list">[joint_states]</rosparam>
+    </node>
+    <include file="$(find sPrinter_description)/launch/display_sprinter.launch" />
 
 </launch>

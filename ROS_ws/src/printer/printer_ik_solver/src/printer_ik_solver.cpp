@@ -20,8 +20,10 @@ PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub) :
 
 }
 
-/*Calculate inverse kinematics for sPrinter robot lens, arguments:
- * desired pose in base_link frame and returned vector of joint values */
+/// \brief Calculate inverse kinematics for sPrinter robot lens.
+/// \param desired_pose Pose in base_link frame.
+/// \param joint_values_ik Vector of joint values.
+/// \return
 bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose, std::vector<double>& joint_values_ik)
 {
     robot_state_->setToDefaultValues();
@@ -49,6 +51,10 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
     return true;
 }
 
+/// \brief Processes IK service request.
+/// \param req Desired pose.
+/// \param res Array of computed IK joint states if IK solution found.
+/// \return True if successful, otherwise false.
 bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& req, sprinter_srvs::GetIkSolution::Response& res)
 {
     try
@@ -65,6 +71,9 @@ bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& 
     return true;
 }
 
+/// \brief Publish status to status topic.
+/// \param logger_level Level as OK, WARN, ERROR
+/// \param message
 void PrinterIKSolver::publishStatus(const int8_t logger_level, const std::string& message)
 {
     status_msg_.level = logger_level;
