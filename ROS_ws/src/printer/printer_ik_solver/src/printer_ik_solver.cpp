@@ -20,7 +20,7 @@ PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub) :
 
 }
 
-/// \brief Calculate inverse kinematics for sPrinter robot lens.
+/// \brief Calculate inverse kinematics for sPrinter robot lens with enabled approximate solutions.
 /// \param desired_pose Pose in base_link frame.
 /// \param joint_values_ik Vector of joint values.
 /// \return
