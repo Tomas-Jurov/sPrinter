@@ -20,14 +20,18 @@ PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub) :
 
 }
 
-/// \brief Calculate inverse kinematics for sPrinter robot lens.
+/// \brief Calculate inverse kinematics for sPrinter robot lens with enabled approximate solutions.
 /// \param desired_pose Pose in base_link frame.
 /// \param joint_values_ik Vector of joint values.
 /// \return
 bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose, std::vector<double>& joint_values_ik)
 {
     robot_state_->setToDefaultValues();
-    bool ik_found = robot_state_->setFromIK(joint_model_group_, desired_pose.pose, 0.1);
+    // we may need to do approximate IK
+    kinematics::KinematicsQueryOptions o;
+    o.return_approximate_solution = true;
+
+    bool ik_found = robot_state_->setFromIK(joint_model_group_, desired_pose.pose, 0.1,  moveit::core::GroupStateValidityCallbackFn(), o);
 
     if (ik_found)
     {
