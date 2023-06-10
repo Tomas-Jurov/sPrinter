@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <robot name="sPrinter" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:include filename="$(find sPrinter_description)/urdf/materials.xacro" />
-  <xacro:include filename="$(find sPrinter_description)/urdf/sPrinter.trans" />
-  <xacro:include filename="$(find sPrinter_description)/urdf/sPrinter.gazebo" />
+  <xacro:include filename="$(find sprinter_description)/urdf/materials.xacro" />
+  <xacro:include filename="$(find sprinter_description)/urdf/sPrinter.trans" />
+  <xacro:include filename="$(find sprinter_description)/urdf/sPrinter.gazebo" />
 
   <!--  LINKS  ......................................................................................................-->
   <link name="base_link">
@@ -15,14 +15,14 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -36,14 +36,14 @@
     <visual>
       <origin xyz="0.26 0.22975 -0.21" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/boggie_right_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/boggie_right_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.26 0.22975 -0.21" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/boggie_right_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/boggie_right_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -57,14 +57,14 @@
     <visual>
       <origin xyz="0.26 -0.22975 -0.21" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/boggie_left_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/boggie_left_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.26 -0.22975 -0.21" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/boggie_left_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/boggie_left_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -78,14 +78,14 @@
     <visual>
       <origin xyz="-0.42 0.38275 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_right_front_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_right_front_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.42 0.38275 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_right_front_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_right_front_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -99,14 +99,14 @@
     <visual>
       <origin xyz="0.0 0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_right_middle_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_right_middle_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.0 0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_right_middle_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_right_middle_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -120,14 +120,14 @@
     <visual>
       <origin xyz="0.42 0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_right_rear__1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_right_rear__1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.42 0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_right_rear__1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_right_rear__1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -141,14 +141,14 @@
     <visual>
       <origin xyz="-0.42 -0.38275 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_left_front_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_left_front_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.42 -0.38275 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_left_front_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_left_front_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -162,14 +162,14 @@
     <visual>
       <origin xyz="-0.0 -0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_left_middle_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_left_middle_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.0 -0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_left_middle_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_left_middle_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -183,14 +183,14 @@
     <visual>
       <origin xyz="0.42 -0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_left_rear_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_left_rear_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.42 -0.40375 -0.09" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/wheel_left_rear_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/wheel_left_rear_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -204,14 +204,14 @@
     <visual>
       <origin xyz="0.0 0.0 -0.31" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/main_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/main_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.0 0.0 -0.31" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/main_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/main_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -225,14 +225,14 @@
     <visual>
       <origin xyz="-0.1445 0.020515 -0.453" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Ylin_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Ylin_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.1445 0.020515 -0.453" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Ylin_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Ylin_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -246,14 +246,14 @@
     <visual>
       <origin xyz="0.2502 0.0 -0.49414" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Xlin_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Xlin_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="0.2502 0.0 -0.49414" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Xlin_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Xlin_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -267,14 +267,14 @@
     <visual>
       <origin xyz="-0.144866 -0.270552 -0.528953" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Yrot_frame__1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Yrot_frame__1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.144866 -0.270552 -0.528953" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Yrot_frame__1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Yrot_frame__1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
@@ -288,14 +288,14 @@
     <visual>
       <origin xyz="-0.392366 8.1e-05 -0.552581" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Xrot_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Xrot_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin xyz="-0.392366 8.1e-05 -0.552581" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://sPrinter_description/meshes/lens_Xrot_frame_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://sprinter_description/meshes/lens_Xrot_frame_1.stl" scale="0.001 0.001 0.001"/>
       </geometry>
     </collision>
   </link>
