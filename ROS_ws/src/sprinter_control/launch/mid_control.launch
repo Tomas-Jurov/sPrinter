@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <!--<include file="$(find gps)/launch/gps.launch"/>-->
+    <include file="$(find gps)/launch/gps.launch"/>
 
     <include file="$(find imu)/launch/imu.launch"/>
 
@@ -10,6 +10,6 @@
     
     <include file="$(find printer_control)/launch/printer_control.launch"/>
 
-    <!--<node pkg="task_manager" type="task_manager" name="task_manager" output="screen"/>-->
+    <node pkg="task_manager" type="task_manager" name="task_manager" output="screen"/>
     
 </launch>

@@ -4,6 +4,6 @@
     <node pkg="sprinter_control" type="sprinter_control" name="sprinter_control" output="screen"/>
 
     <!--    RVIZ-->
-    <include file="$(find sPrinter_description)/launch/display_sprinter.launch" />
+    <include file="$(find sprinter_description)/launch/display.launch" />
 
 </launch>
