@@ -10,8 +10,8 @@ int main(int argc, char** argv)
   ros::Publisher printer_cmd_pub = nh.advertise<geometry_msgs::Point>("target/printer/cmd", 1);
   ros::Publisher printer_state_pub = nh.advertise<std_msgs::Int8>("target/printer/state", 1);
   ros::Publisher pose_stop_pub = nh.advertise<std_msgs::Empty>("pose_control/stop", 1);
-  ros::Publisher gps_pub = nh.advertise<std_msgs::Empty>("gps/global_orientation/cmd", 1);
-  ros::Publisher status_pub = nh.advertise<diagnostic_msgs::DiagnosticStatus>("task_manager/status", 10);
+  ros::Publisher gps_pub = nh.advertise<std_msgs::Empty>("gps/global_orientation/do", 1);
+  ros::Publisher status_pub = nh.advertise<diagnostic_msgs::DiagnosticStatus>("sprinter_status", 10);
 
   TaskManager task_manager(pose_pub, printer_cmd_pub, printer_state_pub, pose_stop_pub, gps_pub, status_pub);
 

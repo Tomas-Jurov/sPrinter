@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find gps)/launch/gps.launch"/>
+    <include file="$(find gps_processing)/launch/gps_processing.launch"/>
 
     <include file="$(find imu)/launch/imu.launch"/>
 

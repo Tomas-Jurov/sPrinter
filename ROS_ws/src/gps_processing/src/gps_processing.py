@@ -47,7 +47,7 @@ class GPSProcessing:
         self.GPS_time = datetime.now()
         
         ## Subscribers
-        self.sub_global = rospy.Subscriber("/gps/global_orientation/cmd", Empty, self.callback_global)
+        self.sub_global = rospy.Subscriber("/gps/global_orientation/do", Empty, self.callback_global)
         self.sub_pos = rospy.Subscriber("/gps/fix", NavSatFix, self.callback_gps)
         self.sub_pos_t = rospy.Subscriber("/gps/time_ref", TimeReference, self.callback_gps_time)
         self.sub_reached = rospy.Subscriber("/target/pose/reached", Bool, self.callback_reached)
