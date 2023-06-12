@@ -2,7 +2,7 @@
 import rospy
 import tf.transformations as tf
 from rospy import Publisher, ServiceProxy
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, ColorRGBA
 from diagnostic_msgs.msg import DiagnosticStatus
 from visualizer import GenericMarker
 from visualization_msgs.msg import Marker
@@ -43,13 +43,28 @@ class SprinterControl(object):
         pose.position.x = msg.x
         pose.position.y = msg.y
         pose.orientation = pose2d_to_quaternion(msg)
-        pos_marker = GenericMarker('odom',pose,Marker.ARROW)
+
+        color = ColorRGBA()
+        color.r = 1.0
+        color.g = 0.0
+        color.b = 0.0
+        color.a = 1.0
+
+        pos_marker = GenericMarker('odom',pose,Marker.ARROW, color)
         self.pos_marker_pub.publish(pos_marker.get())
 
     def target_printer_point_cmd_callback(self, msg : Point) -> None:
         pose = Pose()
         pose.position = msg
-        printer_point_marker = GenericMarker('lens_focal_static_frame',pose,Marker.SPHERE)
+        pose.orientation.w = 1.0
+
+        color = ColorRGBA()
+        color.r = 0.0
+        color.g = 0.0
+        color.b = 1.0
+        color.a = 1.0
+        
+        printer_point_marker = GenericMarker('lens_focal_static_frame',pose,Marker.SPHERE,color)
         self.printer_point_marker_pub.publish(printer_point_marker.get())
 
     def update(self) -> None:

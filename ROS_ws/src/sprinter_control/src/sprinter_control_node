@@ -21,7 +21,7 @@ def main() -> None:
     sprinter_control = SprinterControl(safety_stop_pub, heartbeat_pub, pos_marker_pub, printer_point_marker_pub, initialize_client, set_pose_client,
                                        set_printer_client)
 
-    rospy.Subscriber('task_manager/status', DiagnosticStatus, sprinter_control.task_manager_status_callback, queue_size=10)
+    rospy.Subscriber('sprinter_status', DiagnosticStatus, sprinter_control.task_manager_status_callback, queue_size=10)
     rospy.Subscriber('target/pose/cmd', Pose2D, sprinter_control.target_pose_cmd_callback, queue_size=1)
     rospy.Subscriber('target/printer/cmd', Point, sprinter_control.target_printer_point_cmd_callback,queue_size=1)
 
