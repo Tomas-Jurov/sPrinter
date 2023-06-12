@@ -20,6 +20,8 @@
   <build_depend>sprinter_srvs</build_depend>
   <build_depend>tf2_geometry_msgs</build_depend>
   <build_depend>diagnostic_msgs</build_depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>eigen_conversions</build_depend>
 
   <build_export_depend>geometry_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
