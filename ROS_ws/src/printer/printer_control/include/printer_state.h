@@ -7,14 +7,14 @@
 
 enum PrinterState
 {
-    HOME,
-    IDLE,
-    FAILURE,
-    BUSY,
-    INIT,
-    PRINTING,
-    IDLE2,
-    BUSY_TO_IDLE
+  HOME,
+  IDLE,
+  FAILURE,
+  BUSY,
+  INIT,
+  PRINTING,
+  IDLE2,
+  BUSY_TO_IDLE
 };
 
-#endif //SRC_PRINTER_STATE_H
+#endif  // SRC_PRINTER_STATE_H
