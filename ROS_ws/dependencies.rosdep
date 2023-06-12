@@ -1,1 +1,2 @@
 nmea_navsat_driver: ros-noetic-nmea-navsat-driver
+eigen_conversions: ros-noetic-eigen-conversions
