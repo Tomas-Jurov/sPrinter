@@ -11,15 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   sprinter_srvs
 )
 
+catkin_python_setup()
+
 catkin_package(
 )
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
-
-add_executable(${PROJECT_NAME} src/sprinter_control_node.cpp src/sprinter_control.cpp)
-
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)

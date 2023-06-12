@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-
-from __future__ import annotations 
 import rospy
 import tf.transformations as tf
 from rospy import Publisher, ServiceProxy
@@ -46,13 +44,13 @@ class SprinterControl(object):
         pose.position.y = msg.y
         pose.orientation = pose2d_to_quaternion(msg)
         pos_marker = GenericMarker('odom',pose,Marker.ARROW)
-        self.pos_marker_pub.publish(pos_marker)
+        self.pos_marker_pub.publish(pos_marker.get())
 
     def target_printer_point_cmd_callback(self, msg : Point) -> None:
         pose = Pose()
         pose.position = msg
         printer_point_marker = GenericMarker('lens_focal_static_frame',pose,Marker.SPHERE)
-        self.printer_point_marker_pub.publish(printer_point_marker)
+        self.printer_point_marker_pub.publish(printer_point_marker.get())
 
     def update(self) -> None:
         if (rospy.Time.now() - self.heartbeat_last).to_sec() > self.HEARTBEAT_INTERVAL:
