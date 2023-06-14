@@ -15,6 +15,7 @@ PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub)
   const moveit::core::JointModelGroup* joint_model_group =
       move_group_interface_.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
+  move_group_interface_.setPoseReferenceFrame("base_link");
   robot_state_ = robot_state;
   joint_model_group_ = joint_model_group;
 }
@@ -40,7 +41,7 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
 
     ROS_INFO_STREAM(
         "IK solution found\nJoint values: "
-        "\njoint 9 MainFrame_pitch: " +
+        "\njoint 9 Body_pitch: " +
         std::to_string(joint_values_ik[0]) + "\njoint 10 Lens_Y_axis_trans: " + std::to_string(joint_values_ik[1]) +
         "\njoint 11 Lens_X_axis_trans: " + std::to_string(joint_values_ik[2]) + "\njoint 12 Lens_Y_axis_rot: " +
         std::to_string(joint_values_ik[3]) + "\njoint 13 Lens_X_axis_rot: " + std::to_string(joint_values_ik[4]));

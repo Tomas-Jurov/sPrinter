@@ -6,6 +6,9 @@
   <xacro:include filename="$(find sprinter_description)/urdf/sPrinter.gazebo" />
 
   <!--  LINKS  ......................................................................................................-->
+  <link name="dummy_link">
+    </link>
+
   <link name="base_link">
     <inertial>
       <origin xyz="0.17638918566028436 -1.1617803251776711e-10 0.20039906221891166" rpy="0 0 0"/>
@@ -326,6 +329,14 @@
   </link>
 
 <!--  JOINTS  .......................................................................................................-->
+
+<!--dummy-->
+  <joint name="dummy_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.0" />
+    <parent link="dummy_link"/>
+    <child link="base_link"/>
+  </joint>
+
   <joint name="Boggie_right" type="revolute">
     <origin xyz="-0.26 -0.22975 0.21" rpy="0 0 0"/>
     <parent link="base_link"/>
