@@ -11,7 +11,7 @@
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
     <group name="lens_group">
         <link name="lens_middle_link"/>
-        <link name="lens_focal_work_frame"/>
+        <link name="lens_focal"/>
         <joint name="MainFrame_pitch"/>
         <joint name="Lens_Y_axis_trans"/>
         <joint name="Lens_X_axis_trans"/>
@@ -41,7 +41,7 @@
         <joint name="MainFrame_pitch" value="0"/>
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="lens_focal_work_frame" parent_link="base_link" group="lens_group"/>
+    <end_effector name="lens_focal" parent_link="base_link" group="lens_group"/>
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
     <passive_joint name="Boggie_left"/>
     <passive_joint name="Boggie_right"/>
