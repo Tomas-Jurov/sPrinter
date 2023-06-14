@@ -78,22 +78,22 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Xlin_frame:
+        lens_Xlin:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Xrot_frame:
+        lens_Xrot:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Ylin_frame:
+        lens_Ylin:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Yrot_frame:
+        lens_Yrot:
           Alpha: 1
           Show Axes: false
           Show Trail: false

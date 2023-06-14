@@ -1,11 +1,2 @@
 controller_list:
-  - name: lens_group_controller
-    action_ns: follow_joint_trajectory
-    type: FollowJointTrajectory
-    default: True
-    joints:
-      - MainFrame_pitch
-      - Lens_Y_axis_trans
-      - Lens_X_axis_trans
-      - Lens_Y_axis_rot
-      - Lens_X_axis_rot
+  []
