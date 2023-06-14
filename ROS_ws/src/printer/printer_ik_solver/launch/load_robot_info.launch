@@ -1,6 +1,6 @@
 <launch>
     <!-- Load universal robot description format (URDF) -->
-<!--    <param name="robot_description" command="xacro  '$(find sPrinter_description)/urdf/sPrinter.xacro'"/>-->
+    <!--    <param name="robot_description" command="xacro  '$(find sPrinter_description)/urdf/sPrinter.xacro'"/>-->
 
     <!-- The semantic description that corresponds to the URDF -->
     <param name="robot_description_semantic" textfile="$(find sprinter_robot_model)/config/sPrinter.srdf" />
@@ -17,7 +17,7 @@
     </group>
 
     <!-- Run robot state publisher -->
-<!--    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />-->
+    <!--    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />-->
 
     <!--    do not change-->
     <param name="printer_control_planning_group" type="str" value="lens_group"/>
