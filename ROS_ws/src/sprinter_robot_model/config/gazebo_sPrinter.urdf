@@ -198,7 +198,7 @@
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="main_frame_link">
+    <gazebo reference="body_link">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
@@ -409,7 +409,7 @@
             </geometry>
         </collision>
     </link>
-    <link name="main_frame_link">
+    <link name="body_link">
         <inertial>
             <origin rpy="0 0 0" xyz="-0.08748571926603223 0.002858790568392067 -0.009190179413522459" />
             <mass value="37.61630562888167" />
@@ -418,14 +418,14 @@
         <visual>
             <origin rpy="0 0 0" xyz="0.0 0.0 -0.31" />
             <geometry>
-                <mesh filename="package://sprinter_description/meshes/main_frame.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://sprinter_description/meshes/body.stl" scale="0.001 0.001 0.001" />
             </geometry>
             <material name="silver" />
         </visual>
         <collision>
             <origin rpy="0 0 0" xyz="0.0 0.0 -0.31" />
             <geometry>
-                <mesh filename="package://sprinter_description/meshes/main_frame.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://sprinter_description/meshes/body.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -582,16 +582,16 @@
         <child link="wheel_left_rear_link" />
         <axis xyz="0.0 1.0 0.0" />
     </joint>
-    <joint name="MainFrame_pitch" type="revolute">
+    <joint name="Body_pitch" type="revolute">
         <origin rpy="0 0 0" xyz="0.0 0.0 0.31" />
         <parent link="base_link" />
-        <child link="main_frame_link" />
+        <child link="body_link" />
         <axis xyz="-0.0 1.0 0.0" />
         <limit effort="100" lower="-0.523599" upper="0.523599" velocity="100" />
     </joint>
     <joint name="Lens_Y_axis_trans" type="prismatic">
         <origin rpy="0 0 0" xyz="0.1445 -0.020515 0.143" />
-        <parent link="main_frame_link" />
+        <parent link="body_link" />
         <child link="lens_Ylin_link" />
         <axis xyz="0.0 1.0 0.0" />
         <limit effort="100" lower="-0.12" upper="0.15" velocity="100" />
@@ -638,5 +638,15 @@
         <parent link="base_link" />
         <child link="ref_print_space" />
     </joint>
+    <transmission name="trans_Body_pitch">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="Body_pitch">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="Body_pitch_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
 </robot>
 

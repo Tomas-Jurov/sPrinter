@@ -153,5 +153,5 @@ lens_group:
     - LazyPRMstar
     - SPARS
     - SPARStwo
-  projection_evaluator: joints(MainFrame_pitch,Lens_Y_axis_trans)
+  projection_evaluator: joints(Body_pitch,Lens_Y_axis_trans)
   longest_valid_segment_fraction: 0.005

@@ -2,7 +2,7 @@ controller_list:
   - name: fake_lens_group_controller
     type: $(arg fake_execution_type)
     joints:
-      - MainFrame_pitch
+      - Body_pitch
       - Lens_Y_axis_trans
       - Lens_X_axis_trans
       - Lens_Y_axis_rot

@@ -70,7 +70,7 @@
   <selfCollide>true</selfCollide>
 </gazebo>
 
-<gazebo reference="main_frame_link">
+<gazebo reference="body_link">
   <material>${body_color}</material>
   <mu1>0.2</mu1>
   <mu2>0.2</mu2>
