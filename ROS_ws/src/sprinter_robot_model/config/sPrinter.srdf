@@ -10,7 +10,7 @@
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
     <group name="lens_group">
-        <link name="lens_frame_middle"/>
+        <link name="lens_middle"/>
         <link name="lens_focal_work_frame"/>
         <joint name="MainFrame_pitch"/>
         <joint name="Lens_Y_axis_trans"/>
@@ -59,6 +59,7 @@
     <disable_collisions link1="base_link" link2="wheel_right_rear" reason="Never"/>
     <disable_collisions link1="boggie_left" link2="boggie_right" reason="Never"/>
     <disable_collisions link1="boggie_left" link2="lens_Xlin" reason="Never"/>
+    <disable_collisions link1="boggie_left" link2="lens_Xrot" reason="Never"/>
     <disable_collisions link1="boggie_left" link2="lens_Ylin" reason="Never"/>
     <disable_collisions link1="boggie_left" link2="lens_Yrot" reason="Never"/>
     <disable_collisions link1="boggie_left" link2="main_frame" reason="Never"/>
