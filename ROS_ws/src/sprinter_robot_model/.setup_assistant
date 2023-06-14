@@ -1,6 +1,6 @@
 moveit_setup_assistant_config:
   URDF:
-    package: sPrinter_description
+    package: sprinter_description
     relative_path: urdf/sPrinter.xacro
     xacro_args: ""
   SRDF:
@@ -8,4 +8,4 @@ moveit_setup_assistant_config:
   CONFIG:
     author_name: Kubo
     author_email: sprinter@stuba.sk
-    generated_timestamp: 1685345710
+    generated_timestamp: 1686763838
