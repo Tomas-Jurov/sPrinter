@@ -30,13 +30,8 @@ private:
   moveit::planning_interface::MoveGroupInterface move_group_interface_;
   moveit::core::RobotStatePtr robot_state_;
   const moveit::core::JointModelGroup* joint_model_group_;
-  const std::string planning_group_ = "lens_group";
-  const std::string end_effector_link_ = "lens_focal";
-  const std::string reference_frame_ = "ref_print_space";
-  const std::string robot_description_ = "robot_description";
 
   ros::Publisher status_pub_;
-
   diagnostic_msgs::DiagnosticStatus status_msg_;
   ros::ServiceServer get_ik_service_;
   tf2_ros::Buffer tf_buffer_;
