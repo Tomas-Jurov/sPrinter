@@ -34,17 +34,20 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
   bool ik_found = robot_state_->setFromIK(joint_model_group_, desired_pose.pose, 0.1,
                                           moveit::core::GroupStateValidityCallbackFn(), o);
 
+    std::vector<std::string> joint_names = move_group_interface_.getActiveJoints();
+
   if (ik_found)
   {
     /*Get the resulting joint state values*/
     robot_state_->copyJointGroupPositions(joint_model_group_, joint_values_ik);
 
     ROS_INFO_STREAM(
-        "IK solution found\nJoint values: "
-        "\njoint 9 Body_pitch: " +
-        std::to_string(joint_values_ik[0]) + "\njoint 10 Lens_Y_axis_trans: " + std::to_string(joint_values_ik[1]) +
-        "\njoint 11 Lens_X_axis_trans: " + std::to_string(joint_values_ik[2]) + "\njoint 12 Lens_Y_axis_rot: " +
-        std::to_string(joint_values_ik[3]) + "\njoint 13 Lens_X_axis_rot: " + std::to_string(joint_values_ik[4]));
+        "IK solution found\nJoint (" + std::to_string(joint_names.size()) + ") values: "
+        "\n" +joint_names[0] + ": " + std::to_string(joint_values_ik[0]) +
+        "\n" +joint_names[1] + ": " + std::to_string(joint_values_ik[1]) +
+        "\n" +joint_names[2] + ": " + std::to_string(joint_values_ik[2]) +
+        "\n" +joint_names[3] + ": " + std::to_string(joint_values_ik[3]) +
+        "\n" +joint_names[4] + ": " + std::to_string(joint_values_ik[4]));
     publishStatus(LOG_LEVEL_T::OK, "IK solution found");
   }
   else
