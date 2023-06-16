@@ -8,7 +8,8 @@ int main(int argc, char** argv)
   spinner.start();
 
   ros::Publisher status_pub = nh.advertise<diagnostic_msgs::DiagnosticStatus>("sprinter_status", 50);
-  PrinterIKSolver printer_ik_solver(status_pub);
+  ros::ServiceClient validity_client = nh.serviceClient<moveit_msgs::GetStateValidity>("check_state_validity");
+  PrinterIKSolver printer_ik_solver(status_pub, validity_client);
 
   ros::ServiceServer get_ik_service =
       nh.advertiseService("ik/get_solution", &PrinterIKSolver::calculateIkService, &printer_ik_solver);
