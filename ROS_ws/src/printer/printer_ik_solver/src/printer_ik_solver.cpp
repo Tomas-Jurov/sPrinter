@@ -50,15 +50,22 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
 
     validity_client_.call(validity_srv_);
 
-    if (validity_srv_.response.valid)
+    if (!validity_srv_.response.valid)
     {
-        ROS_INFO_STREAM("Valid IK solution");
-    }
-    else
-    {
-        ROS_ERROR_STREAM("Non-Valid IK solution");
         ik_found = false;
     }
+
+    const Eigen::Affine3d &found_pose = robot_state_->getGlobalLinkTransform("lens_focal");
+
+    //bad attitude IMO, the question is how to check if the found robot pose is suchlike the desired pose
+    double diff_trans = 0.01; //1cm max translation
+    if (abs(desired_pose.pose.position.x-found_pose.translation().x()) >= diff_trans ||
+            abs(desired_pose.pose.position.y-found_pose.translation().y()) >= diff_trans ||
+            abs(desired_pose.pose.position.z-found_pose.translation().z()) >= diff_trans)
+    {
+        ik_found = false;
+    }
+
   }
 
   if (ik_found)
@@ -75,6 +82,7 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
   else
   {
     publishStatus(LOG_LEVEL_T::ERROR, "Failed to compute IK solution");
+    joint_values_ik.empty();
     return false;
   }
 
@@ -90,7 +98,15 @@ bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& 
 {
   try
   {
-    calculateIK(req.pose, res.joint_states);
+    std::vector<double> joint_states;
+
+    bool success = calculateIK(req.pose, joint_states);
+
+    if (success)
+    {
+        res.joint_states = joint_states;
+    }
+    res.success = success;
   }
   catch (...)
   {
