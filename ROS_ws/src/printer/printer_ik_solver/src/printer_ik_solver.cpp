@@ -43,7 +43,7 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
     robot_state_->copyJointGroupPositions(joint_model_group_, joint_values_ik);
 
     /*state validity*/
-    validity_srv_.request.group_name = "lens_group";
+    validity_srv_.request.group_name = PLANNING_GROUP;
     validity_srv_.request.robot_state.joint_state.position = joint_values_ik;
     validity_srv_.request.robot_state.joint_state.name = joint_names;
     validity_srv_.request.robot_state.joint_state.header.frame_id = "base_link";
@@ -57,12 +57,11 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
 
     const Eigen::Affine3d &found_pose = robot_state_->getGlobalLinkTransform("lens_focal");
 
-    //bad attitude IMO, the question is how to check if the found robot pose is suchlike the desired pose
-    double diff_trans = 0.01; //1cm max translation
-    if (abs(desired_pose.pose.position.x-found_pose.translation().x()) >= diff_trans ||
-            abs(desired_pose.pose.position.y-found_pose.translation().y()) >= diff_trans ||
-            abs(desired_pose.pose.position.z-found_pose.translation().z()) >= diff_trans)
+    if (sqrt(abs(desired_pose.pose.position.x-found_pose.translation().x()) +
+        abs(desired_pose.pose.position.y-found_pose.translation().y()) +
+        abs(desired_pose.pose.position.z-found_pose.translation().z())) >= MAX_DIFF)
     {
+        // does not satisfy requirements for printing
         ik_found = false;
     }
 
