@@ -13,13 +13,14 @@
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <diagnostic_msgs/DiagnosticStatus.h>
+#include <moveit_msgs/GetStateValidity.h>
 
 typedef diagnostic_msgs::DiagnosticStatus LOG_LEVEL_T;
 
 class PrinterIKSolver
 {
 public:
-  PrinterIKSolver(const ros::Publisher& status_pub);
+  PrinterIKSolver(const ros::Publisher& status_pub, const ros::ServiceClient& validity_client);
   //    ~PrinterIKSolver() = default;
 
   bool calculateIkService(sprinter_srvs::GetIkSolution::Request& req, sprinter_srvs::GetIkSolution::Response& res);
@@ -33,9 +34,11 @@ private:
 
   ros::Publisher status_pub_;
   diagnostic_msgs::DiagnosticStatus status_msg_;
+  ros::ServiceClient validity_client_;
   ros::ServiceServer get_ik_service_;
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf_listener_;
+  moveit_msgs::GetStateValidity validity_srv_;
 
   void publishStatus(const int8_t logger_level, const std::string& message);
 };
