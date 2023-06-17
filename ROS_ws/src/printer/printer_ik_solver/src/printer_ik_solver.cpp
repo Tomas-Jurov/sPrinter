@@ -35,7 +35,7 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
   bool ik_found = robot_state_->setFromIK(joint_model_group_, desired_pose.pose, 0.1,
                                           moveit::core::GroupStateValidityCallbackFn(), o);
 
-   std::vector<std::string> joint_names = move_group_interface_.getActiveJoints();
+  std::vector<std::string> joint_names = move_group_interface_.getActiveJoints();
 
   if (ik_found)
   {
@@ -52,31 +52,30 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
 
     if (!validity_srv_.response.valid)
     {
-        ik_found = false;
+      ik_found = false;
     }
 
-    const Eigen::Affine3d &found_pose = robot_state_->getGlobalLinkTransform("lens_focal");
+    const Eigen::Affine3d& found_pose = robot_state_->getGlobalLinkTransform("lens_focal");
 
-    if (sqrt(abs(desired_pose.pose.position.x-found_pose.translation().x()) +
-        abs(desired_pose.pose.position.y-found_pose.translation().y()) +
-        abs(desired_pose.pose.position.z-found_pose.translation().z())) >= MAX_DIFF)
+    if (sqrt(abs(desired_pose.pose.position.x - found_pose.translation().x()) +
+             abs(desired_pose.pose.position.y - found_pose.translation().y()) +
+             abs(desired_pose.pose.position.z - found_pose.translation().z())) >= MAX_DIFF)
     {
-        // does not satisfy requirements for printing
-        ik_found = false;
+      // does not satisfy requirements for printing
+      ik_found = false;
     }
-
   }
 
   if (ik_found)
   {
-      ROS_INFO_STREAM(
-              "IK solution found\nJoint (" + std::to_string(joint_names.size()) + ") values: "
-                                                                                  "\n" +joint_names[0] + ": " + std::to_string(joint_values_ik[0]) +
-              "\n" +joint_names[1] + ": " + std::to_string(joint_values_ik[1]) +
-              "\n" +joint_names[2] + ": " + std::to_string(joint_values_ik[2]) +
-              "\n" +joint_names[3] + ": " + std::to_string(joint_values_ik[3]) +
-              "\n" +joint_names[4] + ": " + std::to_string(joint_values_ik[4]));
-      publishStatus(LOG_LEVEL_T::OK, "IK solution found");
+    ROS_INFO_STREAM("IK solution found\nJoint (" + std::to_string(joint_names.size()) + ") values: "
+                                                                                        "\n" +
+                    joint_names[0] + ": " + std::to_string(joint_values_ik[0]) + "\n" + joint_names[1] + ": " +
+                    std::to_string(joint_values_ik[1]) + "\n" + joint_names[2] + ": " +
+                    std::to_string(joint_values_ik[2]) + "\n" + joint_names[3] + ": " +
+                    std::to_string(joint_values_ik[3]) + "\n" + joint_names[4] + ": " +
+                    std::to_string(joint_values_ik[4]));
+    publishStatus(LOG_LEVEL_T::OK, "IK solution found");
   }
   else
   {
@@ -97,14 +96,24 @@ bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& 
 {
   try
   {
+    bool success;
     std::vector<double> joint_states;
 
-    bool success = calculateIK(req.pose, joint_states);
-
-    if (success)
+    /*recalculating attempts loop*/
+    for (int counter = 0; counter < RECALCULATING_ATTEMPTS; counter++)
     {
+      ROS_INFO_STREAM("Calculate IK attempt " + std::to_string(counter + 1));
+      publishStatus(LOG_LEVEL_T::WARN, "Calculate IK attempt " + std::to_string(counter + 1));
+
+      success = calculateIK(req.pose, joint_states);
+
+      if (success)
+      {
         res.joint_states = joint_states;
+        break;
+      }
     }
+
     res.success = success;
   }
   catch (...)
