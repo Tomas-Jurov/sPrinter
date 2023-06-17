@@ -2,7 +2,8 @@
 #define PRINTER_IK_SOLVER_H
 
 #define PLANNING_GROUP "lens_group"
-#define MAX_DIFF 0.01 //in cm
+#define MAX_DIFF 0.01  // in cm
+#define RECALCULATING_ATTEMPTS 3
 
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
