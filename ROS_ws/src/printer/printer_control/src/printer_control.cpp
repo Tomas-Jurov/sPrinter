@@ -147,9 +147,9 @@ void PrinterControl::goPrint()
 
     ik_srv_.request.pose = printing_pose_in_base_link_;
 
-    if (ik_client_.call(ik_srv_) && !ik_srv_.response.joint_states.size())
+    if (ik_client_.call(ik_srv_) && !ik_srv_.response.success)
     {
-      ROS_DEBUG_STREAM("State changed to FAILURE");
+      ROS_DEBUG_STREAM("State changed to FAILURE !");
       printer_state_ = FAILURE;
       std_msgs::Int8 msg;
       msg.data = printer_state_;

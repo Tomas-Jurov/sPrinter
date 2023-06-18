@@ -1,7 +1,8 @@
 #include "../include/printer_ik_solver.h"
 
-PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub)
+PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub, const ros::ServiceClient& validity_client)
   : status_pub_(status_pub)
+  , validity_client_(validity_client)
   , tf_buffer_()
   , tf_listener_(tf_buffer_)
   , move_group_(PLANNING_GROUP)
@@ -15,6 +16,7 @@ PrinterIKSolver::PrinterIKSolver(const ros::Publisher& status_pub)
   const moveit::core::JointModelGroup* joint_model_group =
       move_group_interface_.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
+  move_group_interface_.setPoseReferenceFrame("base_link");
   robot_state_ = robot_state;
   joint_model_group_ = joint_model_group;
 }
@@ -33,22 +35,52 @@ bool PrinterIKSolver::calculateIK(const geometry_msgs::PoseStamped& desired_pose
   bool ik_found = robot_state_->setFromIK(joint_model_group_, desired_pose.pose, 0.1,
                                           moveit::core::GroupStateValidityCallbackFn(), o);
 
+  std::vector<std::string> joint_names = move_group_interface_.getActiveJoints();
+
   if (ik_found)
   {
     /*Get the resulting joint state values*/
     robot_state_->copyJointGroupPositions(joint_model_group_, joint_values_ik);
 
-    ROS_INFO_STREAM(
-        "IK solution found\nJoint values: "
-        "\njoint 9 MainFrame_pitch: " +
-        std::to_string(joint_values_ik[0]) + "\njoint 10 Lens_Y_axis_trans: " + std::to_string(joint_values_ik[1]) +
-        "\njoint 11 Lens_X_axis_trans: " + std::to_string(joint_values_ik[2]) + "\njoint 12 Lens_Y_axis_rot: " +
-        std::to_string(joint_values_ik[3]) + "\njoint 13 Lens_X_axis_rot: " + std::to_string(joint_values_ik[4]));
+    /*state validity*/
+    validity_srv_.request.group_name = PLANNING_GROUP;
+    validity_srv_.request.robot_state.joint_state.position = joint_values_ik;
+    validity_srv_.request.robot_state.joint_state.name = joint_names;
+    validity_srv_.request.robot_state.joint_state.header.frame_id = "base_link";
+
+    validity_client_.call(validity_srv_);
+
+    if (!validity_srv_.response.valid)
+    {
+      ik_found = false;
+    }
+
+    const Eigen::Affine3d& found_pose = robot_state_->getGlobalLinkTransform("lens_focal");
+
+    if (sqrt(abs(desired_pose.pose.position.x - found_pose.translation().x()) +
+             abs(desired_pose.pose.position.y - found_pose.translation().y()) +
+             abs(desired_pose.pose.position.z - found_pose.translation().z())) >= MAX_DIFF)
+    {
+      // does not satisfy requirements for printing
+      ik_found = false;
+    }
+  }
+
+  if (ik_found)
+  {
+    ROS_INFO_STREAM("IK solution found\nJoint (" + std::to_string(joint_names.size()) + ") values: "
+                                                                                        "\n" +
+                    joint_names[0] + ": " + std::to_string(joint_values_ik[0]) + "\n" + joint_names[1] + ": " +
+                    std::to_string(joint_values_ik[1]) + "\n" + joint_names[2] + ": " +
+                    std::to_string(joint_values_ik[2]) + "\n" + joint_names[3] + ": " +
+                    std::to_string(joint_values_ik[3]) + "\n" + joint_names[4] + ": " +
+                    std::to_string(joint_values_ik[4]));
     publishStatus(LOG_LEVEL_T::OK, "IK solution found");
   }
   else
   {
     publishStatus(LOG_LEVEL_T::ERROR, "Failed to compute IK solution");
+    joint_values_ik.empty();
     return false;
   }
 
@@ -64,7 +96,25 @@ bool PrinterIKSolver::calculateIkService(sprinter_srvs::GetIkSolution::Request& 
 {
   try
   {
-    calculateIK(req.pose, res.joint_states);
+    bool success;
+    std::vector<double> joint_states;
+
+    /*recalculating attempts loop*/
+    for (int counter = 0; counter < RECALCULATING_ATTEMPTS; counter++)
+    {
+      ROS_INFO_STREAM("Calculate IK attempt " + std::to_string(counter + 1));
+      publishStatus(LOG_LEVEL_T::WARN, "Calculate IK attempt " + std::to_string(counter + 1));
+
+      success = calculateIK(req.pose, joint_states);
+
+      if (success)
+      {
+        res.joint_states = joint_states;
+        break;
+      }
+    }
+
+    res.success = success;
   }
   catch (...)
   {
