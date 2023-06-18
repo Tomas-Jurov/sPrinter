@@ -68,32 +68,32 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        boggie_left_1:
+        boggie_left:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        boggie_right_1:
+        boggie_right:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Xlin_frame_1:
+        lens_Xlin:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Xrot_frame_1:
+        lens_Xrot:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Ylin_frame_1:
+        lens_Ylin:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_Yrot_frame__1:
+        lens_Yrot:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -110,37 +110,37 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        main_frame_1:
+        main_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_left_front_1:
+        wheel_left_front:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_left_middle_1:
+        wheel_left_middle:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_left_rear_1:
+        wheel_left_rear:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_right_front_1:
+        wheel_right_front:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_right_middle_1:
+        wheel_right_middle:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        wheel_right_rear__1:
+        wheel_right_rear:
           Alpha: 1
           Show Axes: false
           Show Trail: false

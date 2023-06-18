@@ -125,10 +125,10 @@ void PrinterControl::goPrint()
     tmp.pose.orientation = quaternion_world_sun;
     tmp.header.frame_id = PRINTING_FRAME;
 
-    // transform orientation to sun from world to lens_focal_static_frame
+    // transform orientation to sun from world to ref_print_space
     geometry_msgs::PoseStamped pose_static_sun = tf_buffer_.transform(tmp, PRINTING_FRAME);
 
-    // set printing pose in lens_focal_static_frame
+    // set printing pose in ref_print_space
     printing_pose_.pose.orientation = pose_static_sun.pose.orientation;
     printing_pose_.pose.position = printing_point_;
     printing_pose_.header.frame_id = PRINTING_FRAME;

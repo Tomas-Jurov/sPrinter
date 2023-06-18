@@ -31,8 +31,8 @@ private:
   moveit::core::RobotStatePtr robot_state_;
   const moveit::core::JointModelGroup* joint_model_group_;
   const std::string planning_group_ = "lens_group";
-  const std::string end_effector_link_ = "lens_focal_work_frame";
-  const std::string reference_frame_ = "lens_focal_static_frame";
+  const std::string end_effector_link_ = "lens_focal";
+  const std::string reference_frame_ = "ref_print_space";
   const std::string robot_description_ = "robot_description";
 
   ros::Publisher status_pub_;

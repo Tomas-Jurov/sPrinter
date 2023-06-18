@@ -7,7 +7,7 @@
 #define K_DIR 10             // the direct u in order to overcome the deadzone
 #define PRINTING_TIMEOUT 60  // [s]
 #define IDLE_TIMEOUT 5       // [s]
-#define PRINTING_FRAME "lens_focal_static_frame"
+#define PRINTING_FRAME "ref_print_space"
 
 #include "printer_state.h"
 

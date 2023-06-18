@@ -5,7 +5,7 @@
 If you want to `visualize` the **robot in `RViz`**, run the following command (no aditional installation needed):
 
 ```bash
-  roslaunch sPrinter_description display.launch 
+  roslaunch sprinter_description display.launch 
 ```
 In **Displays** panel check the box for `TF`, all frames with connections will be displayed.
 
