@@ -143,13 +143,6 @@
             <robotNamespace>/</robotNamespace>
         </plugin>
     </gazebo>
-    <gazebo reference="dummy_link">
-        <material>Gazebo/Silver</material>
-        <mu1>0.2</mu1>
-        <mu2>0.2</mu2>
-        <selfCollide>false</selfCollide>
-        <gravity>false</gravity>
-    </gazebo>
     <gazebo reference="base_link">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
@@ -157,86 +150,85 @@
         <selfCollide>true</selfCollide>
         <gravity>true</gravity>
     </gazebo>
-    <gazebo reference="boggie_right_link">
+    <gazebo reference="boggie_right">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="boggie_left_link">
+    <gazebo reference="boggie_left">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="wheel_right_front_link">
+    <gazebo reference="wheel_right_front">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="wheel_right_middle_link">
+    <gazebo reference="wheel_right_middle">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="wheel_right_rear_link">
+    <gazebo reference="wheel_right_rear">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="wheel_left_front_link">
+    <gazebo reference="wheel_left_front">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="wheel_left_middle_link">
+    <gazebo reference="wheel_left_middle">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="wheel_left_rear_link">
+    <gazebo reference="wheel_left_rear">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="body_link">
+    <gazebo reference="body">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="lens_Ylin_link">
+    <gazebo reference="lens_Ylin">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="lens_Xlin_link">
+    <gazebo reference="lens_Xlin">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="lens_Yrot_link">
+    <gazebo reference="lens_Yrot">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
-    <gazebo reference="lens_Xrot_link">
+    <gazebo reference="lens_Xrot">
         <material>Gazebo/Silver</material>
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
         <selfCollide>true</selfCollide>
     </gazebo>
     <!--  LINKS  ......................................................................................................-->
-    <link name="dummy_link" />
     <link name="base_link">
         <inertial>
             <origin rpy="0 0 0" xyz="0.17638918566028436 -1.1617803251776711e-10 0.20039906221891166" />
@@ -280,6 +272,7 @@
     <link name="boggie_left">
         <inertial>
             <origin rpy="0 0 0" xyz="0.04608852267144553 0.05868381722034843 -0.0878295588540255" />
+            <mass value="9.26099437267114" />
             <mass value="9.26099437267114" />
             <inertia ixx="0.043816" ixy="-0.001419" ixz="0.005146" iyy="0.34178" iyz="0.011146" izz="0.334085" />
         </inertial>
@@ -540,12 +533,6 @@
         </inertial>
     </link>
     <!--  JOINTS  .......................................................................................................-->
-    <!--dummy-->
-    <joint name="dummy_joint" type="fixed">
-        <origin rpy="0 0 0" xyz="0.0 0.0 0.0" />
-        <parent link="dummy_link" />
-        <child link="base_link" />
-    </joint>
     <joint name="Boggie_right" type="revolute">
         <origin rpy="0 0 0" xyz="-0.26 -0.22975 0.21" />
         <parent link="base_link" />
