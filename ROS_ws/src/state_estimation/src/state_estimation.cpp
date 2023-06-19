@@ -97,7 +97,7 @@ void StateEstimation::publishJointStates()
   joint_state_msg_.name[5] = "Wheel_right_rear";
   joint_state_msg_.name[6] = "Boggie_right";
   joint_state_msg_.name[7] = "Boggie_left";
-  joint_state_msg_.name[8] = "MainFrame_pitch";
+  joint_state_msg_.name[8] = "Body_pitch";
   joint_state_msg_.name[9] = "Lens_Y_axis_trans";
   joint_state_msg_.name[10] = "Lens_X_axis_trans";
   joint_state_msg_.name[11] = "Lens_Y_axis_rot";
