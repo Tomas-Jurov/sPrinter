@@ -64,7 +64,7 @@ class SprinterControl(object):
         color.b = 1.0
         color.a = 1.0
         
-        printer_point_marker = GenericMarker('lens_focal_static_frame',pose,Marker.SPHERE,color)
+        printer_point_marker = GenericMarker('ref_print_space',pose,Marker.SPHERE,color)
         self.printer_point_marker_pub.publish(printer_point_marker.get())
 
     def update(self) -> None:
