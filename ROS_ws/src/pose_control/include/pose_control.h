@@ -32,9 +32,9 @@ public:
   void loadParams(const ros::NodeHandle& nh);
 
   // Callbacks
-  void targetCmdCallback(const geometry_msgs::Pose2D::ConstPtr &msg);
-  void odomCallback(const nav_msgs::Odometry::ConstPtr &msg);
-  void stopCallback(const std_msgs::Empty::ConstPtr &msg);
+  void targetCmdCallback(const geometry_msgs::Pose2D::ConstPtr& msg);
+  void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
+  void stopCallback(const std_msgs::Empty::ConstPtr& msg);
 
 private:
   ros::Publisher cmd_vel_pub_, target_reached_pub_;
@@ -51,15 +51,17 @@ private:
   void getParam(const ros::NodeHandle& nh, const std::string& name, T* storage) const
   {
     if (!nh.getParam(name, *storage))
-    ROS_ERROR("Failed to get parameter \"%s\" from server\n", name.data());
+      ROS_ERROR("Failed to get parameter \"%s\" from server\n", name.data());
   };
 
-  template<typename T>
-  int sgn(T val) {
+  template <typename T>
+  int sgn(T val)
+  {
     return (T(0) < val) - (val < T(0));
   };
 
-  double euclidean_distance(double x1, double y1, double x2, double y2) {
+  double euclidean_distance(double x1, double y1, double x2, double y2)
+  {
     tf::Vector3 v1(x1, y1, 0.0);
     tf::Vector3 v2(x2, y2, 0.0);
     return v1.distance(v2);

@@ -7,7 +7,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
 
   ros::Publisher cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-  ros::Publisher target_reached_pub = nh.advertise<std_msgs::Bool>("target/pose/reached",1);
+  ros::Publisher target_reached_pub = nh.advertise<std_msgs::Bool>("target/pose/reached", 1);
 
   PoseControl pose_control(cmd_vel_pub, target_reached_pub);
   pose_control.loadParams(nh);
