@@ -6,13 +6,6 @@
 <gazebo>
   <plugin name="control" filename="libgazebo_ros_control.so"/>
 </gazebo>
-  <gazebo reference="dummy_link">
-    <material>${body_color}</material>
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
-    <selfCollide>false</selfCollide>
-    <gravity>false</gravity>
-  </gazebo>
 
 <gazebo reference="base_link">
   <material>${body_color}</material>

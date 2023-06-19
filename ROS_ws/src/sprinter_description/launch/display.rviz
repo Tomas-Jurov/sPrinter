@@ -98,19 +98,19 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        lens_focal_static_frame:
+        ref_print_space:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        lens_focal_work_frame:
+        lens_focal:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        lens_frame_middle:
+        lens_middle:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        main_frame:
+        body:
           Alpha: 1
           Show Axes: false
           Show Trail: false

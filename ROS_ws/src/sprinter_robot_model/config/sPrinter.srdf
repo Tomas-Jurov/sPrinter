@@ -78,7 +78,6 @@
     <disable_collisions link1="boggie_left" link2="wheel_right_middle" reason="Never"/>
     <disable_collisions link1="boggie_left" link2="wheel_right_rear" reason="Never"/>
     <disable_collisions link1="boggie_right" link2="lens_Xlin" reason="Never"/>
-    <disable_collisions link1="boggie_right" link2="lens_Xrot" reason="Never"/>
     <disable_collisions link1="boggie_right" link2="lens_Ylin" reason="Never"/>
     <disable_collisions link1="boggie_right" link2="lens_Yrot" reason="Never"/>
     <disable_collisions link1="boggie_right" link2="wheel_left_front" reason="Never"/>
@@ -98,7 +97,6 @@
     <disable_collisions link1="lens_Xlin" link2="wheel_right_rear" reason="Never"/>
     <disable_collisions link1="lens_Xrot" link2="lens_Yrot" reason="Adjacent"/>
     <disable_collisions link1="lens_Xrot" link2="wheel_left_rear" reason="Never"/>
-    <disable_collisions link1="lens_Xrot" link2="wheel_right_middle" reason="Never"/>
     <disable_collisions link1="lens_Xrot" link2="wheel_right_rear" reason="Never"/>
     <disable_collisions link1="lens_Ylin" link2="wheel_left_front" reason="Never"/>
     <disable_collisions link1="lens_Ylin" link2="wheel_left_middle" reason="Never"/>
