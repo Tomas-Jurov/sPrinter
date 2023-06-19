@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <node pkg="sprinter_control" type="sprinter_control" name="sprinter_control" output="screen"/>
+    <node pkg="sprinter_control" type="sprinter_control_node" name="sprinter_control" output="screen"/>
 
     <!--    RVIZ-->
     <include file="$(find sprinter_description)/launch/display.launch" />

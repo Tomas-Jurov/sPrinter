@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+from sprinter_control import SprinterControl
+import rospy
+from std_msgs.msg import Empty as EmptyMsg
+from std_srvs.srv import Empty as EmptySrv
+from sprinter_srvs.srv import SetPose2D, SetPointArr
+from diagnostic_msgs.msg import DiagnosticStatus
+from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Pose2D, Point
+
+def main() -> None:
+    rospy.init_node('sprinter_control')
+    safety_stop_pub = rospy.Publisher('sprinter_control/safety_stop', EmptyMsg, queue_size=1)
+    heartbeat_pub = rospy.Publisher('sprinter_control/heartbeat', EmptyMsg, queue_size=1)
+    pos_marker_pub = rospy.Publisher('sprinter/position_marker', Marker, queue_size=1)
+    printer_point_marker_pub = rospy.Publisher('sprinter/printer_point_marker', Marker, queue_size=1)
+    initialize_client = rospy.ServiceProxy('task_manager/initialize', EmptySrv)
+    set_pose_client = rospy.ServiceProxy('task_manager/set_task/pose', SetPose2D)
+    set_printer_client = rospy.ServiceProxy('task_manager/set_task/printer', SetPointArr)
+
+    sprinter_control = SprinterControl(safety_stop_pub, heartbeat_pub, pos_marker_pub, printer_point_marker_pub, initialize_client, set_pose_client,
+                                       set_printer_client)
+
+    rospy.Subscriber('sprinter_status', DiagnosticStatus, sprinter_control.task_manager_status_callback, queue_size=10)
+    rospy.Subscriber('target/pose/cmd', Pose2D, sprinter_control.target_pose_cmd_callback, queue_size=1)
+    rospy.Subscriber('target/printer/cmd', Point, sprinter_control.target_printer_point_cmd_callback,queue_size=1)
+
+    rate = rospy.Rate(10)
+    while not rospy.is_shutdown():
+        sprinter_control.update()
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        main()       
+    except rospy.ROSInterruptException:
+        rospy.loginfo('SprinterControl node terminated')
