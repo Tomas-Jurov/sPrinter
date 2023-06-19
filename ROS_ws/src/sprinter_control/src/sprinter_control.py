@@ -6,7 +6,7 @@ from std_msgs.msg import Empty, ColorRGBA
 from diagnostic_msgs.msg import DiagnosticStatus
 from visualizer import GenericMarker
 from visualization_msgs.msg import Marker
-from geometry_msgs.msg import Point, Pose, Pose2D, Quaternion
+from geometry_msgs.msg import Point, Pose, Pose2D, Quaternion, Vector3
 
 def pose2d_to_quaternion(pose : Pose2D) -> Quaternion:
     quaternion = tf.quaternion_from_euler(0, 0, pose.theta)
@@ -50,7 +50,12 @@ class SprinterControl(object):
         color.b = 0.0
         color.a = 1.0
 
-        pos_marker = GenericMarker('odom',pose,Marker.ARROW, color)
+        scale = Vector3()
+        scale.x = 0.8
+        scale.y = 0.05
+        scale.z = 0.05
+
+        pos_marker = GenericMarker('odom', pose, scale, Marker.ARROW, color)
         self.pos_marker_pub.publish(pos_marker.get())
 
     def target_printer_point_cmd_callback(self, msg : Point) -> None:
@@ -64,7 +69,12 @@ class SprinterControl(object):
         color.b = 1.0
         color.a = 1.0
         
-        printer_point_marker = GenericMarker('ref_print_space',pose,Marker.SPHERE,color)
+        scale = Vector3()
+        scale.x = 0.1
+        scale.y = 0.1
+        scale.z = 0.1
+
+        printer_point_marker = GenericMarker('ref_print_space', pose, scale, Marker.SPHERE, color)
         self.printer_point_marker_pub.publish(printer_point_marker.get())
 
     def update(self) -> None:

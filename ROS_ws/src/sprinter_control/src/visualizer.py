@@ -2,11 +2,11 @@
 from typing import Literal, Optional
 import rospy
 from visualization_msgs.msg import Marker
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, Vector3
 from std_msgs.msg import ColorRGBA
 
 class GenericMarker(object):
-    def __init__(self, frame : str, pose : Pose, type : Literal[2], color: ColorRGBA, id : Optional[int] = 0) -> None:
+    def __init__(self, frame : str, pose : Pose, scale : Vector3, type : Literal[2], color: ColorRGBA, id : Optional[int] = 0) -> None:
         self.marker = Marker()
         self.marker.header.frame_id = frame
         self.marker.header.stamp = rospy.get_rostime()
@@ -16,9 +16,7 @@ class GenericMarker(object):
 
         self.marker.pose = pose
 
-        self.marker.scale.x = 0.1
-        self.marker.scale.y = 0.1
-        self.marker.scale.z = 0.1
+        self.marker.scale = scale
 
         self.marker.color = color
 
