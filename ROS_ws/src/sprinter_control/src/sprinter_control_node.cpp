@@ -15,7 +15,7 @@ int main(int argc, char** argv)
                                    set_printer_client);
 
   ros::Subscriber task_manager_status_sub =
-      nh.subscribe("task_manager/status", 10, &SprinterControl::taskManagerStatusCallback, &sprinter_control);
+      nh.subscribe("sprinter_status", 10, &SprinterControl::statusCallback, &sprinter_control);
 
   ros::Rate loop_rate(10);
   while (ros::ok())
