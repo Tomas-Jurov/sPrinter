@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <std_msgs/Empty.h>
 #include <std_msgs/Float32.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/Imu.h>
@@ -34,6 +35,7 @@ public:
   void stepper2Callback(const std_msgs::Float32& msg);
   void servo1Callback(const std_msgs::Float32& msg);
   void servo2Callback(const std_msgs::Float32& msg);
+  void resetOdomCallback(const std_msgs::Empty& msg);
 
 private:
   void calculateOdom();

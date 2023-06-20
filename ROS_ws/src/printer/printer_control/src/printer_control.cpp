@@ -100,7 +100,8 @@ void PrinterControl::goPrint()
     printer_state_ = INIT;
     if (gps_client_.call(gps_srv_))
     {
-      quaternion_world_sun = gps_srv_.response.orientation;
+      if (gps_srv_.response.success == true)
+        quaternion_world_sun = gps_srv_.response.orientation;
     }
     else
     {

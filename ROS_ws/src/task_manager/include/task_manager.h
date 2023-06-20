@@ -31,7 +31,8 @@ enum State
   ROBOT_MOVING,
   PRINTER_BUSY,
   PRINTER_IDLE,
-  STOPPING
+  STOPPING,
+  RESETTING
 };
 
 enum PrinterState
@@ -45,14 +46,16 @@ class TaskManager
 {
 public:
   TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publisher& printer_cmd_pub,
-              const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub, const ros::Publisher& gps_cmd_pub,
-              const ros::Publisher& status_pub);
+              const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub, 
+              const ros::Publisher& gps_do_pub, const ros::Publisher& gps_reset_pub, 
+              const ros::Publisher& status_pub, const ros::Publisher& reset_odom_pub);
   ~TaskManager() = default;
 
   void update();
 
   // Input callbacks
   bool safetyStopCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
+  bool resetCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
   void heartbeatCallback(const std_msgs::Empty::ConstPtr& msg);
   bool initializeCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
   bool poseTaskCallback(sprinter_srvs::SetPose2D::Request& req, sprinter_srvs::SetPose2D::Response& res);
@@ -68,6 +71,7 @@ public:
 private:
   bool watchdogCheck();
   void safetyStop();
+  void reset();
   void setState(TaskManagerNS::State state);
   void publishStatus(const int8_t logger_level, const std::string& message);
   void publishPoseTarget();
@@ -82,7 +86,8 @@ private:
   TaskManagerNS::State state_;
   ros::Time watchdog_last_;
 
-  ros::Publisher pose_cmd_pub_, printer_cmd_pub_, printer_state_pub_, pose_stop_pub_, gps_cmd_pub_, status_pub_;
+  ros::Publisher pose_cmd_pub_, printer_cmd_pub_, printer_state_pub_, pose_stop_pub_, gps_do_pub_, gps_reset_pub_, 
+                status_pub_, reset_odom_pub_;
 
   std_msgs::Int8 printer_state_msg_;
   diagnostic_msgs::DiagnosticStatus status_msg_;

@@ -38,6 +38,8 @@ class GPSProcessing:
         """
         ## Flag indicating if the robot has already moved to the second position.
         self.pose_reached = False
+
+        self.global_orientation_done = False
         
         ## Queue of data taken from the GPS.
         self.q = deque()
@@ -47,10 +49,11 @@ class GPSProcessing:
         self.GPS_time = datetime.now()
         
         ## Subscribers
-        self.sub_global = rospy.Subscriber("/gps/global_orientation/do", Empty, self.callback_global)
+        self.sub_global_orientation_do = rospy.Subscriber("/gps/global_orientation/do", Empty, self.callback_global_orientation_do)
+        self.sub_global_orientation_reset = rospy.Subscriber("/gps/global_orientation/reset", Empty, self.callback_global_orientation_reset)
         self.sub_pos = rospy.Subscriber("/gps/fix", NavSatFix, self.callback_gps)
         self.sub_pos_t = rospy.Subscriber("/gps/time_ref", TimeReference, self.callback_gps_time)
-        self.sub_reached = rospy.Subscriber("/target/pose/reached", Bool, self.callback_reached)
+        self.sub_reached = rospy.Subscriber("/target/pose/reached", Bool, self.callback_pose)
         
         ## Publishers
         self.pub_global = rospy.Publisher("/gps/global_orientation/done", Bool, queue_size=1)
@@ -69,12 +72,15 @@ class GPSProcessing:
         @param req sprinter_srvs/GetOrientationRequest Empty request
         @return  Sun's angular position in "world" frame (quaternion coordinates).
         """
-        gps = self.measure_position()
-        pos_sun = get_position(self.GPS_time, gps.y, gps.x)
-        rospy.loginfo("Returning [%s, %s]"%(float(pos_sun['altitude']), float(pos_sun['azimuth'])+pi))
-        quat = tf.transformations.quaternion_from_euler(
-                   float(0),float(pos_sun['altitude']),float(pos_sun['azimuth']+pi))
-        return GetOrientationResponse(Quaternion(*quat))
+        if self.global_orientation_done:
+            gps = self.measure_position()
+            pos_sun = get_position(self.GPS_time, gps.y, gps.x)
+            rospy.loginfo("Returning [%s, %s]"%(float(pos_sun['altitude']), float(pos_sun['azimuth'])+pi))
+            quat = tf.transformations.quaternion_from_euler(
+                    float(0),float(pos_sun['altitude']),float(pos_sun['azimuth']+pi))
+            return GetOrientationResponse(True, Quaternion(*quat))
+        else:
+            return GetOrientationResponse(False, Quaternion(0, 0, 0, 1))
         
     def callback_gps_time(self, data):
         """! Callback of the GPS time. 
@@ -108,7 +114,7 @@ class GPSProcessing:
         pos = mean(self.q, axis=0)
         return Pose2D(x=pos[0], y=pos[1])
     
-    def callback_reached(self, data):
+    def callback_pose(self, data):
         """! Callback of the Pose Control node feedback topic.
         
         Sets the value of the pose_reached flag to false when it is true and 
@@ -116,7 +122,12 @@ class GPSProcessing:
         reached.
         @param data std_msgs/Bool Pose Control node feedback
         """
-        if self.pose_reached and data.data: self.pose_reached = True
+        if not self.global_orientation_done and not self.pose_reached and data.data: 
+            self.pose_reached = True
+            rospy.loginfo('Meassuring position 2')
+            self.second = self.measure_position()
+            self.compute_global_orientation()
+
 
     def publish_tf_static(self, angle):
         """! Converts the angle in euler coordinates to quaternion 
@@ -147,7 +158,7 @@ class GPSProcessing:
         rospy.loginfo('Publishing static TF, angle: ' + str(angle))
         broadcaster.sendTransform(static_transformStamped)
 
-    def callback_global(self, data):
+    def callback_global_orientation_do(self, data):
         """! Callback of the command topic to perform the global orientation 
         estimation procedure.
         
@@ -158,20 +169,35 @@ class GPSProcessing:
 
         @param data std_msgs/Empty message.
         """
-        rospy.loginfo('Meassuring position 1')
-        first = self.measure_position()
-        self.pub.publish(Pose2D(x=10.0, y=0.0, theta=0.0))
-        self.pose_reached = True
-        rate = rospy.Rate(1) # 0.1hz
-        while not self.pose_reached:
-            rate.sleep()
-        rospy.loginfo('Meassuring position 2')
-        second = self.measure_position()
-        rospy.logdebug('First measurement: ' + str(first))
-        rospy.logdebug('Second measurement: ' + str(second))
-        north_angle = (arctan2(second.x - first.x, second.y - first.y) + pi) % (2*pi)
+        if not self.global_orientation_done:
+            rospy.loginfo('Meassuring position 1')
+            self.first = self.measure_position()
+            self.pose_reached = False
+            self.pub.publish(Pose2D(x=10.0, y=0.0, theta=0.0))
+            
+            # rate = rospy.Rate(1) # 0.1hz
+            # while not self.pose_reached:
+            #     rate.sleep()
+            # rospy.loginfo('Meassuring position 2')
+            # second = self.measure_position()
+            # rospy.logdebug('First measurement: ' + str(first))
+            # rospy.logdebug('Second measurement: ' + str(second))
+            # north_angle = (arctan2(second.x - first.x, second.y - first.y) + pi) % (2*pi)
+            # self.publish_tf_static(north_angle)
+            # self.pub_global.publish(Bool(data=True))
+
+    def callback_global_orientation_reset(self, data):
+        self.publish_tf_static(0.0)
+        self.global_orientation_done = False
+    
+    def compute_global_orientation(self):
+        rospy.logdebug('First measurement: ' + str(self.first))
+        rospy.logdebug('Second measurement: ' + str(self.second))
+        north_angle = (arctan2(self.second.x - self.first.x, self.second.y - self.first.y) + pi) % (2*pi)
         self.publish_tf_static(north_angle)
         self.pub_global.publish(Bool(data=True))
+        self.global_orientation_done = True
+
 
 
 if __name__ == '__main__':

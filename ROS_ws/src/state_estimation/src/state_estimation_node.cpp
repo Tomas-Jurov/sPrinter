@@ -20,6 +20,8 @@ int main(int argc, char** argv)
       nh.subscribe("servo1/current_angle", 1, &StateEstimation::servo1Callback, &state_estimation);
   ros::Subscriber servo2_sub =
       nh.subscribe("servo2/current_angle", 1, &StateEstimation::servo2Callback, &state_estimation);
+  ros::Subscriber reset_odom_sub =
+      nh.subscribe("reset_odometry", 1, &StateEstimation::resetOdomCallback, &state_estimation);
 
   // set the rate of TF publishing
   ros::Rate looprate(40);
