@@ -18,6 +18,7 @@
 // sPrinter
 #include <sprinter_srvs/SetPointArr.h>
 #include <sprinter_srvs/SetPose2D.h>
+#include "../../printer/printer_control/include/printer_state.h"
 
 typedef diagnostic_msgs::DiagnosticStatus LOG_LEVEL_T;
 
@@ -33,13 +34,6 @@ enum State
   PRINTER_IDLE,
   STOPPING,
   RESETTING
-};
-
-enum PrinterState
-{
-  HOME = 0,
-  IDLE,
-  FAILURE
 };
 
 class TaskManager
