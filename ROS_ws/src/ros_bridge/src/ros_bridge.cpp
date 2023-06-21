@@ -2,13 +2,15 @@
 
 ROSbridge::ROSBridge::ROSBridge(const ros::Publisher& wheels_twist_pub, const ros::Publisher& stepper1_position_pub,
                                 const ros::Publisher& stepper2_position_pub, const ros::Publisher& servo1_angle_pub,
-                                const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub)
+                                const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub,
+                                const ros::Publisher& lin_actuator_is_on_point_pub)
   : wheels_twist_pub_(wheels_twist_pub)
   , stepper1_position_pub_(stepper1_position_pub)
   , stepper2_position_pub_(stepper2_position_pub)
   , servo1_angle_pub_(servo1_angle_pub)
   , servo2_angle_pub_(servo2_angle_pub)
   , suntracker_fb_pub_(suntracker_fb_pub)
+  , lin_actuator_is_on_point_pub_(lin_actuator_is_on_point_pub)
 {
   // initial position
   stepper1_position_msg_.data = 0.08;  // [m]
@@ -76,6 +78,7 @@ void ROSbridge::ROSBridge::getAndPublishReturns()
     servo2_angle_msg_.data = params_.servo2_gain * (returns_.servo2_current_angle - params_.servo2_offset);
 
     suntracker_fb_msg_.data = returns_.suntracker_done;
+    lin_actuator_is_on_point_fb_msg_.data = returns_.tilt_is_on_point;
 
     wheels_twist_pub_.publish(wheels_twist_msg_);
 
@@ -86,6 +89,7 @@ void ROSbridge::ROSBridge::getAndPublishReturns()
     stepper2_position_pub_.publish(stepper2_position_msg_);
 
     suntracker_fb_pub_.publish(suntracker_fb_msg_);
+    lin_actuator_is_on_point_pub_.publish(lin_actuator_is_on_point_fb_msg_);
   }
 }
 

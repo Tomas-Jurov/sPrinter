@@ -44,13 +44,14 @@ struct VelocityOfWheels
 
 struct Returns
 {
-  short left_grp_velocity : 8;
-  short right_grp_velocity : 8;
+  short left_grp_velocity    : 8;
+  short right_grp_velocity   : 8;
   int stepper1_current_steps : 32;
   int stepper2_current_steps : 32;
   short servo1_current_angle : 16;
   short servo2_current_angle : 16;
-  bool suntracker_done : 1;
+  bool suntracker_done       : 1;
+  bool tilt_is_on_point      : 1;
 } __attribute__((packed));
 
 }  // namespace ROSbridge
