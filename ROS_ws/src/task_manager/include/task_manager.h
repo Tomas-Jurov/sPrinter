@@ -40,9 +40,9 @@ class TaskManager
 {
 public:
   TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publisher& printer_cmd_pub,
-              const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub, 
-              const ros::Publisher& gps_do_pub, const ros::Publisher& gps_reset_pub, 
-              const ros::Publisher& status_pub, const ros::Publisher& reset_odom_pub);
+              const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub, const ros::Publisher& gps_do_pub,
+              const ros::Publisher& gps_reset_pub, const ros::Publisher& status_pub,
+              const ros::Publisher& reset_odom_pub);
   ~TaskManager() = default;
 
   void update();
@@ -80,8 +80,8 @@ private:
   TaskManagerNS::State state_;
   ros::Time watchdog_last_;
 
-  ros::Publisher pose_cmd_pub_, printer_cmd_pub_, printer_state_pub_, pose_stop_pub_, gps_do_pub_, gps_reset_pub_, 
-                status_pub_, reset_odom_pub_;
+  ros::Publisher pose_cmd_pub_, printer_cmd_pub_, printer_state_pub_, pose_stop_pub_, gps_do_pub_, gps_reset_pub_,
+      status_pub_, reset_odom_pub_;
 
   std_msgs::Int8 printer_state_msg_;
   diagnostic_msgs::DiagnosticStatus status_msg_;

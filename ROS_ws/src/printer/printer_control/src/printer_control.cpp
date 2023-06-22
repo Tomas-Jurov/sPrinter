@@ -93,7 +93,6 @@ void PrinterControl::update()
 /// If IK didn't find the solution, there is a FAILURE state set and robot does not move.
 void PrinterControl::goPrint()
 {
-
   if (need_initialize_)
   {
     ROS_DEBUG_STREAM("Initializing");
@@ -177,7 +176,8 @@ void PrinterControl::goPrint()
   }
 
   // on printing pos
-  ROS_DEBUG_STREAM("servos on pos: " << servosOnPos() << "steppersOnPos: " << steppersOnPos() << "lin_actuator on pose: "<< lin_actuator.is_on_pos);
+  ROS_DEBUG_STREAM("servos on pos: " << servosOnPos() << "steppersOnPos: " << steppersOnPos()
+                                     << "lin_actuator on pose: " << lin_actuator.is_on_pos);
   if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
   {
     publishStatus(LOG_LEVEL_T::OK, "Printer is on PRINTING position");
@@ -197,7 +197,6 @@ void PrinterControl::goPrint()
 /// If actuators are on desired position, IDLE state is returned.
 void PrinterControl::goIdle()
 {
-
   if (printer_state_ != BUSY_TO_IDLE && printer_state_ == HOME)
     printer_state_ = BUSY_TO_IDLE;
   if (printer_state_ != BUSY && printer_state_ != BUSY_TO_IDLE)
@@ -326,7 +325,7 @@ void PrinterControl::servo2Update(bool condition)
 /// Override servo2Update(bool condition)
 void PrinterControl::servo2Update()
 {
-  ROS_DEBUG_STREAM("Updating servo2... "); 
+  ROS_DEBUG_STREAM("Updating servo2... ");
   servo2Update(true);
 }
 
@@ -394,14 +393,13 @@ void PrinterControl::linActuatorUpdate()
     lin_actuator.is_on_pos = true;
     ROS_DEBUG("Is on spot");
   }
-  
+
   if (lin_actuator.is_on_pos == true && lin_fb_is_on_point_ != true)
   {
     msg.data = static_cast<int8_t>(0);
     tilt_pub_.publish(msg);
     ros::Duration(0.025).sleep();
   }
-
 }
 
 /// \brief Resets structs for actuators actuator.is_on_pos = false, actuator.is_set = false.

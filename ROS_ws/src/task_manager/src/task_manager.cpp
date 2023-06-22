@@ -3,9 +3,9 @@
 namespace TaskManagerNS
 {
 TaskManager::TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publisher& printer_cmd_pub,
-                        const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub, 
-                        const ros::Publisher& gps_do_pub, const ros::Publisher& gps_reset_pub, 
-                        const ros::Publisher& status_pub, const ros::Publisher& reset_odom_pub)
+                         const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub,
+                         const ros::Publisher& gps_do_pub, const ros::Publisher& gps_reset_pub,
+                         const ros::Publisher& status_pub, const ros::Publisher& reset_odom_pub)
   : connected_(true)
   , state_(TaskManagerNS::START)
   , watchdog_last_(ros::Time::now())
@@ -264,7 +264,6 @@ void TaskManager::printerControlCallback(const std_msgs::Int8::ConstPtr& msg)
       reset();
     }
   }
-  
 }
 
 void TaskManager::setState(State state)
