@@ -22,7 +22,7 @@
     <group_state name="home" group="lens_group">
         <joint name="Body_pitch" value="0"/>
         <joint name="Lens_X_axis_rot" value="0"/>
-        <joint name="Lens_X_axis_trans" value="0.08"/>
+        <joint name="Lens_X_axis_trans" value="0.12"/>
         <joint name="Lens_Y_axis_rot" value="0"/>
         <joint name="Lens_Y_axis_trans" value="0"/>
     </group_state>

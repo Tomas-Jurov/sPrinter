@@ -388,7 +388,7 @@ void PrinterControl::stepper2Update()
 void PrinterControl::linActuatorUpdate()
 {
   std_msgs::Int8 msg;
-  // linear motor MainFrame_pitch
+  // linear motor Body_pitch
   if (!lin_actuator.is_on_pos && linActuatorControl(joint_positions_abs_target_[0] - joint_positions_[0]))
   {
     lin_actuator.is_on_pos = true;

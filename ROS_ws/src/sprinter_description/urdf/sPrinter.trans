@@ -89,12 +89,12 @@
   </actuator>
 </transmission>
 
-<transmission name="MainFrame_pitch_tran">
+<transmission name="Body_pitch_tran">
   <type>transmission_interface/SimpleTransmission</type>
-  <joint name="MainFrame_pitch">
+  <joint name="Body_pitch">
     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
   </joint>
-  <actuator name="MainFrame_pitch_actr">
+  <actuator name="Body_pitch_actr">
     <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     <mechanicalReduction>1</mechanicalReduction>
   </actuator>
