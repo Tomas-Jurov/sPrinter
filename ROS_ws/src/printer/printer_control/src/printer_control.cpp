@@ -176,8 +176,6 @@ void PrinterControl::goPrint()
   }
 
   // on printing pos
-  ROS_DEBUG_STREAM("servos on pos: " << servosOnPos() << "steppersOnPos: " << steppersOnPos()
-                                     << "lin_actuator on pose: " << lin_actuator.is_on_pos);
   if (servosOnPos() && steppersOnPos() && lin_actuator.is_on_pos)
   {
     publishStatus(LOG_LEVEL_T::OK, "Printer is on PRINTING position");
@@ -298,7 +296,6 @@ void PrinterControl::servo1Update(bool condition)
 /// Override servo1Update(bool condition)
 void PrinterControl::servo1Update()
 {
-  ROS_DEBUG_STREAM("Updating servo1... ");
   servo1Update(true);
 }
 
@@ -325,7 +322,6 @@ void PrinterControl::servo2Update(bool condition)
 /// Override servo2Update(bool condition)
 void PrinterControl::servo2Update()
 {
-  ROS_DEBUG_STREAM("Updating servo2... ");
   servo2Update(true);
 }
 
@@ -398,7 +394,6 @@ void PrinterControl::linActuatorUpdate()
   {
     msg.data = static_cast<int8_t>(0);
     tilt_pub_.publish(msg);
-    ros::Duration(0.025).sleep();
   }
 }
 
@@ -460,13 +455,8 @@ bool PrinterControl::linActuatorControl(double error)
     // PI controller
     ros::Duration dt = ros::Time::now() - lin_actuator_last_time_;
     integrator += error * dt.toSec();
-    ROS_DEBUG_STREAM("Dt: " << dt.toSec());
-    ROS_DEBUG_STREAM(integrator);
     u = KP_GAIN * (error) + KI_GAIN * integrator + K_DIR * (error / std::abs(error));
   }
-  ROS_DEBUG("----Lin actuator----");
-  ROS_DEBUG_STREAM(error);
-  ROS_DEBUG_STREAM(joint_positions_abs_target_[0]);
 
   // Publish msg
   msg.data = static_cast<int8_t>(u);
