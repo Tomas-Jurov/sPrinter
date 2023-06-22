@@ -16,16 +16,18 @@ class SprinterControl(object):
     HEARTBEAT_INTERVAL = 1.0
 
 
-    def __init__(self, safety_stop_pub : Publisher, heartbeat_pub : Publisher, pos_marker_pub : Publisher, 
+    def __init__(self, heartbeat_pub : Publisher, pos_marker_pub : Publisher, 
                  printer_point_marker_pub : Publisher, initialize_client : ServiceProxy,
-                 set_pose_client : ServiceProxy, set_printer_client : ServiceProxy) -> None:
-        self.safety_stop_pub = safety_stop_pub
+                 set_pose_client : ServiceProxy, set_printer_client : ServiceProxy,
+                 safety_stop_client : ServiceProxy, reset_client : ServiceProxy) -> None:
         self.heartbeat_pub = heartbeat_pub
         self.pos_marker_pub = pos_marker_pub
         self.printer_point_marker_pub = printer_point_marker_pub
         self.initialize_client = initialize_client
         self.set_pose_client = set_pose_client
         self.set_printer_client = set_printer_client
+        self.safety_stop_client = safety_stop_client
+        self.reset_client = reset_client
         self.heartbeat_last = rospy.Time.now()
 
     def task_manager_status_callback(self, msg : DiagnosticStatus) -> None:

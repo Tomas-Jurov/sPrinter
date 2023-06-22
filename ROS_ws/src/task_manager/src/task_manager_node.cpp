@@ -10,10 +10,13 @@ int main(int argc, char** argv)
   ros::Publisher printer_cmd_pub = nh.advertise<geometry_msgs::Point>("target/printer/cmd", 1);
   ros::Publisher printer_state_pub = nh.advertise<std_msgs::Int8>("target/printer/state", 1);
   ros::Publisher pose_stop_pub = nh.advertise<std_msgs::Empty>("pose_control/stop", 1);
-  ros::Publisher gps_pub = nh.advertise<std_msgs::Empty>("gps/global_orientation/do", 1);
+  ros::Publisher gps_do_pub = nh.advertise<std_msgs::Empty>("gps/global_orientation/do", 1);
+  ros::Publisher gps_reset_pub = nh.advertise<std_msgs::Empty>("gps/global_orientation/reset", 1);
+  ros::Publisher reset_odom_pub = nh.advertise<std_msgs::Empty>("reset_odometry", 1);
   ros::Publisher status_pub = nh.advertise<diagnostic_msgs::DiagnosticStatus>("sprinter_status", 10);
 
-  TaskManager task_manager(pose_pub, printer_cmd_pub, printer_state_pub, pose_stop_pub, gps_pub, status_pub);
+  TaskManager task_manager(pose_pub, printer_cmd_pub, printer_state_pub, pose_stop_pub, gps_do_pub, gps_reset_pub,
+                           status_pub, reset_odom_pub);
 
   ros::Subscriber pose_sub =
       nh.subscribe("target/pose/reached", 1, &TaskManager::TaskManager::poseControlCallback, &task_manager);
@@ -23,8 +26,8 @@ int main(int argc, char** argv)
       nh.subscribe("gps/global_orientation/done", 1, &TaskManager::gpsProcessingCallback, &task_manager);
   ros::Subscriber heartbeat_sub =
       nh.subscribe("sprinter_control/heartbeat", 1, &TaskManager::heartbeatCallback, &task_manager);
-  ros::ServiceServer stop_server =
-      nh.advertiseService("sprinter_control/safety_stop", &TaskManager::safetyStopCallback, &task_manager);
+  ros::ServiceServer stop_server = nh.advertiseService("safety_stop", &TaskManager::safetyStopCallback, &task_manager);
+  ros::ServiceServer reset_server = nh.advertiseService("reset", &TaskManager::resetCallback, &task_manager);
   ros::ServiceServer init_server =
       nh.advertiseService("task_manager/initialize", &TaskManager::initializeCallback, &task_manager);
   ros::ServiceServer pose_target_server =

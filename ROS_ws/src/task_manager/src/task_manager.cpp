@@ -4,7 +4,8 @@ namespace TaskManagerNS
 {
 TaskManager::TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publisher& printer_cmd_pub,
                          const ros::Publisher& printer_state_pub, ros::Publisher& pose_stop_pub,
-                         const ros::Publisher& gps_cmd_pub, const ros::Publisher& status_pub)
+                         const ros::Publisher& gps_do_pub, const ros::Publisher& gps_reset_pub,
+                         const ros::Publisher& status_pub, const ros::Publisher& reset_odom_pub)
   : connected_(true)
   , state_(TaskManagerNS::START)
   , watchdog_last_(ros::Time::now())
@@ -12,8 +13,10 @@ TaskManager::TaskManager(const ros::Publisher& pose_cmd_pub, const ros::Publishe
   , printer_cmd_pub_(printer_cmd_pub)
   , printer_state_pub_(printer_state_pub)
   , pose_stop_pub_(pose_stop_pub)
-  , gps_cmd_pub_(gps_cmd_pub)
+  , gps_do_pub_(gps_do_pub)
+  , gps_reset_pub_(gps_reset_pub)
   , status_pub_(status_pub)
+  , reset_odom_pub_(reset_odom_pub)
   , pose_task_ptr_(nullptr)
 {
 }
@@ -97,6 +100,14 @@ void TaskManager::safetyStop()
   }
 }
 
+void TaskManager::reset()
+{
+  reset_odom_pub_.publish(std_msgs::Empty());
+  gps_reset_pub_.publish(std_msgs::Empty());
+  publishStatus(LOG_LEVEL_T::OK, "Reset successfull.");
+  setState(START);
+}
+
 void TaskManager::heartbeatCallback(const std_msgs::Empty::ConstPtr& msg)
 {
   watchdog_last_ = ros::Time::now();
@@ -109,13 +120,28 @@ bool TaskManager::safetyStopCallback(std_srvs::Empty::Request& req, std_srvs::Em
   return true;
 }
 
+bool TaskManager::resetCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
+{
+  publishStatus(LOG_LEVEL_T::WARN, "RESET received! Caneling all jobs.");
+  safetyStop();
+  if (state_ == ROBOT_READY)
+  {
+    reset();
+  }
+  else
+  {
+    setState(RESETTING);
+  }
+  return true;
+}
+
 bool TaskManager::initializeCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
 {
   if (state_ == START)
   {
     publishStatus(LOG_LEVEL_T::OK, "Starting a procedure to estimate global orientation.");
     publishStatus(LOG_LEVEL_T::WARN, "Robot will start to move soon!");
-    gps_cmd_pub_.publish(std_msgs::Empty());
+    gps_do_pub_.publish(std_msgs::Empty());
     setState(INITIALIZING);
   }
   else
@@ -188,6 +214,10 @@ void TaskManager::poseControlCallback(const std_msgs::Bool::ConstPtr& msg)
     }
     setState(ROBOT_READY);
   }
+  else if (msg->data && (state_ == RESETTING))
+  {
+    reset();
+  }
 }
 
 void TaskManager::printerControlCallback(const std_msgs::Int8::ConstPtr& msg)
@@ -222,10 +252,17 @@ void TaskManager::printerControlCallback(const std_msgs::Int8::ConstPtr& msg)
     else
       publishStatus(LOG_LEVEL_T::WARN, "Unknown Printer Control state obrained. Ignoring.");
   }
-  else if (state_ == STOPPING && msg->data == HOME)
+  else if (msg->data == HOME)
   {
-    publishStatus(LOG_LEVEL_T::OK, "Vehicle is safe now.");
-    setState(ROBOT_READY);
+    if (state_ == STOPPING)
+    {
+      publishStatus(LOG_LEVEL_T::OK, "Vehicle is safe now.");
+      setState(ROBOT_READY);
+    }
+    else if (state_ == RESETTING)
+    {
+      reset();
+    }
   }
 }
 
@@ -259,6 +296,8 @@ void TaskManager::setState(State state)
     case STOPPING:
       state_str = "STOPPING";
       break;
+    case RESETTING:
+      state_str = "RESETTING";
     default:
       state_str = "UNDEFINED";
       break;

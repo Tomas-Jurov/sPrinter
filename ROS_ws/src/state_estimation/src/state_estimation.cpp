@@ -164,3 +164,13 @@ void StateEstimation::servo2Callback(const std_msgs::Float32& msg)
 {
   servo2_angle_.data = msg.data;
 }
+
+void StateEstimation::resetOdomCallback(const std_msgs::Empty& msg)
+{
+  x_ = 0.0;
+  y_ = 0.0;
+  theta_ = 0.0;
+  current_time_ = ros::Time::now();
+  publishOdomMsg();
+  publishTFMsg();
+}

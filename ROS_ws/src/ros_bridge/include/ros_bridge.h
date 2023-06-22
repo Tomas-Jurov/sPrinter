@@ -28,7 +28,8 @@ class ROSBridge
 public:
   ROSBridge(const ros::Publisher& wheels_twist_pub, const ros::Publisher& stepper1_position_pub,
             const ros::Publisher& stepper2_position_pub, const ros::Publisher& servo1_angle_pub,
-            const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub);
+            const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub,
+            const ros::Publisher& lin_actuator_is_on_point_pub);
   ~ROSBridge() = default;
 
   void setup();
@@ -53,7 +54,7 @@ private:
 
 private:
   ros::Publisher wheels_twist_pub_, stepper1_position_pub_, stepper2_position_pub_, servo1_angle_pub_,
-      servo2_angle_pub_, suntracker_fb_pub_;
+      servo2_angle_pub_, suntracker_fb_pub_, lin_actuator_is_on_point_pub_;
 
   std::unique_ptr<ROSbridge::Sprinter> sprinter_;
   ROSbridge::VelocityOfWheels velocity_of_wheels_;
@@ -62,6 +63,7 @@ private:
   geometry_msgs::Twist wheels_twist_msg_;
   std_msgs::Float32 stepper1_position_msg_, stepper2_position_msg_, servo1_angle_msg_, servo2_angle_msg_,
       suntracker_fb_msg_;
+  std_msgs::Bool lin_actuator_is_on_point_fb_msg_;
   Params params_;
 
   static constexpr double R = 0.09;

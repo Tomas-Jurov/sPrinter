@@ -3,7 +3,7 @@
 #roslib.load_manifest('imu')
 
 import rospy
-import lsm6ds0 
+import lsm6ds0
 import time
 import computation
 from sensor_msgs.msg import Imu
@@ -14,14 +14,6 @@ from tf.transformations import quaternion_from_euler
 earth_accelartion = 9.81
 
 def publisher():
-    """!
-    @brief publish IMU message containing; 
-        measured values for:    linear_acceleration in x,y and z direction from the accelerometer  
-                                angular_velocity in x,y, and z direction from the gyroscope                    
-                                calculated and filtered values in quaternion in x,y,z, and w calculated from roll and pitch
-                                yaw is set to zero because it cannot be calculated 
-
-    """
     # define the actions the publisher will make
     pub = rospy.Publisher('imu_data',Imu,queue_size =10)
 
@@ -44,7 +36,7 @@ def publisher():
         [xa,ya,za] = lsm6ds0.lsm6ds0_get_acc()
         [rollv,pitchv,yawv] = lsm6ds0.lsm6sl_get_gyro()
 
-        # caculate roll, pitch, and yaw 
+        # caculate roll,pitch and yaw 
         roll = computation.compute_filtered_roll([xa,ya,za])
         pitch =computation.compute_filtered_pitch([xa,ya,za])
         yaw = 0
@@ -75,8 +67,7 @@ def publisher():
 
 if __name__ == "__main__":
     try:
-        #init lsm6ds0 6-axis IMU and run publisher function 
-        lsm6ds0.lsm6dsl_init() 
+        lsm6ds0.lsm6dsl_init()
         publisher()
     except rospy.ROSInterruptException:
         pass
