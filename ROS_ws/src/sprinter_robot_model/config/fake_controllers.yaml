@@ -1,12 +1,12 @@
 controller_list:
   - name: fake_lens_group_controller
-    type: $(arg fake_execution_type)
+    type: $(arg execution_type)
     joints:
       - Body_pitch
       - Lens_Y_axis_trans
       - Lens_X_axis_trans
       - Lens_Y_axis_rot
       - Lens_X_axis_rot
-initial:  # Define initial robot poses per group
+initial:  # Define initial robot poses.
   - group: lens_group
     pose: home
