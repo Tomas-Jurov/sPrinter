@@ -1,53 +1,72 @@
 #pragma once
 
 #include <ros/ros.h>
+#include <std_msgs/Bool.h>
 #include <std_msgs/Empty.h>
+#include <std_msgs/Float32.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Int16.h>
-#include <std_msgs/Int32.h>
-#include <geometry_msgs/Pose2D.h>
-#include <sensor_msgs/Imu.h>
+#include <geometry_msgs/Twist.h>
+#include "sprinter.h"
+
+namespace ROSbridge
+{
+struct Params
+{
+  std::string port_name;
+  int baud_rate;
+  float stepper1_gain;
+  float stepper2_gain;
+  float servo1_gain;
+  int servo1_offset;
+  float servo2_gain;
+  int servo2_offset;
+};
 
 class ROSBridge
 {
 public:
-  ROSBridge(const ros::Publisher& encoders_left_pub, const ros::Publisher& encoders_right_pub,
-            const ros::Publisher& encoders_location_pub, const ros::Publisher& imu_pub, const ros::Publisher& tilt_pub,
-            const ros::Publisher& stepper1_idle_pub, const ros::Publisher& stepper2_idle_pub,
-            const ros::Publisher& stepper1_current_pub, const ros::Publisher& stepper2_current_pub,
-            const ros::Publisher& servo1_pub, const ros::Publisher& servo2_pub, const ros::Publisher& suntracker_fb_pub)
-    : encoders_left_pub_(encoders_left_pub)
-    , encoders_right_pub_(encoders_right_pub)
-    , encoders_location_pub_(encoders_location_pub)
-    , imu_pub_(imu_pub)
-    , tilt_pub_(tilt_pub)
-    , stepper1_idle_pub_(stepper1_idle_pub)
-    , stepper2_idle_pub_(stepper2_idle_pub)
-    , stepper1_current_pub_(stepper1_current_pub_)
-    , stepper2_current_pub_(stepper2_current_pub)
-    , servo1_pub_(servo1_pub)
-    , servo2_pub_(servo2_pub)
-    , suntracker_fb_pub_(suntracker_fb_pub)
-  {
-  }
+  ROSBridge(const ros::Publisher& wheels_twist_pub, const ros::Publisher& stepper1_position_pub,
+            const ros::Publisher& stepper2_position_pub, const ros::Publisher& servo1_angle_pub,
+            const ros::Publisher& servo2_angle_pub, const ros::Publisher& suntracker_fb_pub,
+            const ros::Publisher& lin_actuator_is_on_point_pub);
   ~ROSBridge() = default;
 
-  void Do();
+  void setup();
+  void update();
+  void loadParams(const ros::NodeHandle& nh);
 
   // Callbacks
-  void leftSpeedTargetCallback(const std_msgs::Int8& msg);
-  void rightSpeedTargetCallback(const std_msgs::Int8& msg);
-  void tiltSpeedTargetback(const std_msgs::Int8& msg);
-  void stepper1SpeedCallback(const std_msgs::Int16& msg);
-  void stepper2SpeedCallback(const std_msgs::Int16& msg);
-  void stepper1TargetCallback(const std_msgs::Int32& msg);
-  void stepper2TargetCallback(const std_msgs::Int32& msg);
-  void servo1TargetCallback(const std_msgs::Int16& msg);
-  void servo2TargetCallback(const std_msgs::Int16& msg);
-  void suntrackerCmdCallback(const std_msgs::Empty& msg);
+  void cmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
+  void tiltTargetVelCallback(const std_msgs::Int8::ConstPtr& msg);
+  void stepper1SetSpeedCallback(const std_msgs::Int16::ConstPtr& msg);
+  void stepper2SetSpeedCallback(const std_msgs::Int16::ConstPtr& msg);
+  void stepper1TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void stepper2TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void servo1TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void servo2TargetCallback(const std_msgs::Float32::ConstPtr& msg);
+  void suntrackerCmdCallback(const std_msgs::Empty::ConstPtr& msg);
 
 private:
-  ros::Publisher encoders_left_pub_, encoders_right_pub_, encoders_location_pub_, imu_pub_, tilt_pub_,
-      stepper1_idle_pub_, stepper2_idle_pub_, stepper1_current_pub_, stepper2_current_pub_, servo1_pub_, servo2_pub_,
-      suntracker_fb_pub_;
+  template <class T>
+  void getParam(const ros::NodeHandle& nh, const std::string& name, T* storage) const;
+  void getAndPublishReturns();
+
+private:
+  ros::Publisher wheels_twist_pub_, stepper1_position_pub_, stepper2_position_pub_, servo1_angle_pub_,
+      servo2_angle_pub_, suntracker_fb_pub_, lin_actuator_is_on_point_pub_;
+
+  std::unique_ptr<ROSbridge::Sprinter> sprinter_;
+  ROSbridge::VelocityOfWheels velocity_of_wheels_;
+  ROSbridge::Returns returns_;
+
+  geometry_msgs::Twist wheels_twist_msg_;
+  std_msgs::Float32 stepper1_position_msg_, stepper2_position_msg_, servo1_angle_msg_, servo2_angle_msg_,
+      suntracker_fb_msg_;
+  std_msgs::Bool lin_actuator_is_on_point_fb_msg_;
+  Params params_;
+
+  static constexpr double R = 0.09;
+  static constexpr double B = 0.7;
 };
+}

@@ -1,0 +1,11 @@
+mcu_serial:
+  port: "/dev/ttyACM0"
+  baud: 115200
+
+transmission_params:
+  servo1_gain: 0.0019635 # [rad.us^-1]
+  servo1_offset: 1640    # [us]
+  servo2_gain: 0.0018675 # [rad.us^-1]
+  servo2_offset: 1550    # [us]
+  stepper1: 0.00002
+  stepper2: 0.000005

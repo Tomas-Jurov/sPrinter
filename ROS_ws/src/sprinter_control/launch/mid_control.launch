@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+		<!-- <include file="$(find gps_processing)/launch/gps_processing.launch"/> -->
+
+    <include file="$(find imu)/launch/imu.launch"/>
+
+    <include file="$(find ros_bridge)/launch/ros_bridge.launch"/>
+
+    <include file="$(find state_estimation)/launch/state_estimation.launch"/>
+    
+    <include file="$(find printer_control)/launch/printer_control.launch"/>
+
+    <include file="$(find pose_control)/launch/pose_control.launch"/>
+    
+    <node pkg="task_manager" type="task_manager" name="task_manager" output="screen"/>
+</launch>

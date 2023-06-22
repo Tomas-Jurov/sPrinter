@@ -32,10 +32,14 @@
 *.app
 
 # IDE enviroment settings
-.vscode/
+*.vscode/
+*.idea/
 
 # ROS
 ROS_ws/.catkin_tools/
+ROS_ws/.catkin_workspace
 ROS_ws/build/
 ROS_ws/devel/
 ROS_ws/logs/
+ROS_ws/src/cmake-build-debug
+ROS_ws/src/imu/src/__pycache__/

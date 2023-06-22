@@ -1,0 +1,9 @@
+<launch>
+
+    <node name="printer_control" pkg="printer_control" type="printer_control"
+          respawn="false" output="screen">
+    </node>
+
+    <include file="$(find printer_ik_solver)/launch/printer_ik_solver.launch" />
+
+</launch>
