@@ -5,7 +5,7 @@
 #define KP_GAIN 200
 #define KI_GAIN 1
 #define K_DIR 10             // the direct u in order to overcome the deadzone
-#define PRINTING_TIMEOUT 60  // [s]
+#define PRINTING_TIMEOUT 10  // [s]
 #define IDLE_TIMEOUT 5       // [s]
 #define PRINTING_FRAME "ref_print_space"
 

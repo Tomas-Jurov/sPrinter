@@ -28,7 +28,7 @@ int main(int argc, char** argv)
   ros::Subscriber joint_state_sub =
       nh.subscribe("/joint_states", 5, &PrinterControl::jointStateCallback, &printer_control);
   ros::Subscriber lin_fb_is_on_point_sub = 
-      nh.subscribe("/lin_actuator_fb/is_on_point", 1, &PrinterControl::linFbCallback ,&printer_control);	
+      nh.subscribe("/lin_actuator_fb/is_on_point", 10, &PrinterControl::linFbCallback ,&printer_control);	
 
   ros::Rate loop_rate(40);
   while (ros::ok())

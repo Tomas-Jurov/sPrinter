@@ -187,7 +187,6 @@ void PrinterControl::goPrint()
     msg.data = printer_state_;
     printer_state_pub_.publish(msg);
     go_print_ = false;
-    resetActuatorsStruct();
     printing_start_timestamp_ = ros::Time::now();
     ROS_DEBUG_STREAM("Printing started");
   }
@@ -274,7 +273,6 @@ void PrinterControl::goHome()
     msg.data = printer_state_;
     printer_state_pub_.publish(msg);
     go_home_ = false;
-    resetActuatorsStruct();
   }
 }
 
@@ -396,13 +394,14 @@ void PrinterControl::linActuatorUpdate()
     lin_actuator.is_on_pos = true;
     ROS_DEBUG("Is on spot");
   }
-
+  
   if (lin_actuator.is_on_pos == true && lin_fb_is_on_point_ != true)
   {
     msg.data = static_cast<int8_t>(0);
     tilt_pub_.publish(msg);
     ros::Duration(0.025).sleep();
   }
+
 }
 
 /// \brief Resets structs for actuators actuator.is_on_pos = false, actuator.is_set = false.
@@ -614,6 +613,7 @@ void PrinterControl::printerStateCallback(const std_msgs::Int8::ConstPtr& msg)
       ROS_DEBUG_STREAM("PrinterStateCallback: IDLE");
       setAbsAndRelTargets(joint_positions_idle1_);
       go_idle_ = true;
+      resetActuatorsStruct();
     }
     else
     {
