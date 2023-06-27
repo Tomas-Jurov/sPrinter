@@ -1,0 +1,3 @@
+<launch>
+        <node pkg="sprinter_gui" type="sprinter_gui_node" name="sprinter_gui" output="screen"></node>
+</launch>

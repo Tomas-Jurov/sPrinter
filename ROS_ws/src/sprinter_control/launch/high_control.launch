@@ -2,6 +2,7 @@
 <launch>
 
     <node pkg="sprinter_control" type="sprinter_control_node" name="sprinter_control" output="screen"/>
+    <include file="$(find sprinter_gui)/launch/sprinter_gui.launch"/>
 
     <!--    RVIZ-->
     <include file="$(find sprinter_description)/launch/display.launch" />
