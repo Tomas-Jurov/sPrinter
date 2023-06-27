@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+from PyQt5 import QtWidgets
+import rospy
+from std_msgs.msg import Bool
+from std_srvs.srv import Empty
+from sprinter_srvs.srv import SetPointArr, SetPose2D
+from sprinter_gui import Ui_MainWindow
+
+def ros_init() -> None:
+    global fake_gps_publisher
+    global initialize_service
+    global safety_stop_service
+    global reset_service
+    global start_printing_service
+    global go_to_pose_service
+    rospy.init_node('sprinter_gui')
+    fake_gps_publisher = rospy.Publisher('/gps/global_orientation/done', Bool, queue_size=1)
+    initialize_service = rospy.ServiceProxy('/task_manager/initialize', Empty)
+    safety_stop_service = rospy.ServiceProxy('/safety_stop', Empty)
+    reset_service = rospy.ServiceProxy('/reset', Empty)
+    start_printing_service = rospy.ServiceProxy('/task_manager/set_task/printer', SetPointArr)
+    go_to_pose_service = rospy.ServiceProxy('task_manager/set_task/pose', SetPose2D)
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ros_init()
+    ui = Ui_MainWindow(fake_gps_publisher, initialize_service, safety_stop_service, reset_service, start_printing_service, go_to_pose_service)
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
